@@ -146,7 +146,7 @@ QUnit.test('versionCompare', function()
 /* !Dependency tests */
 QUnit.test('Dependency tests', function()
 {
-  QUnit.expect(6);
+  QUnit.expect(8);
   
   QUnit.ok(jQuery, 'function exists');
   QUnit.equal('function', typeof jQuery, 'jQuery is a function');
@@ -155,17 +155,18 @@ QUnit.test('Dependency tests', function()
   QUnit.ok(jQuery.fn.oneTime, 'jQuery.oneTime available');
   QUnit.ok(jQuery.fn.everyTime, 'jQuery.everyTime available');
   QUnit.ok(jQuery.fn.stopTime, 'jQuery.stopTime available');
+  
+  QUnit.ok(jQuery.fn.glome, 'Glome DOM extension class exists');
+  QUnit.ok(jQuery.Glome, 'Glome jQuery extension class exists');
 });
+
+
+var Glome = new jQuery.Glome();
 
 /* !Glome generic method tests */
 QUnit.module('Glome generic method tests');
 QUnit.test('Glome methods', function()
 {
-  QUnit.ok(jQuery.fn.glome, 'Glome DOM extension class exists');
-  
-  QUnit.ok(jQuery.Glome, 'Glome jQuery extension class exists');
-  
-  var Glome = new jQuery.Glome();
   QUnit.ok(Glome.get, 'Local storage getter is defined');
   QUnit.ok(Glome.set, 'Local storage setter is defined');
   
@@ -248,6 +249,11 @@ QUnit.test('Glome methods', function()
   QUnit.deepEqual(Glome.pref('foo'), param, 'Preference remained the same after getting it');
 });
 
+QUnit.test('Glome API', function()
+{
+  QUnit.ok(Glome.api, 'API is accessible');
+});
+
 /* !Glome templates tests */
 QUnit.module('Glome templates');
 QUnit.test('Glome templates', function()
@@ -292,7 +298,7 @@ QUnit.test('Glome templates', function()
 
 /* !Glome usage tests */
 QUnit.module('Glome usage');
-QUnit.test('Glome usage', function()
+QUnit.test('Glome UI', function()
 {
   var fixture = jQuery('#qunit-fixture');
   

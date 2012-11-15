@@ -199,5 +199,10 @@
       
       return tmp;
     }
+    
+    plugin.api = function()
+    {
+      
+    }
   }
 }(jQuery)
