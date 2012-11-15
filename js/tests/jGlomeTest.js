@@ -95,17 +95,20 @@ function versionCompare(a, b)
   return 1;
 }
 
+/* Preliminary tests */
 QUnit.module('Preliminary checks');
 
+/* Browser support */
 QUnit.test('Browser support', function()
 {
   QUnit.ok(typeof window.localStorage != 'undefined', 'Support local storage');
   
   // Write something to local storage
   window.localStorage.setItem('foo', 'bar');
-  QUnit.equal('bar', window.localStorage.getItem('foo'));
+  QUnit.equal('bar', window.localStorage.getItem('foo'), 'Local storage returns the same string as its initial input');
 });
 
+/* Version compare tests */
 QUnit.test('versionCompare', function()
 {
   QUnit.expect(13);
@@ -140,15 +143,21 @@ QUnit.test('versionCompare', function()
   QUnit.equal(1, versionCompare('1.0b2', '1.0b'), 'Beta 2 is greater than plain beta');
 });
 
-QUnit.test('jQuery loaded', function()
+/* !Dependency tests */
+QUnit.test('Dependency tests', function()
 {
-  QUnit.expect(3);
+  QUnit.expect(6);
   
   QUnit.ok(jQuery, 'function exists');
   QUnit.equal('function', typeof jQuery, 'jQuery is a function');
   QUnit.equal(1, versionCompare(jQuery.fn.jquery, '1.8.0'), 'jQuery is at least version 1.8.0 (v' + jQuery.fn.jquery + ')');
+  
+  QUnit.ok(jQuery.fn.oneTime, 'jQuery.oneTime available');
+  QUnit.ok(jQuery.fn.everyTime, 'jQuery.everyTime available');
+  QUnit.ok(jQuery.fn.stopTime, 'jQuery.stopTime available');
 });
 
+/* !Glome generic method tests */
 QUnit.module('Glome generic method tests');
 QUnit.test('Glome methods', function()
 {
@@ -239,6 +248,7 @@ QUnit.test('Glome methods', function()
   QUnit.deepEqual(Glome.pref('foo'), param, 'Preference remained the same after getting it');
 });
 
+/* !Glome templates tests */
 QUnit.module('Glome templates');
 QUnit.test('Glome templates', function()
 {
@@ -280,9 +290,9 @@ QUnit.test('Glome templates', function()
   );
 });
 
-QUnit.module('Initialize Glome');
-
-QUnit.test('Initialize Glome', function()
+/* !Glome usage tests */
+QUnit.module('Glome usage');
+QUnit.test('Glome usage', function()
 {
   var fixture = jQuery('#qunit-fixture');
   
