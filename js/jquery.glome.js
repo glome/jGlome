@@ -41,6 +41,7 @@
   {
     var plugin = this;
     var _template = null;
+    var glomeid = null;
     
     jQuery.ajax
     (
@@ -55,6 +56,7 @@
           var tmp = data;
           var elements = [];
           
+          // Get all links directly from the raw text source
           while (regs = tmp.match(/(<link.+?>)/))
           {
             var regexp = new RegExp(regs[1]);
@@ -98,10 +100,9 @@
       // @TODO: support extensions and store the information on their local storage or preferences
       // via their own interfaces
       
-      // @TODO: typecasting
-      
       var storage = JSON.parse(window.localStorage.getItem(key));
       
+      // If there is nothing in the storage, return null
       if (   !storage
           || typeof storage.val == 'undefined')
       {
@@ -200,9 +201,74 @@
       return tmp;
     }
     
-    plugin.api = function()
+    plugin.Api =
     {
+      server: 'http://www.kaktus.cc/glomeproxy/',
       
+      /**
+       * Get request
+       * 
+       * @access public
+       * @param string type         Purpose of the request i.e. API identifier
+       * @param object data         Data used for the GET request, @optional
+       * @param function callback   Callback function, @optional
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      get: function(type, data, callback)
+      {
+        // Store the handles here
+        var types =
+        {
+          ads:
+          {
+            url: 'ads.json',
+          }
+        }
+        
+        if (typeof types[type] == 'undefined')
+        {
+          throw new Error('Glome.Api.get does not support request ' + type);
+        }
+        
+        // Callback function defined, but no data
+        if (   typeof data == 'function'
+            && typeof callback == 'undefined')
+        {
+          console.log('switch data to callback');
+          callback = data;
+          data = {};
+          console.log(typeof data, typeof callback);
+        }
+        
+        if (   data
+            && !jQuery.isPlainObject(data))
+        {
+          console.log('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
+          throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
+        }
+        
+        if (   callback
+            && typeof callback !== 'function')
+        {
+          console.log('Callback has to be a function, now received typeof ' + typeof callback);
+          throw new Error('Callback has to be a function, now received typeof ' + typeof callback);
+        }
+        
+        return request = jQuery.ajax
+        (
+          {
+            url: this.server + types[type].url,
+            data: data,
+            type: 'GET',
+            dataType: 'json',
+            callbacks: callback,
+            success: function(data, status, jqXHR)
+            {
+              console.log('callback', this.callbacks);
+            }
+          }
+        );
+      }
     }
   }
 }(jQuery)

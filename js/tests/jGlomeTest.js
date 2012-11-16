@@ -251,7 +251,71 @@ QUnit.test('Glome methods', function()
 
 QUnit.test('Glome API', function()
 {
-  QUnit.ok(Glome.api, 'API is accessible');
+  var method, callback;
+  
+  QUnit.ok(Glome.Api, 'API is accessible in general');
+  QUnit.equal('function', typeof Glome.Api.get, 'API get is accessible');
+  
+  method = 'foobar';
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Api.get(method);
+    },
+    'Glome.Api.get does not support request ' + method,
+    'Glome.Api.get should not support arbitrary request ' + method
+  );
+  
+  // Use ads method
+  method = 'ads';
+  
+  QUnit.throws
+  (
+    function()
+    {
+      var data = [];
+      
+      Glome.Api.get(method, data);
+    },
+    'Glome.Api.get requires the second argument to be an object or a callback function'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      var data = {};
+      var callback = 'foo';
+      
+      Glome.Api.get(method, data, callback);
+    },
+    'Glome.Api.get callback is not a function'
+  );
+  
+  var callback = function(d)
+  {
+    window.glomeCallback = 'callback called successfully';
+  };
+  
+  // Use proxy server to prevent issues with same origin policy when testing on JavaScript only
+  //Glome.Api.server = '/glomeproxy/';
+  
+  QUnit.ok(Glome.Api.get(method, null, callback), 'Glome.Api.get supports null as second argument, function as third');
+  QUnit.ok(Glome.Api.get(method, {}, callback), 'Glome.Api.get supports an object as second argument, function as third');
+  QUnit.ok(!Glome.Api.get(method, callback), 'Glome.Api.get supports function as second argument');
+  
+  QUnit.stop();
+  
+  setTimeout
+  (
+    function()
+    {
+      QUnit.start();
+      QUnit.equal(window.glomeCallback, 'callback called successfully', 'Glome callback does what was expected');
+    }
+  );
 });
 
 /* !Glome templates tests */
