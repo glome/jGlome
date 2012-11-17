@@ -1,5 +1,5 @@
 // Network latency for asynchronous testing
-var networkLatency = 750;
+var networkLatency = 250;
 var previousId = null;
 
 function versionCompare(a, b)
@@ -312,10 +312,8 @@ QUnit.asyncTest('Glome API', function()
       QUnit.start();
       QUnit.equal(window.glomeCallback, 'callback called successfully', 'Glome callback does what was expected');
     },
-    networkLatency
+    networkLatency * 3
   );
-  
-  QUnit.ok(Glome.Api.set)
 });
 
 /* !- Creating a new Glome ID */
@@ -491,14 +489,45 @@ QUnit.asyncTest('Glome UI', function()
         },
         'Glome has to be bound to an element before initializing'
       );
-      QUnit.ok(Glome.DOM.bindTo(fx), 'Glome was bound to fixture');
+      
+      QUnit.strictEqual(false, Glome.DOM.bindTo('loremipsum'), 'Binding to an invented string returns false');
+      QUnit.ok(Glome.DOM.bindTo(fx), 'Glome was bound to fixture (jQuery object)');
+      
+      // Try to bind the second time
+      Glome.DOM.bindTo(fx)
+      
+      QUnit.ok(Glome.DOM.bindTo('#qunit-fixture'), 'Glome was bound to fixture (CSS selector)');
+      QUnit.ok(Glome.DOM.bindTo(document.getElementById('qunit-fixture')));
       QUnit.ok(Glome.DOM.init(), 'Glome was initialized successfully');
+      
+      // Reinitializing does not insert second Glome window
+      Glome.DOM.init();
+      QUnit.equal(jQuery('#glome_window').size(), 1, 'Glome was initialized successfully and only once');
+      
       QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully');
-      QUnit.equal(fx.find('#glome_ticker').size(), 1, 'Glome main window was inserted successfully');
+      QUnit.equal(fx.find('#glome_ticker').size(), 1, 'Glome ticker can be found');
+      //QUnit.equal(Number(fx.find('#glome_ticker').find('[data-count]')), Object.keys(Glome.ads).length, 'Ticker has the correct number of ads');
       QUnit.start();
     },
     networkLatency
   )
+});
+
+// These tests have to be asynchronous to ensure that template test
+// has been run already
+QUnit.asyncTest('Initialize with constructor', function()
+{
+  window.setTimeout
+  (
+    function()
+    {
+      var fx = jQuery('#qunit-fixture');
+      var Glome = new jQuery.Glome(fx);
+      QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
+      QUnit.start();
+    },
+    networkLatency
+  );
 });
 
 /*

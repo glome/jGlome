@@ -12,7 +12,7 @@
   {
     var plugin = this;
     var _template = null;
-    var context = el;
+    var context = jQuery(el);
     
     this.glomeid = null;
     this.ads = {};
@@ -178,11 +178,11 @@
         throw new Error('Glome template failed to load');
       }
       
-      var tmp = this._template.filter('#' + name);
+      var tmp = this._template.filter('#' + name).clone();
       
       if (!tmp.size())
       {
-        tmp = this._template.find('#' + name);
+        tmp = this._template.find('#' + name).clone();
       }
       
       if (!tmp.size())
@@ -439,8 +439,17 @@
     /* !DOM manipulation */
     plugin.DOM =
     {
+      /**
+       * Bind Glome to DOM object
+       * 
+       * @param mixed el    jQuery object, DOM object or CSS path
+       */
       bindTo: function(el)
       {
+        // Ensure that this is a jQuery object
+        el = jQuery(el);
+        
+        // Check that the element exists
         if (el.size() !== 1)
         {
           return false;
@@ -465,6 +474,9 @@
           return false;
         }
         
+        jQuery('#glome_ticker').find('[data-count]').text(Object.keys(Glome.ads).length);
+        console.log(Object.keys(Glome.ads).length);
+        
         return true;
       }
     };
@@ -474,7 +486,7 @@
      * 
      * 
      */
-    plugin.initialize = function()
+    plugin.initialize = function(el)
     {
       // Create a new Glome ID if previous ID does not exist
       if (!Glome.id())
@@ -490,9 +502,15 @@
       
       if (el)
       {
+        console.log('init immediately');
         this.DOM.bindTo(el);
         this.DOM.init();
       }
     };
+    
+    if (el)
+    {
+      plugin.initialize(el);
+    }
   };
 }(jQuery)
