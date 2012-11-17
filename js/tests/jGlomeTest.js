@@ -1,3 +1,7 @@
+// Network latency for asynchronous testing
+var networkLatency = 750;
+var previousId = null;
+
 function versionCompare(a, b)
 {
   var parts_a = a.toString().split('.');
@@ -146,7 +150,7 @@ QUnit.test('versionCompare', function()
 /* !Dependency tests */
 QUnit.test('Dependency tests', function()
 {
-  QUnit.expect(8);
+  QUnit.expect(7);
   
   QUnit.ok(jQuery, 'function exists');
   QUnit.equal('function', typeof jQuery, 'jQuery is a function');
@@ -156,7 +160,6 @@ QUnit.test('Dependency tests', function()
   QUnit.ok(jQuery.fn.everyTime, 'jQuery.everyTime available');
   QUnit.ok(jQuery.fn.stopTime, 'jQuery.stopTime available');
   
-  QUnit.ok(jQuery.fn.glome, 'Glome DOM extension class exists');
   QUnit.ok(jQuery.Glome, 'Glome jQuery extension class exists');
 });
 
@@ -165,6 +168,8 @@ var Glome = new jQuery.Glome();
 
 /* !Glome generic method tests */
 QUnit.module('Glome generic method tests');
+
+/* !- Test methods*/
 QUnit.test('Glome methods', function()
 {
   QUnit.ok(Glome.get, 'Local storage getter is defined');
@@ -249,7 +254,8 @@ QUnit.test('Glome methods', function()
   QUnit.deepEqual(Glome.pref('foo'), param, 'Preference remained the same after getting it');
 });
 
-QUnit.test('Glome API', function()
+/* !- Test API */
+QUnit.asyncTest('Glome API', function()
 {
   var method, callback;
   
@@ -275,23 +281,12 @@ QUnit.test('Glome API', function()
   (
     function()
     {
-      var data = [];
-      
-      Glome.Api.get(method, data);
-    },
-    'Glome.Api.get requires the second argument to be an object or a callback function'
-  );
-  
-  QUnit.throws
-  (
-    function()
-    {
       var data = {};
       var callback = 'foo';
       
       Glome.Api.get(method, data, callback);
     },
-    'Glome.Api.get callback is not a function'
+    'String "foo" is not a function'
   );
   
   var callback = function(d)
@@ -299,39 +294,157 @@ QUnit.test('Glome API', function()
     window.glomeCallback = 'callback called successfully';
   };
   
-  // Use proxy server to prevent issues with same origin policy when testing on JavaScript only
-  //Glome.Api.server = '/glomeproxy/';
+  var callbacks = new Array();
+  callbacks.push(callback);
   
   QUnit.ok(Glome.Api.get(method, null, callback), 'Glome.Api.get supports null as second argument, function as third');
   QUnit.ok(Glome.Api.get(method, {}, callback), 'Glome.Api.get supports an object as second argument, function as third');
-  QUnit.ok(!Glome.Api.get(method, callback), 'Glome.Api.get supports function as second argument');
+  QUnit.ok(Glome.Api.get(method, callback), 'Glome.Api.get supports function as second argument');
   
-  QUnit.stop();
+  QUnit.ok(Glome.Api.get(method, callbacks), 'Glome.Api.get supports an array of callbacks');
   
-  setTimeout
+  Glome.Api.get(method, callback);
+  
+  window.setTimeout
   (
     function()
     {
       QUnit.start();
       QUnit.equal(window.glomeCallback, 'callback called successfully', 'Glome callback does what was expected');
-    }
+    },
+    networkLatency
   );
+  
+  QUnit.ok(Glome.Api.set)
 });
 
-/* !Glome templates tests */
-QUnit.module('Glome templates');
-QUnit.test('Glome templates', function()
+/* !- Creating a new Glome ID */
+QUnit.asyncTest('Creating a new Glome ID', function()
 {
-  QUnit.stop();
+  // Set a test ID for the test runs
+  var date = new Date();
+  var testGlomeId = 'test' + date.getTime();
   
-  var Glome = new jQuery.Glome();
-  QUnit.ok(Glome.template, 'Glome template is accessible');
+  // Erase any existing Glome ID
+  Glome.glomeid = null;
+  Glome.pref('glomeid', null);
   
-  setTimeout
+  QUnit.throws
   (
     function()
     {
+      Glome.createGlomeId();
+    },
+    'Glome ID creation requires a parameter',
+    'Glome ID creation requires a parameter'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.createGlomeId({});
+    },
+    'Glome ID has to be alphanumeric',
+    'Glome ID has to be alphanumeric'
+  );
+  
+  QUnit.equal(null, Glome.id(), 'Glome ID is null');
+  
+  // Calling createGlomeId over 10 times should fail
+  QUnit.throws
+  (
+    function()
+    {
+      
+      Glome.createGlomeId(testGlomeId, 10);
+    },
+    'Exceeded maximum number of times to create a Glome ID',
+    'Exceeded maximum number of times to create a Glome ID'
+  );
+  
+  Glome.createGlomeId(testGlomeId);
+  
+  window.setTimeout
+  (
+    function()
+    {
+      QUnit.ok(Glome.id(), 'Glome ID is initialized');
+      QUnit.equal(Glome.id(), Glome.pref('glomeid'), 'Initialized and stored Glome ID is the same');
       QUnit.start();
+    },
+    networkLatency
+  );
+});
+
+QUnit.asyncTest('Duplicate Glome ID', function()
+{
+  // Try to recreate exactly same Glome ID
+  previousId = Glome.id();
+  Glome.glomeid = null;
+  Glome.createGlomeId(previousId);
+  
+  window.setTimeout
+  (
+    function()
+    {
+      QUnit.notEqual(null, Glome.id(), 'Created successfully asynchronously a Glome ID after trying to create a reserved ID, part 1');
+      QUnit.notEqual(previousId, Glome.id(), 'Created successfully asynchronously a Glome ID after trying to create a reserved ID, part 2');
+      
+      QUnit.strictEqual(Glome.id(), Glome.pref('glomeid'), 'Ensured that locally stored Glome ID is the newly created ID');
+      
+      var tmp = Glome.id();
+      
+      // Reset the current Glome ID so that it is fetched from the storage
+      Glome.glomeid = null;
+      
+      QUnit.strictEqual(Glome.id(), tmp, 'Id is successfully received from the storage');
+      QUnit.start();
+    },
+    networkLatency
+  );
+});
+
+/* !Glome usage tests */
+QUnit.module('Glome Ads class');
+
+/* !Test handling ads */
+QUnit.asyncTest('List ads', function()
+{
+  // Ad loading callback has to be a function
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.load([]);
+    },
+    'Glome.Ads.load callback has to be a function',
+    'Glome.Ads.load throws an error on Array as callback'
+  );
+  
+  // List ads for this Glome user
+  Glome.Ads.load(function()
+  {
+    QUnit.start();
+    QUnit.notEqual(0, Object.keys(Glome.ads).length, 'Glome ads were loaded');
+  });
+});
+
+
+/* !Glome user interface tests */
+/* !- Initialize user interface */
+QUnit.module('Glome user interface');
+
+/* !Glome templates tests */
+QUnit.asyncTest('Glome templates', function()
+{
+  Glome.loadTemplates();
+  
+  window.setTimeout
+  (
+    function()
+    {
+      QUnit.ok(Glome.template, 'Glome template is accessible');
       QUnit.throws
       (
         function()
@@ -355,17 +468,45 @@ QUnit.test('Glome templates', function()
       QUnit.ok(Glome.template('glome_templates'), 'Glome master template was found');
       
       QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome]').size(), 1, 'Glome CSS was appended');
+      QUnit.start();
     },
-    250
+    networkLatency
   );
 });
 
-/* !Glome usage tests */
-QUnit.module('Glome usage');
-QUnit.test('Glome UI', function()
+// These tests have to be asynchronous to ensure that template test
+// has been run already
+QUnit.asyncTest('Glome UI', function()
 {
-  var fixture = jQuery('#qunit-fixture');
-  
-  QUnit.ok(function(){jQuery('#qunit-fixture').glome('init')}, 'Glome was successfully initialized');
+  window.setTimeout
+  (
+    function()
+    {
+      var fx = jQuery('#qunit-fixture');
+      QUnit.throws
+      (
+        function()
+        {
+          Glome.DOM.init();
+        },
+        'Glome has to be bound to an element before initializing'
+      );
+      QUnit.ok(Glome.DOM.bindTo(fx), 'Glome was bound to fixture');
+      QUnit.ok(Glome.DOM.init(), 'Glome was initialized successfully');
+      QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully');
+      QUnit.equal(fx.find('#glome_ticker').size(), 1, 'Glome main window was inserted successfully');
+      QUnit.start();
+    },
+    networkLatency
+  )
 });
 
+/*
+QUnit.asyncTest('Set ad as viewed', function()
+{
+  Glome.Ads.getit(Glome.ads[0].adid, function()
+  {
+    QUnit.start();
+  });
+});
+*/

@@ -6,83 +6,31 @@
   var version = '0.1a';
   
   /**
-   * Methods for the DOM operations
-   * 
-   * @var Object
-   */
-  var methods =
-  {
-    init: function(options)
-    {
-      return true;
-    },
-  };
-  
-  /**
-   * Glome DOM operations glue
-   * 
-   * @param string method    Operation method
-   * @param object options   Options set
-   */
-  jQuery.fn.glome = function(method, options)
-  {
-    if (typeof methods[method] == 'undefined')
-    {
-      throw new Error('Undefined method: ' + method);
-    }
-    
-    return true;
-  }
-  
-  /**
    * Glome master class, which is responsible for all of the non-DOM interactions
    */
-  jQuery.Glome = function()
+  jQuery.Glome = function(el)
   {
     var plugin = this;
     var _template = null;
-    var glomeid = null;
+    var context = el;
     
-    jQuery.ajax
-    (
+    this.glomeid = null;
+    this.ads = {};
+    this.container = null;
+    
+    /**
+     * Return the current Glome ID
+     * 
+     * return Glome ID
+     */
+    plugin.id = function()
+    {
+      if (!this.glomeid)
       {
-        url: 'template.html',
-        context: this,
-        dataType: 'html',
-        isLocal: true,
-        success: function(data)
-        {
-          this._template = jQuery(data);
-          var tmp = data;
-          var elements = [];
-          
-          // Get all links directly from the raw text source
-          while (regs = tmp.match(/(<link.+?>)/))
-          {
-            var regexp = new RegExp(regs[1]);
-            tmp = tmp.replace(regexp, '');
-            
-            elements.push(jQuery(regs[1]));
-          }
-          
-          for (var i = 0; i < elements.length; i++)
-          {
-            var element = elements[i];
-            
-            // Not related to Glome, no need to add
-            if (!element.attr('data-glome'))
-            {
-              continue;
-            }
-            
-            if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
-            {
-              jQuery('head').append(element);
-            }
-          }
-        },
+        this.glomeid = this.pref('glomeid');
       }
-    );
+      return this.glomeid;
+    }
     
     /**
      * Get a locally stored value
@@ -167,6 +115,50 @@
       }
     };
     
+    plugin.loadTemplates = function()
+    {
+      jQuery.ajax
+      (
+        {
+          url: 'template.html',
+          context: this,
+          dataType: 'html',
+          isLocal: true,
+          success: function(data)
+          {
+            this._template = jQuery(data);
+            var tmp = data;
+            var elements = [];
+            
+            // Get all links directly from the raw text source
+            while (regs = tmp.match(/(<link.+?>)/))
+            {
+              var regexp = new RegExp(regs[1]);
+              tmp = tmp.replace(regexp, '');
+              
+              elements.push(jQuery(regs[1]));
+            }
+            
+            for (var i = 0; i < elements.length; i++)
+            {
+              var element = elements[i];
+              
+              // Not related to Glome, no need to add
+              if (!element.attr('data-glome'))
+              {
+                continue;
+              }
+              
+              if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
+              {
+                jQuery('head').append(element);
+              }
+            }
+          },
+        }
+      );
+    }
+    
     /**
      * Get a template part
      * 
@@ -201,10 +193,26 @@
       return tmp;
     }
     
+    /* !API */
     plugin.Api =
     {
-      server: 'http://www.kaktus.cc/glomeproxy/',
+      server: 'https://api.glome.me/',
       
+      // Store the handles here
+      types:
+      {
+        ads:
+        {
+          url: 'ads.json',
+          allowed: ['get', 'set']
+        },
+        user:
+        {
+          url: 'users.json',
+          allowed: ['get', 'set']
+        }
+      },
+        
       /**
        * Get request
        * 
@@ -212,63 +220,279 @@
        * @param string type         Purpose of the request i.e. API identifier
        * @param object data         Data used for the GET request, @optional
        * @param function callback   Callback function, @optional
+       * @param function onerror    Onerror function, @optional
        * @return jqXHR              jQuery XMLHttpRequest
        */
-      get: function(type, data, callback)
+      get: function(type, data, callback, onerror)
       {
-        // Store the handles here
-        var types =
-        {
-          ads:
-          {
-            url: 'ads.json',
-          }
-        }
-        
-        if (typeof types[type] == 'undefined')
+        if (typeof this.types[type] == 'undefined')
         {
           throw new Error('Glome.Api.get does not support request ' + type);
         }
         
-        // Callback function defined, but no data
-        if (   typeof data == 'function'
-            && typeof callback == 'undefined')
+        if (   !this.types[type].allowed
+            || jQuery.inArray('get', this.types[type].allowed) == -1)
         {
-          console.log('switch data to callback');
-          callback = data;
-          data = {};
-          console.log(typeof data, typeof callback);
+          throw new Error('Getting this type ' + type + ' is not allowed');
         }
         
+        // Callback function defined, but no data
+        if (   typeof data == 'function'
+            || jQuery.isArray(data))
+        {
+          onerror = callback;
+          callback = data;
+          data = {};
+        }
+        
+        // Type check for data
         if (   data
             && !jQuery.isPlainObject(data))
         {
-          console.log('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
           throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
         }
         
+        // Type check for callback
         if (   callback
-            && typeof callback !== 'function')
+            && typeof callback !== 'function'
+            && !jQuery.isArray(callback))
         {
-          console.log('Callback has to be a function, now received typeof ' + typeof callback);
-          throw new Error('Callback has to be a function, now received typeof ' + typeof callback);
+          throw new Error('Callback has to be a function or an array, now received typeof ' + typeof callback);
         }
         
-        return request = jQuery.ajax
+        var request = jQuery.ajax
         (
           {
-            url: this.server + types[type].url,
+            url: this.server + this.types[type].url,
             data: data,
             type: 'GET',
             dataType: 'json',
-            callbacks: callback,
-            success: function(data, status, jqXHR)
-            {
-              console.log('callback', this.callbacks);
-            }
+            success: callback,
+            error: onerror
           }
         );
+        
+        return request;
+      },
+      
+      /**
+       * Set data on Glome server
+       * 
+       * @param string type
+       * @param Object data
+       * @param function callback   Callback function, @optional
+       * @param function onerror    On error function, @optional
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      set: function(type, data, callback, onerror)
+      {
+        if (typeof this.types[type] == 'undefined')
+        {
+          throw new Error('Glome.Api.set does not support request ' + type);
+        }
+        
+        if (   !this.types[type].allowed
+            || jQuery.inArray('set', this.types[type].allowed) == -1)
+        {
+          throw new Error('Setting this type ' + type + ' is not allowed');
+        }
+        
+        // Type check for data
+        if (   data
+            && !jQuery.isPlainObject(data))
+        {
+          throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
+        }
+        
+        // Type check for callback
+        if (   callback
+            && typeof callback !== 'function')
+        {
+          throw new Error('Callback has to be a function, now received typeof ' + typeof callback);
+        }
+        
+        if (!onerror)
+        {
+          onerror = null;
+        }
+        
+        // Type check for callback
+        if (   onerror
+            && typeof onerror !== 'function')
+        {
+          throw new Error('onerror has to be a function, now received typeof ' + typeof onerror);
+        }
+        
+        var request = jQuery.ajax
+        (
+          {
+            url: this.server + this.types[type].url,
+            data: data,
+            type: 'POST',
+            dataType: 'json',
+            success: callback,
+            error: onerror
+          }
+        );
+        return request;
       }
-    }
-  }
+    };
+    
+    /**
+     * Initialize Glome
+     * 
+     * @param string ID
+     * @param int counter Recursive call counter
+     */
+    plugin.createGlomeId = function(id, counter)
+    {
+      if (!counter)
+      {
+        counter = 1;
+      }
+      
+      if (counter >= 10)
+      {
+        throw new Error('Exceeded maximum number of times to create a Glome ID');
+      }
+      
+      if (!id)
+      {
+        throw new Error('Glome ID creation requires a parameter');
+      }
+      
+      if (!id.toString().match(/^[0-9a-z]+$/i))
+      {
+        throw new Error('Glome ID has to be alphanumeric in lowercase');
+      }
+      
+      var glomeId = String(id);
+      
+      if (counter > 1)
+      {
+        glomeId += counter;
+      }
+      
+      this.Api.set
+      (
+        'user',
+        {
+          user:
+          {
+            glomeid: glomeId
+          }
+        },
+        function(data)
+        {
+          Glome.pref('glomeid', data.glomeid);
+          Glome.glomeid = data.glomeid;
+        },
+        function()
+        {
+          plugin.createGlomeId(id, counter + 1);
+        }
+      );
+    };
+    
+    /* !Ads */
+    /**
+     * Ads interface object
+     * 
+     * Methods:
+     * 
+     * GLome.Ads.load
+     */
+    plugin.Ads =
+    {
+      load: function(callback)
+      {
+        if (   callback
+            && typeof callback !== 'function')
+        {
+          throw new Error('Glome.loadAds callback has to be a function');
+        }
+        
+        Glome.Api.get
+        (
+          'ads',
+          {
+            user:
+            {
+              glomeid: Glome.id()
+            }
+          },
+          [
+            function(data)
+            {
+              for (var i = 0; i < data.length; i++)
+              {
+                var id = data[i].id;
+                Glome.ads[id] = data[i];
+              }
+            },
+            callback
+          ]
+        );
+      }
+    };
+    
+    /* !DOM manipulation */
+    plugin.DOM =
+    {
+      bindTo: function(el)
+      {
+        if (el.size() !== 1)
+        {
+          return false;
+        }
+        
+        Glome.container = el;
+        
+        return true;
+      },
+      init: function()
+      {
+        if (   !Glome.container
+            || !Glome.container.size())
+        {
+          throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
+        }
+        
+        jQuery(Glome.container).append(Glome.template('glome_window'));
+        
+        if (!jQuery(Glome.container).find('#glome_window').size())
+        {
+          return false;
+        }
+        
+        return true;
+      }
+    };
+    
+    /**
+     * Initialize Glome
+     * 
+     * 
+     */
+    plugin.initialize = function()
+    {
+      // Create a new Glome ID if previous ID does not exist
+      if (!Glome.id())
+      {
+        var date = new Date();
+        this.createGlomeId(date.getTime());
+      }
+      
+      if (!Glome._template)
+      {
+        this.loadTemplates();
+      }
+      
+      if (el)
+      {
+        this.DOM.bindTo(el);
+        this.DOM.init();
+      }
+    };
+  };
 }(jQuery)
