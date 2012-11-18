@@ -7,9 +7,18 @@
   </head>
   <body>
     <div id="glome_templates">
-      <div id="glome_window">
-        <div id="glome_ticker">
-          <div data-count="0">0</div>
+      <div id="glome_window" class="glome-on">
+        <div id="glome_widget" class="display">
+          <div class="glome-counter" data-count="0">0</div>
+          <div class="glome-widget-close"></div>
+          <div class="glome-widget-contents">
+            <label class="glome-switch">
+              <input type="checkbox" />
+              <span class="glome-switch-toggle"></span>
+              Turn Glome On
+            </label>
+          </div>
+          <div class="glome-icon"></div>
         </div>
       </div>
     </div>
