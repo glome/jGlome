@@ -115,8 +115,62 @@
       }
     };
     
-    plugin.loadTemplates = function()
+    /**
+     * Load template file
+     * 
+     * @param callback   @optional, Function or array of functions that will be executed after template has been loaded
+     */
+    plugin.loadTemplates = function(callback)
     {
+      var callbacks = [];
+      
+      callbacks.push
+      (
+        function(data)
+        {
+          this._template = jQuery(data);
+          var tmp = data;
+          var elements = [];
+          
+          // Get all links directly from the raw text source
+          while (regs = tmp.match(/(<link.+?>)/))
+          {
+            var regexp = new RegExp(regs[1]);
+            tmp = tmp.replace(regexp, '');
+            
+            elements.push(jQuery(regs[1]));
+          }
+          
+          for (var i = 0; i < elements.length; i++)
+          {
+            var element = elements[i];
+            
+            // Not related to Glome, no need to add
+            if (!element.attr('data-glome'))
+            {
+              continue;
+            }
+            
+            if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
+            {
+              jQuery('head').append(element);
+            }
+          }
+        }
+      );
+      
+      if (   callback
+          && typeof callback !== 'function'
+          && !jQuery.isArray(callback))
+      {
+        throw new Error('Callback has to be either a function or an array of functions.');  
+      }
+      
+      if (callback)
+      {
+        callbacks.push(callback);
+      }
+      
       jQuery.ajax
       (
         {
@@ -124,37 +178,7 @@
           context: this,
           dataType: 'html',
           isLocal: true,
-          success: function(data)
-          {
-            this._template = jQuery(data);
-            var tmp = data;
-            var elements = [];
-            
-            // Get all links directly from the raw text source
-            while (regs = tmp.match(/(<link.+?>)/))
-            {
-              var regexp = new RegExp(regs[1]);
-              tmp = tmp.replace(regexp, '');
-              
-              elements.push(jQuery(regs[1]));
-            }
-            
-            for (var i = 0; i < elements.length; i++)
-            {
-              var element = elements[i];
-              
-              // Not related to Glome, no need to add
-              if (!element.attr('data-glome'))
-              {
-                continue;
-              }
-              
-              if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
-              {
-                jQuery('head').append(element);
-              }
-            }
-          },
+          success: callbacks
         }
       );
     }
@@ -252,7 +276,7 @@
           throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
         }
         
-        // Type check for callback
+        // Type check for callback. Allowed are function and array.
         if (   callback
             && typeof callback !== 'function'
             && !jQuery.isArray(callback))
@@ -384,8 +408,8 @@
         },
         function(data)
         {
-          Glome.pref('glomeid', data.glomeid);
-          Glome.glomeid = data.glomeid;
+          plugin.pref('glomeid', data.glomeid);
+          plugin.glomeid = data.glomeid;
         },
         function()
         {
@@ -412,13 +436,13 @@
           throw new Error('Glome.loadAds callback has to be a function');
         }
         
-        Glome.Api.get
+        plugin.Api.get
         (
           'ads',
           {
             user:
             {
-              glomeid: Glome.id()
+              glomeid: plugin.id()
             }
           },
           [
@@ -427,7 +451,7 @@
               for (var i = 0; i < data.length; i++)
               {
                 var id = data[i].id;
-                Glome.ads[id] = data[i];
+                plugin.ads[id] = data[i];
               }
             },
             callback
@@ -455,27 +479,26 @@
           return false;
         }
         
-        Glome.container = el;
+        plugin.container = el;
         
         return true;
       },
       init: function()
       {
-        if (   !Glome.container
-            || !Glome.container.size())
+        if (   !plugin.container
+            || !plugin.container.size())
         {
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(Glome.container).append(Glome.template('glome_window'));
+        jQuery(plugin.container).append(plugin.template('glome_window'));
         
-        if (!jQuery(Glome.container).find('#glome_window').size())
+        if (!jQuery(plugin.container).find('#glome_window').size())
         {
           return false;
         }
         
-        jQuery('#glome_ticker').find('[data-count]').text(Object.keys(Glome.ads).length);
-        console.log(Object.keys(Glome.ads).length);
+        jQuery('#glome_ticker').find('[data-count]').text(Object.keys(plugin.ads).length);
         
         return true;
       }
@@ -484,28 +507,27 @@
     /**
      * Initialize Glome
      * 
-     * 
+     * @param mixed el     DOM object (either plain of jQuery wrapped) or a string with traversable path
      */
     plugin.initialize = function(el)
     {
       // Create a new Glome ID if previous ID does not exist
-      if (!Glome.id())
+      if (!plugin.id())
       {
         var date = new Date();
         this.createGlomeId(date.getTime());
       }
       
-      if (!Glome._template)
-      {
-        this.loadTemplates();
-      }
-      
       if (el)
       {
-        console.log('init immediately');
-        this.DOM.bindTo(el);
-        this.DOM.init();
+        this.loadTemplates(function()
+        {
+          this.DOM.bindTo(el);
+          this.DOM.init();
+        });
       }
+      
+      return true;
     };
     
     if (el)

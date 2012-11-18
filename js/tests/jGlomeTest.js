@@ -1,5 +1,5 @@
 // Network latency for asynchronous testing
-var networkLatency = 250;
+var networkLatency = 500;
 var previousId = null;
 
 function versionCompare(a, b)
@@ -436,6 +436,24 @@ QUnit.module('Glome user interface');
 /* !Glome templates tests */
 QUnit.asyncTest('Glome templates', function()
 {
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.loadTemplates('foo');
+    },
+    'Glome.loadTemplates throws an error for string callback'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.loadTemplates({});
+    },
+    'Glome.loadTemplates throws an error for object callback'
+  );
+  
   Glome.loadTemplates();
   
   window.setTimeout
@@ -517,16 +535,18 @@ QUnit.asyncTest('Glome UI', function()
 // has been run already
 QUnit.asyncTest('Initialize with constructor', function()
 {
+  var fx = jQuery('#qunit-fixture');
+  var Glome = new jQuery.Glome(fx);
+  
   window.setTimeout
   (
     function()
     {
-      var fx = jQuery('#qunit-fixture');
-      var Glome = new jQuery.Glome(fx);
       QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
+      QUnit.ok(Glome.id(), 'There is a Glome ID');
       QUnit.start();
     },
-    networkLatency
+    networkLatency * 2
   );
 });
 
