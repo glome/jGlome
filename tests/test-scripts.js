@@ -4,93 +4,93 @@ var previousId = null;
 
 function versionCompare(a, b)
 {
-  var parts_a = a.toString().split('.');
-  var parts_b = b.toString().split('.');
+  var partsA = a.toString().split('.');
+  var partsB = b.toString().split('.');
   
   var regexp = new RegExp('([0-9]+)(a(lpha)?|b(eta)?|rc?)([0-9]*)$', 'i');
   
-  for (var i = 0; i < Math.max(parts_a.length, parts_b.length); i++)
+  for (var i = 0; i < Math.max(partsA.length, partsB.length); i++)
   {
-    var t_a = (typeof parts_a[i] == 'undefined') ? '0' : parts_a[i];
-    var t_b = (typeof parts_b[i] == 'undefined') ? '0' : parts_b[i];
+    var tA = (typeof partsA[i] == 'undefined') ? '0' : partsA[i];
+    var tB = (typeof partsB[i] == 'undefined') ? '0' : partsB[i];
     
     // Catch alpha and beta versions
-    if ((regs = t_a.match(regexp)))
+    if ((regs = tA.match(regexp)))
     {
-      parts_a.push(t_a.match(regexp)[2].toLowerCase()[0]);
+      partsA.push(tA.match(regexp)[2].toLowerCase()[0]);
       
       if (regs[5])
       {
-        parts_a.push(regs[5]);
+        partsA.push(regs[5]);
       }
       
-      t_a = t_a.replace(/[^0-9]+/g, '');
+      tA = tA.replace(/[^0-9]+/g, '');
     }
     
-    if ((regs = t_b.match(regexp)))
+    if ((regs = tB.match(regexp)))
     {
-      parts_b.push(t_b.match(regexp)[2].toLowerCase()[0]);
+      partsB.push(tB.match(regexp)[2].toLowerCase()[0]);
       
       if (regs[5])
       {
-        parts_b.push(regs[5]);
+        partsB.push(regs[5]);
       }
       
-      t_b = t_b.replace(/[^0-9]+/g, '');
+      tB = tB.replace(/[^0-9]+/g, '');
     }
     
-    if (t_a == 'a')
+    if (tA == 'a')
     {
-      t_a = -3;
+      tA = -3;
     }
     
-    if (t_b == 'a')
+    if (tB == 'a')
     {
-      t_b = -3;
+      tB = -3;
     }
     
-    if (t_a == 'b')
+    if (tA == 'b')
     {
-      t_a = -2;
+      tA = -2;
     }
     
-    if (t_b == 'b')
+    if (tB == 'b')
     {
-      t_b = -2;
+      tB = -2;
     }
     
-    if (t_a == 'r')
+    if (tA == 'r')
     {
-      t_a = -1;
+      tA = -1;
     }
     
-    if (t_b == 'r')
+    if (tB == 'r')
     {
-      t_b = -1;
+      tB = -1;
     }
     
-    if (t_a.toString().match(/[^\-0-9]/))
+    if (tA.toString().match(/[^\-0-9]/))
     {
-      throw new Error('Parse error for the first attribute: ' + t_a);
+      throw new Error('Parse error for the first attribute: ' + tA);
     }
     
-    if (t_b.toString().match(/[^\-0-9]/))
+    if (tB.toString().match(/[^\-0-9]/))
     {
-      throw new Error('Parse error for the second attribute: ' + t_b);
+      throw new Error('Parse error for the second attribute: ' + tB);
     }
     
     // Equal
-    if (Number(t_a) === Number(t_b))
+    if (Number(tA) === Number(tB))
     {
       continue;
     }
     
-    if (Number(t_a) < Number(t_b))
+    if (Number(tA) < Number(tB))
     {
       return -1;
     }
     
-    if (Number(t_a) > Number(t_b))
+    if (Number(tA) > Number(tB))
     {
       return 1;
     }
@@ -481,7 +481,7 @@ QUnit.asyncTest('Glome templates', function()
       );
       
       // Load Glome templates
-      QUnit.ok(Glome.template('glome_templates'), 'Glome master template was found');
+      QUnit.ok(Glome.template('glomeTemplates'), 'Glome master template was found');
       
       QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome]').size(), 1, 'Glome CSS was appended');
       QUnit.start();
@@ -520,11 +520,11 @@ QUnit.asyncTest('Glome UI', function()
       
       // Reinitializing does not insert second Glome window
       Glome.DOM.init();
-      QUnit.equal(jQuery('#glome_window').size(), 1, 'Glome was initialized successfully and only once');
+      QUnit.equal(jQuery('#glomeWindow').size(), 1, 'Glome was initialized successfully and only once');
       
-      QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully');
-      QUnit.equal(fx.find('#glome_ticker').size(), 1, 'Glome ticker can be found');
-      //QUnit.equal(Number(fx.find('#glome_ticker').find('[data-count]')), Object.keys(Glome.ads).length, 'Ticker has the correct number of ads');
+      QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully');
+      QUnit.equal(fx.find('#glomeWidget').size(), 1, 'Glome widget can be found');
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').text()), Object.keys(Glome.ads).length, 'Ticker has the correct number of ads');
       QUnit.start();
     },
     networkLatency
@@ -542,11 +542,26 @@ QUnit.asyncTest('Initialize with constructor', function()
   (
     function()
     {
-      QUnit.equal(fx.find('#glome_window').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
+      QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
       QUnit.ok(Glome.id(), 'There is a Glome ID');
       QUnit.start();
     },
     networkLatency * 2
+  );
+});
+
+QUnit.asyncTest('Glome popups', function()
+{
+  window.setTimeout
+  (
+    function()
+    {
+      QUnit.ok(Glome.DOM.resize, 'Resize method is available');
+      QUnit.start();
+      
+      QUnit.ok((jQuery(window).height() >= jQuery('#glomePopupWrapper').height()), 'Popup fits inside the window');
+    },
+    networkLatency
   );
 });
 

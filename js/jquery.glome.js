@@ -483,6 +483,12 @@
         
         return true;
       },
+      
+      /**
+       * Initialize DOM
+       * 
+       * @return boolean True on success, false on failure
+       */
       init: function()
       {
         if (   !plugin.container
@@ -491,16 +497,28 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(plugin.container).append(plugin.template('glome_window'));
+        jQuery(plugin.container).append(plugin.template('glomeWindow'));
         
-        if (!jQuery(plugin.container).find('#glome_window').size())
+        if (!jQuery(plugin.container).find('#glomeWindow').size())
         {
           return false;
         }
         
-        jQuery('#glome_ticker').find('[data-count]').text(Object.keys(plugin.ads).length);
+        jQuery('#glomeWidget').find('.glome-counter').text(Object.keys(plugin.ads).length);
         
         return true;
+      },
+      
+      /**
+       * Bind resize to window
+       */
+      resize: function()
+      {
+        jQuery(window)
+          .on('resize.glome', function()
+          {
+            
+          });
       }
     };
     
