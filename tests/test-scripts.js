@@ -487,7 +487,11 @@ QUnit.asyncTest('Glome templates', function()
       );
       
       // Load Glome templates
-      QUnit.ok(Glome.template('glomeTemplates'), 'Glome master template was found');
+      QUnit.ok(Glome.template('glome-master'), 'Glome master template was found');
+      
+      // Insert a Glome template
+      var template = Glome.template('glome-popup');
+      QUnit.notEqual(template.attr('id'), 'glomeTemplates', 'ID of the element was removed to ');
       
       QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome-include]').size(), 1, 'Glome CSS was appended');
       QUnit.start();

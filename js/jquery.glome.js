@@ -222,17 +222,19 @@
         throw new Error('Glome template failed to load');
       }
       
-      var tmp = this._template.filter('#' + name).clone();
+      var tmp = this._template.filter('[data-glome-template=' + name + ']').clone();
       
       if (!tmp.size())
       {
-        tmp = this._template.find('#' + name).clone();
+        tmp = this._template.find('[data-glome-template=' + name + ']').clone();
       }
       
       if (!tmp.size())
       {
         throw new Error('No template with name ' + name + ' found');
       }
+      
+      // Remove ID
       
       return tmp;
     }
@@ -517,7 +519,7 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(plugin.container).append(plugin.template('glomeWindow'));
+        jQuery(plugin.container).append(plugin.template('glome-master'));
         
         if (!jQuery(plugin.container).find('#glomeWindow').size())
         {

@@ -6,26 +6,39 @@
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
     <link rel="stylesheet" type="text/css" href="css/glome2.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
+    <link rel="localization" hreflang="fi" href="locales/glome-fi.json" type="application/l10n+json" data-glome-include="true" />
   </head>
   <body>
-    <div id="glomeTemplates">
-      <div id="glomePopup">
+    <div id="glomeTemplates" data-glome-template="glome-master">
+      <div id="glomeListRow" data-glome-template="glome-list-row">
+        <div class="glome-row">
+        </div>
+      </div>
+      <div id="glomePopup" data-glome-template="glome-popup">
         <div id="glomePopupMatte"></div>
         <div id="glomePopupWrapper">
           <div class="glome-popup-header">
-            <div class="glome-popup-title"><span class="title" data-i18n="glome popup title">Glome Popup title</span></div>
+            <div class="glome-popup-title"><span class="title">Glome Popup title</span></div>
             <div class="glome-popup-close"></div>
           </div>
-          <div class="glome-popup-content"></div>
-          <div class="glome-popup-footer"></div>
+          <div class="glome-popup-content">
+          </div>
+          <div class="glome-popup-footer">
+            <div class="glome-valign">
+              <label class="glome-switch">
+                <input type="checkbox" />
+                <span class="glome-switch-toggle"></span>
+              </label>
+            </div>
+          </div>
         </div>
       </div>
       <div id="glomeWindow" class="glome-on">
-        <div id="glomeWidget" class="display">
+        <div id="glomeWidget" class="display" data-glome-template="glome-widget">
           <div class="glome-counter" data-count="0">0</div>
           <div class="glome-widget-close"></div>
           <div class="glome-widget-contents">
-            <label class="glome-switch">
+            <label class="glome-switch" data-glome-template="glome-checkbox">
               <input type="checkbox" />
               <span class="glome-switch-toggle"></span>
             </label>
