@@ -14,9 +14,20 @@ var resize = function(wnd, width, height)
 QUnit.module('Prerequisites');
 QUnit.test('Window resizes as commanded', function()
 {
-  resize(w, 500, 500);
-  QUnit.equal(wq.width(), 500, 'Window was resized correctly, width is 500px');
-  QUnit.equal(wq.height(), 500, 'Window was resized correctly, height is 500px');
+  var width = 500;
+  var height = 500;
+  
+  resize(w, width, height);
+  QUnit.equal(jQuery(w).width(), width, 'Window was resized correctly, width is ' + width + 'px');
+  QUnit.equal(jQuery(w).height(), height, 'Window was resized correctly, height is ' + height + 'px');
+  
+  // Set width and height
+  width = 1000;
+  height = 700;
+  
+  resize(w, width, height);
+  QUnit.equal(jQuery(w).width(), width, 'Window was resized correctly, width is ' + width + 'px');
+  QUnit.equal(jQuery(w).height(), height, 'Window was resized correctly, height is ' + height + 'px');
 });
 
 QUnit.asyncTest('Vital template parts', function()
@@ -30,12 +41,11 @@ QUnit.asyncTest('Vital template parts', function()
       
       // Continue running the tests
       QUnit.equal(1, jQuery(w.document).find('#glomeTemplates').size(), 'Template container loaded');
-      QUnit.start();
-      
-      resize(w, 1000,500);
       
       // Bind wq as a shorthand for the popup document
       wq = jQuery(w.document);
+      
+      QUnit.start();
     }
   });
 });

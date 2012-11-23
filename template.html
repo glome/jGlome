@@ -4,17 +4,14 @@
     <title>Glome Template</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
-    <link rel="stylesheet" type="text/css" href="css/glome2.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
     <link rel="localization" hreflang="fi" href="locales/glome-fi.json" type="application/l10n+json" data-glome-include="true" />
   </head>
   <body>
-    <div id="glomeTemplates" data-glome-template="glome-master">
-      <div id="glomeListRow" data-glome-template="glome-list-row">
-        <div class="glome-row">
-        </div>
+    <div id="glomeTemplates" data-glome-template="master">
+      <div class="glome-row" data-glome-template="list-row">
       </div>
-      <div id="glomePopup" data-glome-template="glome-popup">
+      <div id="glomePopup" data-glome-template="popup">
         <div id="glomePopupMatte"></div>
         <div id="glomePopupWrapper">
           <div class="glome-popup-header">
@@ -34,11 +31,11 @@
         </div>
       </div>
       <div id="glomeWindow" class="glome-on">
-        <div id="glomeWidget" class="display" data-glome-template="glome-widget">
+        <div id="glomeWidget" class="knocking" data-glome-template="widget">
           <div class="glome-counter" data-count="0">0</div>
           <div class="glome-widget-close"></div>
           <div class="glome-widget-contents">
-            <label class="glome-switch" data-glome-template="glome-checkbox">
+            <label class="glome-switch" data-glome-template="checkbox">
               <input type="checkbox" />
               <span class="glome-switch-toggle"></span>
             </label>

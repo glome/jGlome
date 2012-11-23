@@ -519,7 +519,7 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(plugin.container).append(plugin.template('glome-master'));
+        jQuery(plugin.container).append(plugin.template('master'));
         
         if (!jQuery(plugin.container).find('#glomeWindow').size())
         {
