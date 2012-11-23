@@ -252,6 +252,12 @@ QUnit.test('Glome methods', function()
   var param = 'glomePrefTest';
   QUnit.ok(Glome.pref('foo', param), 'Storing a preference did not raise any errors');
   QUnit.deepEqual(Glome.pref('foo'), param, 'Preference remained the same after getting it');
+  
+  // Tools exist
+  QUnit.ok(Glome.Tools, 'Tools are available');
+  QUnit.ok(Glome.Tools.escape, 'Regular expressions escaping is available');
+  QUnit.equal('foo', Glome.Tools.escape('foo'), 'Plain string does not change');
+  QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
 /* !- Test API */
@@ -483,7 +489,7 @@ QUnit.asyncTest('Glome templates', function()
       // Load Glome templates
       QUnit.ok(Glome.template('glomeTemplates'), 'Glome master template was found');
       
-      QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome]').size(), 1, 'Glome CSS was appended');
+      QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome-include]').size(), 1, 'Glome CSS was appended');
       QUnit.start();
     },
     networkLatency

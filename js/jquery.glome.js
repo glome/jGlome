@@ -33,6 +33,17 @@
     }
     
     /**
+     * Generic tools
+     */
+    plugin.Tools =
+    {
+      escape: function(str)
+      {
+        return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      }
+    }
+    
+    /**
      * Get a locally stored value
      * 
      * @param string key
@@ -131,14 +142,23 @@
           this._template = jQuery(data);
           var tmp = data;
           var elements = [];
+          var index = 0;
           
           // Get all links directly from the raw text source
           while (regs = tmp.match(/(<link.+?>)/))
           {
-            var regexp = new RegExp(regs[1]);
+            var str = Glome.Tools.escape(regs[1]);
+            var regexp = new RegExp(str, 'g');
             tmp = tmp.replace(regexp, '');
             
             elements.push(jQuery(regs[1]));
+            
+            if (i > 10)
+            {
+              console.log('break on overflow');
+              break;
+            }
+            i++;
           }
           
           for (var i = 0; i < elements.length; i++)
@@ -146,7 +166,7 @@
             var element = elements[i];
             
             // Not related to Glome, no need to add
-            if (!element.attr('data-glome'))
+            if (!element.attr('data-glome-include'))
             {
               continue;
             }

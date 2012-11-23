@@ -3,7 +3,9 @@
   <head>
     <title>Glome Template</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome="true" />
+    <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
+    <link rel="stylesheet" type="text/css" href="css/glome2.css" data-glome-include="true" />
+    <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
   </head>
   <body>
     <div id="glomeTemplates">
@@ -11,7 +13,7 @@
         <div id="glomePopupMatte"></div>
         <div id="glomePopupWrapper">
           <div class="glome-popup-header">
-            <div class="glome-popup-title">Glome popup title</div>
+            <div class="glome-popup-title"><span class="title" data-i18n="glome popup title">Glome Popup title</span></div>
             <div class="glome-popup-close"></div>
           </div>
           <div class="glome-popup-content"></div>
@@ -26,7 +28,6 @@
             <label class="glome-switch">
               <input type="checkbox" />
               <span class="glome-switch-toggle"></span>
-              Turn Glome On
             </label>
           </div>
           <div class="glome-icon"></div>
