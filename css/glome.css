@@ -15,6 +15,12 @@
   height: 19px;
 }
 
+.glome-icon-36x36
+{
+  width: 36px;
+  height: 36px;
+}
+
 .glome-configuration
 {
   background-image: url('../images/icons/config-icon-19x19.png');
@@ -82,6 +88,7 @@
 {
   height: 21px;
   line-height: 21px;
+  text-align: left !important;
 }
 
 .glome-switch > span.glome-switch-toggle
@@ -330,7 +337,12 @@
   font-style: normal;
 }
 
-#glomePopup .glome-row > .content h2
+#glomePopup h1
+{
+  font-size: 185%;
+}
+
+#glomePopup h2
 {
   font-size: 154%;
 }
@@ -338,6 +350,172 @@
 #glomePopup .glome-row > .glome-actions
 {
   white-space: nowrap;
+}
+
+#glomePopup .glome-popup-content > *
+{
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+/* !Category action chooser */
+#glomeCategoryAsk > div.glome-wrapper
+{
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+#glomeCategoryAsk div.buttons
+{
+  padding: 2em 0;
+}
+
+#glomeCategoryAsk > div.glome-wrapper > *
+{
+  margin: 2em 0;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button
+{
+  background-image: -moz-linear-gradient(bottom, #e6e6e6 0%, #f1f1f1 48%, #f5f5f5 50%, #fdfdfd 100%);
+  background-repeat: inherit;
+  background-color: #e6e6e6;
+  border: none;
+  -moz-appearance: none;
+  display: inline-block;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(25, 63, 95, 0.4);
+  border-radius: 6px;
+  color: #d1d1d1;
+  width: 150px;
+  height: 120px;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button span.icon
+{
+  background-image: url('../images/icons/arrows-19x19-set.png');
+  background-repeat: no-repeat;
+  background-position: -19px 0;
+  width: 19px;
+  height: 19px;
+  margin: 10px auto;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button:hover
+{
+  cursor: pointer;
+  color: #008bff;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button:hover span.icon
+{
+  background-position: -19px -38px;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button + button
+{
+  margin-left: 1em;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button > *
+{
+  display: block;
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button > h1
+{
+  margin: 0;
+}
+
+/* !Display a single ad */
+#glomeDisplayAd .glome-ad-image
+{
+  background-color: black;
+  text-align: center;
+  vertical-align: middle;
+  height: 310px;
+  margin-top: -10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  overflow: hidden;
+}
+
+#glomeDisplayAd .glome-ad-image img
+{
+  min-width: 100%;
+  min-height: 100%;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper
+{
+  display: table;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > *
+{
+  display: table-cell;
+}
+
+#glomeDisplayAd .glome-ad-content
+{
+  height: 150px;
+  vertical-align: middle;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions
+{
+  text-align: right;
+  vertical-align: middle;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button
+{
+  background-image: none;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  height: 36px;
+  white-space: nowrap;
+  line-height: 36px;
+  font-size: 185%;
+  font-weight: bold;
+  text-transform: none;
+  text-align: right;
+  box-shadow: none;
+  text-shadow: none;
+  -moz-appearance: none;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button + button
+{
+  margin-top: 10px;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button > *
+{
+  height: 36px;
+  vertical-align: middle;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button span.glome-icon-36x36
+{
+  background-image: url('../images/icons/arrows-36x36-set.png');
+  background-position: -36px 0;
+  background-repeat: no-repeat;
+  display: inline-block;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button:hover
+{
+  color: #008ffd;
+}
+
+#glomeDisplayAd .glome-ad-content-wrapper > .glome-actions button:hover span.glome-icon-36x36
+{
+  background-position: -36px -72px;
 }
 
 /* !Glome ticker */
@@ -350,6 +528,7 @@
   right: 10px;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.2);
   z-index: 100002;
+  text-align: center;
 }
 
 #glomeWindow:not(.glome-off) #glomeWidget.knocking
@@ -373,6 +552,15 @@
 {
   padding: 5px 10px;
   float: right;
+}
+
+#glomeWidget:hover .glome-icon,
+#glomeWidget.display .glome-icon
+{
+  position: absolute;
+  float: none;
+  bottom: 0;
+  right: 0;
 }
 
 #glomeWidget .glome-counter
@@ -404,6 +592,12 @@
   display: block;
 }
 
+#glomeWidget:hover .glome-counter,
+#glomeWidget.display .glome-counter
+{
+  display: none !important;
+}
+
 #glomeWidget .glome-counter
 {
   float: right;
@@ -422,3 +616,110 @@
 {
   display: none !important;
 }
+
+#glomeWidget:hover #glomeWidgetClose,
+#glomeWidget.display #glomeWidgetClose
+{
+  background-image: url('../images/icons/icon-close-10x10.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  float: right;
+  width: 10px;
+  height: 10px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+#glomeWidget .glome-widget-contents
+{
+  padding: 10px 10px 0;
+}
+
+#glomeWidget .glome-widget-contents .glome-actions button
+{
+  padding: 7px 20px;
+  border-radius: 4px;
+}
+
+#glomeWidget #glomeWidgetPager
+{
+  background-image: url('../images/dash-pattern-white-4x4.gif');
+  background-color: #eceaea;
+  margin: 20px -10px 10px;
+  line-height: 33px;
+  text-align: center;
+  padding: 7px;
+  height: 19px;
+  line-height: 19px;
+}
+
+#glomeWidget #glomeWidgetPager span
+{
+  display: inline-block;
+  height: 19px;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+#glomeWidget #glomeWidgetPager span:hover
+{
+  color: #0088af;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-previous,
+#glomeWidget #glomeWidgetPager .glome-pager-next
+{
+  background-image: url('../images/icons/arrows-19x19-set.png');
+  background-repeat: none;
+  width: 19px;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-previous
+{
+  background-position: 0 -19px;
+  margin-right: 0.4em;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-previous:hover
+{
+  background-position: 0 -38px;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-next
+{
+  background-position: -19px -19px;
+  margin-left: 0.6em;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-next:hover
+{
+  background-position: -19px -38px;
+}
+
+#glomeWidget #glomeWidgetPager .glome-pager-separator:hover
+{
+  color: black;
+  cursor: default;
+}
+
+#glomeWidget #glomeWidgetFooter
+{
+  padding-bottom: 5px;
+  text-align: right;
+  margin-right: 25px;
+}
+
+#glomeWidget #glomeWidgetFooter .glome-icon-container a
+{
+  border-right: solid 1px #b0b2b8;
+  padding-right: 1em;
+}
+
+#glomeWidget .glome-icon-container a
+{
+  width: 19px;
+  height: 19px;
+  vertical-align: top;
+  display: inline-block;
+}
+
