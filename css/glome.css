@@ -626,8 +626,15 @@
   float: right;
   width: 10px;
   height: 10px;
-  padding: 5px;
+  padding: 7px;
+  margin-right: 2px;
+  margin-top: 2px;
   cursor: pointer;
+}
+
+#glomeWidget #glomeWidgetClose:hover
+{
+  background-image: url('../images/icons/icon-close.png') !important;
 }
 
 #glomeWidget .glome-widget-contents
