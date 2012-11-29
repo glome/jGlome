@@ -412,8 +412,181 @@ QUnit.asyncTest('Duplicate Glome ID', function()
 /* !Glome usage tests */
 QUnit.module('Glome Ads class');
 
+/**
+ * Test ad object
+ */
+QUnit.test('Glome.Ads.ad object', function()
+{
+  QUnit.equal(typeof Glome.Ads.ad, 'function', 'There is a method for creating a new ad prototype object');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.ad('foo');
+    },
+    'Glome.Ads.ad requires an object or an integer (ad id) as a constructor',
+    'Glome.Ads.ad constructor did not accept a string as constructor'
+  );
+  
+  QUnit.equal
+  (
+    Glome.Ads.ad(1),
+    null,
+    'Glome.Ads.ad with ID 1 is not available (yet)'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.ad({foo: 'bar'});
+    },
+    'There has to be an ID present in the Glome.Ads.ad constructor object'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.ad({id: 'bar'});
+    },
+    'Property id of the constructor has to be an integer'
+  );
+  
+  // Dummy ad content
+  var ad =
+  {
+    id: 1,
+    title: 'Test'
+  }
+  
+  var gad = Glome.Ads.ad(ad);
+  
+  for (var i in ad)
+  {
+    QUnit.strictEqual(gad[i], ad[i], 'Property "' + i + '" was copied successfully');
+  }
+  
+  QUnit.ok(Glome.Ads.stack[ad.id], 'Newly created ad added itself to ad stack');
+  
+  // Set the ad status to 2
+  gad.setStatus(2);
+  QUnit.equal(gad.status, 2, 'Ad status was set to 2');
+  
+  QUnit.equal(typeof gad.setStatus, 'function', 'setStatus method exists in ad object');
+  QUnit.equal(typeof gad.update, 'function', 'update method exists in ad object');
+  QUnit.equal(typeof gad.remove, 'function', 'remove method exists in ad object');
+  
+  // Remove newly created ad
+  QUnit.ok(gad.remove(), 'Removing the ad was successful');
+  
+  QUnit.equal(Glome.Ads.ad(gad.id), null, 'Ad was removed successfully from the stack');
+});
+
+/* !Test Ads API */
+QUnit.test('Glome.Ads API', function()
+{
+  Glome.Ads.stack = {};
+  
+  var ad =
+  {
+    id: 1,
+    title: 'Test'
+  }
+  
+  var id = ad.id;
+  
+  var gad = Glome.Ads.ad(ad);
+  QUnit.ok(Glome.Ads.removeAd(id), 'Removing an ad was successful');
+  QUnit.equal(typeof Glome.Ads.stack[id], 'undefined', 'Ad was removed successfully from the stack');
+});
+
+QUnit.test('Ads list filters', function()
+{
+  // Add an ad
+  var ad =
+  {
+    id: 100,
+    title: 'Test',
+    adcategories: []
+  }
+  
+  var id = ad.id;
+  var categoryId = 2;
+  var statusCode = 2;
+  
+  var gad = Glome.Ads.ad(ad);
+  gad.adcategories.push(categoryId);
+  gad.setStatus(statusCode);
+  
+  // List ads
+  QUnit.ok(Glome.Ads.listAds, 'Ad listing method is available');
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.listAds([]);
+    },
+    'Optional filters parameter has to be an object',
+    'Glome.Ads.listAds did not accept an array as a filter'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.listAds('foo');
+    },
+    'Optional filters parameter has to be an object',
+    'Glome.Ads.listAds did not accept a string as a filter'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.listAds({category: 'foo'});
+    },
+    'Glome.Ads.listAds requires category filter to be a number or an array of numbers',
+    'Glome.Ads.listAds throws an error on string category filter'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.listAds({category: {}});
+    },
+    'Glome.Ads.listAds requires category filter to be a number or an array of numbers',
+    'Glome.Ads.listAds throws an error on an object category filter'
+  );
+  
+  var ads = Glome.Ads.listAds({category: categoryId});
+  QUnit.ok(ads[id], 'Freshly entered ad was found after filtering by category ' + categoryId);
+  QUnit.equal(Object.keys(ads).length, 1, 'There should be exactly one match');
+  
+  var ads = Glome.Ads.listAds({status: statusCode});
+  QUnit.ok(ads[id], 'Freshly entered ad was found after filtering by status code ' + statusCode);
+  QUnit.equal(Object.keys(ads).length, 1, 'There should be exactly one match');
+  
+  // There should be no ads with a status code + 1
+  var ads = Glome.Ads.listAds({status: (statusCode + 1)});
+  QUnit.equal(typeof ads[id], 'undefined', 'Freshly entered ad was not found after filtering by status code ' + (statusCode + 1));
+  QUnit.equal(Object.keys(ads).length, 0, 'No ads should be matched');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.listAds({'undefined': 'foo'});
+    },
+    'Glome.Ads.listAds throws an error when trying to get with an undefined filter'
+  );
+});
+
 /* !Test handling ads */
-QUnit.asyncTest('List ads', function()
+QUnit.asyncTest('Fetch ads', function()
 {
   // Ad loading callback has to be a function
   QUnit.throws
@@ -430,10 +603,19 @@ QUnit.asyncTest('List ads', function()
   Glome.Ads.load(function()
   {
     QUnit.start();
-    QUnit.notEqual(0, Object.keys(Glome.ads).length, 'Glome ads were loaded');
+    QUnit.notEqual(0, Object.keys(Glome.Ads.stack).length, 'Glome ads were loaded');
   });
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.load(null, []);
+    },
+    'Glome.Ads.load onerror has to be a function',
+    'Glome.Ads.load throws an error on Array as onerror callback'
+  );
 });
-
 
 /* !Glome user interface tests */
 /* !- Initialize user interface */
@@ -446,55 +628,63 @@ QUnit.asyncTest('Glome templates', function()
   (
     function()
     {
-      Glome.loadTemplates('foo');
+      Glome.Templates.load('foo');
     },
-    'Glome.loadTemplates throws an error for string callback'
+    'Glome.Templates.load throws an error for string callback'
   );
   
   QUnit.throws
   (
     function()
     {
-      Glome.loadTemplates({});
+      Glome.Templates.load({});
     },
-    'Glome.loadTemplates throws an error for object callback'
+    'Glome.Templates.load throws an error for object callback'
   );
   
-  Glome.loadTemplates();
+  Glome.Templates.load();
   
   window.setTimeout
   (
     function()
     {
-      QUnit.ok(Glome.template, 'Glome template is accessible');
+      QUnit.start();
+      QUnit.ok(Glome.Templates.get, 'Glome template is accessible');
       QUnit.throws
       (
         function()
         {
-          Glome.template();
-          Glome.template('foo', 'bar');
+          Glome.Templates.get();
         },
-        'Glome.template respects the argument count'
+        'Glome.template respects the argument count and throws an error on no arguments'
       );
       
       QUnit.throws
       (
         function()
         {
-          Glome.template('undefined-template');
+          Glome.Templates.get('foo', 'bar');
+        },
+        'Glome.template respects the argument count and throws an error on two arguments'
+      );
+      
+      QUnit.throws
+      (
+        function()
+        {
+          Glome.Templates.get('undefined-template');
         },
         'Glome.template throws an error on undefined "undefined-template"'
       );
       
       // Load Glome templates
-      QUnit.ok(Glome.template('master'), 'Glome master template was found');
+      QUnit.ok(Glome.Templates.get('widget'), 'Glome widget template was found');
       
       // Insert a Glome template
-      var template = Glome.template('popup');
+      var template = Glome.Templates.get('popup');
       QUnit.notEqual(template.attr('id'), 'glomeTemplates', 'ID of the element was removed to ');
       
       QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome-include]').size(), 1, 'Glome CSS was appended');
-      QUnit.start();
     },
     networkLatency
   );
@@ -534,7 +724,7 @@ QUnit.asyncTest('Glome UI', function()
       
       QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully');
       QUnit.equal(fx.find('#glomeWidget').size(), 1, 'Glome widget can be found');
-      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').text()), Object.keys(Glome.ads).length, 'Ticker has the correct number of ads');
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads');
       QUnit.start();
     },
     networkLatency
@@ -560,7 +750,7 @@ QUnit.asyncTest('Initialize with constructor', function()
   );
 });
 
-QUnit.asyncTest('Glome popups', function()
+QUnit.asyncTest('Glome templates work as expected', function()
 {
   window.setTimeout
   (

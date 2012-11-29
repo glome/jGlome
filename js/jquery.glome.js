@@ -11,7 +11,6 @@
   jQuery.Glome = function(el)
   {
     var plugin = this;
-    var _template = null;
     var context = jQuery(el);
     
     this.glomeid = null;
@@ -126,117 +125,137 @@
       }
     };
     
-    /**
-     * Load template file
-     * 
-     * @param callback   @optional, Function or array of functions that will be executed after template has been loaded
-     */
-    plugin.loadTemplates = function(callback)
+    /* !Templates */
+    plugin.Templates =
     {
-      var callbacks = [];
+      /**
+       * Container for all of the template parts, identified by template name as key. Templates
+       * are stored as jQuery DOM objects
+       */
+      templates: {},
       
-      callbacks.push
-      (
-        function(data)
+      /**
+       * Master template stored after loading the template file, stored as a jQuery DOM object
+       */
+      masterTemplate: null,
+      
+      /**
+       * Get a template. This effectively creates a clone of the template or throws an error
+       * if requested template is not available
+       * 
+       * @param String name     Template name
+       * @return jQuery DOM object
+       */
+      get: function(name)
+      {
+        if (arguments.length !== 1)
         {
-          this._template = jQuery(data);
-          var tmp = data;
-          var elements = [];
-          var index = 0;
-          
-          // Get all links directly from the raw text source
-          while (regs = tmp.match(/(<link.+?>)/))
-          {
-            var str = Glome.Tools.escape(regs[1]);
-            var regexp = new RegExp(str, 'g');
-            tmp = tmp.replace(regexp, '');
-            
-            elements.push(jQuery(regs[1]));
-            
-            if (i > 10)
-            {
-              console.log('break on overflow');
-              break;
-            }
-            i++;
-          }
-          
-          for (var i = 0; i < elements.length; i++)
-          {
-            var element = elements[i];
-            
-            // Not related to Glome, no need to add
-            if (!element.attr('data-glome-include'))
-            {
-              continue;
-            }
-            
-            if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
-            {
-              jQuery('head').append(element);
-            }
-          }
+          throw new Error('Glome.loadTemplate expects exactly one parameter');
         }
-      );
-      
-      if (   callback
-          && typeof callback !== 'function'
-          && !jQuery.isArray(callback))
-      {
-        throw new Error('Callback has to be either a function or an array of functions.');  
-      }
-      
-      if (callback)
-      {
-        callbacks.push(callback);
-      }
-      
-      jQuery.ajax
-      (
+        
+        if (   typeof this.templates == 'null'
+            || typeof this.templates !== 'object')
         {
-          url: 'template.html',
-          context: this,
-          dataType: 'html',
-          isLocal: true,
-          success: callbacks
+          throw new Error('Glome template failed to load');
         }
-      );
-    }
-    
-    /**
-     * Get a template part
-     * 
-     * @param String name  Template name
-     * @return template DOM wrapped as a jQuery object
-     */
-    plugin.template = function(name)
-    {
-      if (arguments.length !== 1)
+        
+        if (!this.templates[name])
+        {
+          throw new Error('No template with name ' + name + ' found');
+        }
+        
+        var tmp = this.templates[name].clone();
+        
+        if (!tmp.size())
+        {
+          throw new Error('Unexpected error: failed to clone a new template');
+        }
+        
+        return tmp;
+      },
+      
+      /**
+       * Load the main set of templates
+       * 
+       * @param function callback    Callback executed on successful load
+       */
+      load: function(callback)
       {
-        throw new Error('Glome.loadTemplate expects exactly one parameter');
+        var callbacks = [];
+        
+        callbacks.push
+        (
+          function(data)
+          {
+            this.masterTemplate = jQuery(data);
+            var tmp = data;
+            var elements = [];
+            var index = 0;
+            
+            var parts = this.masterTemplate.find('[data-glome-template]');
+            
+            for (var i = 0; i < parts.size(); i++)
+            {
+              var part = parts.eq(i).clone();
+              var templateName = part.attr('data-glome-template');
+              this.templates[templateName] = part;
+            }
+            
+            i = 0;
+            
+            // Get all links directly from the raw text source
+            while (regs = tmp.match(/(<link.+?>)/))
+            {
+              var str = Glome.Tools.escape(regs[1]);
+              var regexp = new RegExp(str, 'g');
+              tmp = tmp.replace(regexp, '');
+              
+              elements.push(jQuery(regs[1]));
+              
+              i++;
+            }
+            
+            for (var i = 0; i < elements.length; i++)
+            {
+              var element = elements[i];
+              
+              // Not related to Glome, no need to add
+              if (!element.attr('data-glome-include'))
+              {
+                continue;
+              }
+              
+              if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
+              {
+                jQuery('head').append(element);
+              }
+            }
+          }
+        );
+        
+        if (   callback
+            && typeof callback !== 'function'
+            && !jQuery.isArray(callback))
+        {
+          throw new Error('Callback has to be either a function or an array of functions.');  
+        }
+        
+        if (callback)
+        {
+          callbacks.push(callback);
+        }
+        
+        jQuery.ajax
+        (
+          {
+            url: 'template.html',
+            context: this,
+            dataType: 'html',
+            isLocal: true,
+            success: callbacks
+          }
+        );
       }
-      
-      if (   typeof this._template == 'null'
-          || typeof this._template !== 'object')
-      {
-        throw new Error('Glome template failed to load');
-      }
-      
-      var tmp = this._template.filter('[data-glome-template=' + name + ']').clone();
-      
-      if (!tmp.size())
-      {
-        tmp = this._template.find('[data-glome-template=' + name + ']').clone();
-      }
-      
-      if (!tmp.size())
-      {
-        throw new Error('No template with name ' + name + ' found');
-      }
-      
-      // Remove ID
-      
-      return tmp;
     }
     
     /* !API */
@@ -450,12 +469,294 @@
      */
     plugin.Ads =
     {
-      load: function(callback)
+      /**
+       * Ad stack for storing the ads
+       * 
+       */
+      stack: {},
+      
+      /**
+       * Create a new ad or fetch an existing from stack. Constructor
+       * 
+       * @param mixed data
+       */
+      ad: function(data)
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        if (   data
+            && data.toString().match(/^[1-9][0-9]*$/))
+        {
+          var id = data.toString();
+          
+          if (typeof this.stack[id] != 'undefined')
+          {
+            return this.stack[id];
+          }
+          else
+          {
+            return null;
+          }
+        }
+        
+        var adObject =
+        {
+          /**
+           * Ad ID
+           *  
+           * @var Integer
+           */
+          id: null,
+          
+          /**
+           * Ad view status
+           * 
+           * @var Integer
+           */
+          status: 0,
+          
+          /**
+           * List of categories this ad belongs to
+           * 
+           * @var Array
+           */
+          adcategories: [],
+          
+          /**
+           * Set the view status of this ad
+           * 
+           * @param Integer statusCode    Status code
+           */
+          setStatus: function(statusCode)
+          {
+            this.status = statusCode;
+            return true;
+          },
+          
+          /**
+           * Update this ad
+           */
+          update: function()
+          {
+            // @TODO: onchange event trigger
+          },
+          
+          /**
+           * Remove this ad
+           */
+          remove: function()
+          {
+            var id = this.id;
+            
+            if (!plugin.Ads.stack[id])
+            {
+              return true;
+            }
+            
+            plugin.Ads.removeAd(id);
+            
+            if (!plugin.Ads.stack[id])
+            {
+              return true;
+            }
+            else
+            {
+              return false;
+            }
+          }
+        };
+        
+        if (data)
+        {
+          if (!jQuery.isPlainObject(data))
+          {
+            throw new Error('Glome.Ads.ad requires an object or an integer (ad id) as a constructor');
+          }
+          
+          if (!data.id)
+          {
+            throw new Error('There has to be an ID present in the Glome.Ads.ad constructor object');
+          }
+          
+          if (!data.id.toString().match(/^[1-9][0-9]*$/))
+          {
+            throw new Error('ID has to be an integer');
+          }
+          
+          for (var i in data)
+          {
+            adObject[i] = data[i];
+          }
+        }
+        
+        if (adObject.id)
+        {
+          var id = adObject.id.toString();
+          plugin.Ads.stack[id] = adObject;
+        }
+        
+        return adObject;
+      },
+      
+      /**
+       * List ads
+       * 
+       * @param Object filters  Optional filters
+       * @return Array of ads
+       */
+      listAds: function(filters)
+      {
+        var found;
+        
+        if (   filters
+            && !jQuery.isPlainObject(filters))
+        {
+          throw new Error('Optional filters parameter has to be an object');
+        }
+        
+        if (!filters)
+        {
+          return plugin.Ads.stack;
+        }
+        
+        var ads = {};
+        
+        // Loop through the ads and apply filters
+        for (i in plugin.Ads.stack)
+        {
+          var ad = plugin.Ads.stack[i];
+          found = false;
+          
+          for (k in filters)
+          {
+            // Which object key should be used
+            var filterKey = k;
+            
+            // Filter rules
+            switch (k)
+            {
+              // Add here the cases where search is from an array
+              case 'category':
+                filterKey = 'adcategories';
+                var filter = filters[k];
+                
+                // @TODO: support filtering by category name (String)
+                if (typeof filter == 'number')
+                {
+                  if (jQuery.inArray(filter, ad[filterKey]) !== -1)
+                  {
+                    found = true;
+                    break;
+                  }
+                }
+                else if (jQuery.isArray(filter))
+                {
+                  var tmp = filters;
+                  
+                  for (var n = 0; n < filter.length; n++)
+                  {
+                    tmp.category = filter[n];
+                    jQuery.extend(ads, this.listAds(tmp));
+                  }
+                }
+                else
+                {
+                  throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
+                }
+                break;
+              
+              // Add here the cases where search is from a string or a number
+              case 'status':
+                var filter = filters[k];
+                
+                if (typeof filter == 'number')
+                {
+                  if (ad[filterKey] === filter)
+                  {
+                    found = true;
+                    break;
+                  }
+                }
+                else if (jQuery.isArray(filter))
+                {
+                  var tmp = filters;
+                  
+                  for (var n = 0; n < filter.length; n++)
+                  {
+                    tmp.category = filter[n];
+                    jQuery.extend(ads, this.listAds(tmp));
+                  }
+                }
+                else
+                {
+                  throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
+                }
+                break;
+              
+              default:
+                throw new Error('Glome.Ads.listAds does not have a filter ' + k);
+            }
+          }
+          
+          if (found)
+          {
+            var id = ad.id;
+            ads[id] = ad;
+          }
+        }
+        
+        console.log('stack', plugin.Ads.stack);
+        console.log('found', ads);
+        return ads;
+      },
+      
+      /** 
+       * Removes an ad from the stack
+       *
+       * @param id
+       */
+      removeAd: function(id)
+      {
+        if (typeof this.stack[id] == 'undefined')
+        {
+          return true;
+        }
+        
+        delete this.stack[id];
+        // @TODO: onchange event trigger
+        
+        if (typeof this.stack[id] == 'undefined')
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      },
+      
+      /**
+       * Load ads from the Glome server
+       * 
+       * @param function callback     Callback for successful load
+       * @param function onerror      Callback for unsuccessful load
+       */
+      load: function(callback, onerror)
       {
         if (   callback
             && typeof callback !== 'function')
         {
-          throw new Error('Glome.loadAds callback has to be a function');
+          throw new Error('Glome.Ads.load callback has to be a function');
+        }
+        
+        if (!onerror)
+        {
+          onerror = null;
+        }
+        
+        if (   onerror
+            && typeof onerror !== 'function')
+        {
+          throw new Error('Glome.Ads.load onerror has to be a function');
         }
         
         plugin.Api.get
@@ -470,14 +771,18 @@
           [
             function(data)
             {
+              // Reset the ad stack
+              plugin.Ads.stack = {};
+              
               for (var i = 0; i < data.length; i++)
               {
                 var id = data[i].id;
-                plugin.ads[id] = data[i];
+                var ad = new plugin.Ads.ad(data[i]);
               }
             },
             callback
-          ]
+          ],
+          onerror
         );
       }
     };
@@ -519,14 +824,19 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(plugin.container).append(plugin.template('master'));
+        jQuery(plugin.container).append(plugin.Templates.get('window'));
         
         if (!jQuery(plugin.container).find('#glomeWindow').size())
         {
           return false;
         }
         
-        jQuery('#glomeWidget').find('.glome-counter').text(Object.keys(plugin.ads).length);
+        jQuery('#glomeWidget')
+          .on('change.glome', function()
+          {
+            jQuery(this).find('.glome-counter').attr('data-count', (Object.keys(plugin.Ads.stack).length));
+          })
+          .trigger('change.glome');
         
         return true;
       },
@@ -560,10 +870,10 @@
       
       if (el)
       {
-        this.loadTemplates(function()
+        this.Templates.load(function()
         {
-          this.DOM.bindTo(el);
-          this.DOM.init();
+          plugin.DOM.bindTo(el);
+          plugin.DOM.init();
         });
       }
       
