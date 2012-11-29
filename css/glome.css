@@ -74,6 +74,21 @@
   border-bottom: solid 1px #b8b8b8;
 }
 
+@media screen and (max-width: 720px)
+{
+  .glome-row
+  {
+    display: block;
+    border-bottom: solid 1px #b8b8b8;
+  }
+  
+  .glome-row > *
+  {
+    display: inline-block;
+    border-bottom: none;
+  }
+}
+
 .glome-row.glome-row-disabled > *
 {
   color: #888888;
@@ -253,6 +268,14 @@ form.glome-oneline
   width: 100%;
 }
 
+@media screen and (max-width: 720px)
+{
+  form.glome-oneline
+  {
+    white-space: normal;
+  }
+}
+
 /* !Glome popup */
 #glomePopup
 {
@@ -322,6 +345,8 @@ form.glome-oneline
   color: #42434e;
   border-bottom: solid 3px;
   opacity: 0.3;
+  text-decoration: none !important;
+  cursor: pointer !important;
   transition-property: all;
   transition-duration: 200ms;
   -moz-transition-property: all;
@@ -437,10 +462,36 @@ form.glome-oneline
     padding-bottom: 10px;
   }
   
+  #glomePopupWrapper .glome-popup-navigation,
+  #glomePopupWrapper .glome-popup-navigation a
+  {
+    height: 25px;
+    line-height: 25px;
+  }
+  
   #glomePopupWrapper .glome-popup-content
   {
-    height: auto;
+    position: absolute;
+    top: 36px;
+    bottom: 20px;
+    display: block;
+    height: auto !important;
   }
+  
+  #glomePopupWrapper .glome-popup-navigation + .glome-popup-content
+  {
+    top: 61px;
+  }
+  
+  #glomePopupWrapper .glome-popup-footer
+  {
+    height: 30px;
+    line-height: 30px;
+    padding-top: 5px;
+    position: absolute;
+    bottom: 0;
+  }
+  
 }
 
 @media screen and (max-width: 720px)
@@ -502,6 +553,20 @@ form.glome-oneline
   box-sizing: padding-box;
   -moz-box-sizing: padding-box;
 }
+
+@media screen and (max-width: 720px)
+{
+  #glomePopup .glome-row > * + *
+  {
+    padding-left: 0;
+  }
+  
+  #glomePopup .glome-row > *
+  {
+    padding-right: 10px;
+  }
+}
+
 
 #glomePopup .glome-row > .thumbnail img
 {
@@ -632,6 +697,21 @@ form.glome-oneline
   margin-left: 1em;
 }
 
+@media screen and (max-width: 400px)
+{
+  #glomeCategoryAsk > div.glome-wrapper .buttons button + button
+  {
+    margin-left: 0 !important;
+    margin-top: 1em;
+    padding: 5px;
+  }
+}
+
+#glomeCategoryAsk > div.glome-wrapper .buttons button + button
+{
+  margin-left: 1em;
+}
+
 #glomeCategoryAsk > div.glome-wrapper .buttons button > *
 {
   display: block;
@@ -731,6 +811,17 @@ form.glome-oneline
   background-position: -36px -72px;
 }
 
+@media screen and (max-width: 720px)
+{
+  #glomeDisplayAd .glome-ad-image img
+  {
+    min-width: inherit;
+    min-height: inherit;
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
 @media screen and (max-width: 550px)
 {
   #glomeDisplayAd .glome-ad-content
@@ -741,16 +832,6 @@ form.glome-oneline
   #glomeDisplayAd .glome-ad-image
   {
     height: auto;
-  }
-  
-  #glomeDisplayAd .glome-ad-image img
-  {
-/*
-    min-width: inherit;
-    min-height: inherit;
-    max-width: 100%;
-    max-height: 100%;
-*/
   }
   
   #glomeDisplayAd .glome-ad-content-wrapper,

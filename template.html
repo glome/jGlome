@@ -24,11 +24,13 @@
             <div class="glome-popup-title"><span class="title">Glome Popup title</span></div>
             <div class="glome-popup-close"></div>
           </div>
+<!--
           <div class="glome-popup-navigation" data-glome-template="popup-navigation">
             <a data-i18n="my rules" class="selected">My rules</a>
             <a data-i18n="my web">My web</a>
             <a data-i18n="my wallet">My wallet</a>
           </div>
+-->
           <div class="glome-popup-content">
             <!-- Glome wizard -->
             <div id="glomeWizard">
@@ -76,14 +78,12 @@
                 <button data-i18n="tweak your glome filter">Tweak your Glome filter</button>
                 <button data-i18n="enjoy your clutter free web">Enjoy your clutter free web</button>
               </form>
+              <hr />
             </div>
             <!-- Glome configuration view -->
-<!--
             <div id="glomeConfigurationView">
             </div>
--->
             <!-- !List of categories -->
-<!--
             <div id="glomeListCategories" class="glome-list-container">
               <div class="glome-list-container" data-glome-template="list-ads">
                 <div class="glome-row">
@@ -139,9 +139,7 @@
                 </div>
               </div>
             </div>
--->
             <!-- !Glome list ads template -->
-<!--
             <div id="glomeListAds" class="glome-list-container">
               <div class="glome-list-container" data-glome-template="list-ads">
                 <div class="glome-row">
@@ -163,10 +161,8 @@
                 </div>
               </div>
             </div>
--->
             <!-- Glome list ads template ends -->
             <!-- !Glome inquire about interest in a categry -->
-<!--
             <div id="glomeCategoryAsk" data-glome-template="category-ask">
               <div class="glome-wrapper">
                 <h1 data-i18n="interested in cars">Interested in cars?</h1>
@@ -190,9 +186,7 @@
                 </p>
               </div>
             </div>
--->
             <!-- !Display a single ad -->
-<!--
             <div id="glomeDisplayAd" data-glome-template="ad-display">
               <div class="glome-ad-image">
                 <img src="images/template/audi-image.jpg" alt="" />
@@ -216,7 +210,6 @@
                 </div>
               </div>
             </div>
--->
             <!-- End popup templates -->
           </div>
           <div class="glome-popup-footer">
@@ -231,7 +224,7 @@
           </div>
         </div>
       </div>
-      <div id="glomeWindow" class="glome-on">
+      <div id="glomeWindow" class="glome-on" data-glome-template="window">
         <div id="glomeWidget" class="knocking" data-glome-template="widget">
           <div class="glome-counter" data-count="1"></div>
           <div id="glomeWidgetClose"></div>
