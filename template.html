@@ -24,16 +24,14 @@
             <div class="glome-popup-title"><span class="title">Glome Popup title</span></div>
             <div class="glome-popup-close"></div>
           </div>
-<!--
           <div class="glome-popup-navigation" data-glome-template="popup-navigation">
             <a data-i18n="my rules" class="selected">My rules</a>
             <a data-i18n="my web">My web</a>
             <a data-i18n="my wallet">My wallet</a>
           </div>
--->
           <div class="glome-popup-content">
             <!-- Glome wizard -->
-            <div id="glomeWizard">
+            <div id="glomeWizard" data-glome-template="wizard">
               <h1 data-i18n="welcome to glome">Welcome to Glome</h1>
               <p data-i18n="start enjoying">
                 You can just start enjoying a clutter free web, but to get started the right way,
@@ -81,10 +79,10 @@
               <hr />
             </div>
             <!-- Glome configuration view -->
-            <div id="glomeConfigurationView">
+            <div id="glomeConfigurationView" data-glome-template="configuration-view">
             </div>
             <!-- !List of categories -->
-            <div id="glomeListCategories" class="glome-list-container">
+            <div id="glomeListCategories" class="glome-list-container" data-glome-template="list-ads">
               <div class="glome-list-container" data-glome-template="list-ads">
                 <div class="glome-row">
                   <div class="glome-switch-container">
@@ -228,16 +226,18 @@
         <div id="glomeWidget" class="knocking" data-glome-template="widget">
           <div class="glome-counter" data-count="1"></div>
           <div id="glomeWidgetClose"></div>
-          <div class="glome-widget-contents">
-            <h2 class="glome-widget-title"><a href="#">Audi has an offer for you</a></h2>
-            <p data-i18n="up to %s per order">
-              Up to %s per order
-            </p>
-            <div class="glome-actions">
-              <button data-i18n="see it">See it</button>
-              <button data-i18n="not now">Not now</button>
+          <div id="glomeWidgetContent" class="glome-widget-contents">
+            <div data-glome-template="widget-ad">
+              <h2 class="glome-widget-title"><a href="#">Audi has an offer for you</a></h2>
+              <p class="glome-widget-subtext" data-i18n="up to %s per order">
+                Up to %s per order
+              </p>
+              <div class="glome-actions">
+                <button data-i18n="see it">See it</button>
+                <button data-i18n="not now">Not now</button>
+              </div>
             </div>
-            <div id="glomeWidgetPager">
+            <div id="glomeWidgetPager" data-glome-template="widget-pager">
               <span class="glome-pager glome-pager-previous"></span>
               <span class="glome-pager glome-pager-current">1</span>
               <span class="glome-pager glome-pager-separator">/</span>
@@ -245,7 +245,7 @@
               <span class="glome-pager glome-pager-next"></span>
             </div>
             <div id="glomeWidgetFooter">
-              <label class="glome-switch" data-glome-template="checkbox">
+              <label class="glome-switch">
                 <input type="checkbox" checked />
                 <span class="glome-switch-toggle"></span>
               </label>
