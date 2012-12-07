@@ -283,7 +283,7 @@ form.glome-oneline
   left: 50%;
   top: 50%;
   border: solid 1px white;
-  z-index: 100001;
+  z-index: 100003;
 }
 
 #glomePopupMatte
@@ -877,7 +877,6 @@ form.glome-oneline
   display: none;
 }
 
-#glomeWidget:hover .glome-widget-contents,
 #glomeWidget.display .glome-widget-contents
 {
   display: block;
@@ -890,7 +889,6 @@ form.glome-oneline
   float: right;
 }
 
-#glomeWidget:hover .glome-icon,
 #glomeWidget.display .glome-icon
 {
   position: absolute;
@@ -928,7 +926,6 @@ form.glome-oneline
   display: block;
 }
 
-#glomeWidget:hover .glome-counter,
 #glomeWidget.display .glome-counter
 {
   display: none !important;
@@ -941,7 +938,6 @@ form.glome-oneline
 }
 
 .glome-off #glomeWidget .glome-counter,
-#glomeWidget:hover .glome-counter,
 #glomeWidget.display .glome-counter
 {
   display: none;
@@ -953,7 +949,6 @@ form.glome-oneline
   display: none !important;
 }
 
-#glomeWidget:hover #glomeWidgetClose,
 #glomeWidget.display #glomeWidgetClose
 {
   background-image: url('../images/icons/icon-close-10x10.png');
