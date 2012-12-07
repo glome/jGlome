@@ -2,6 +2,13 @@
 var networkLatency = 500;
 var previousId = null;
 
+/**
+ * Version compare
+ * 
+ * @param String a   Version a
+ * @param String b   Version b
+ * @return Integer 1 if a is greater than or equal to b, otherwise -1
+ */
 function versionCompare(a, b)
 {
   var partsA = a.toString().split('.');
@@ -99,10 +106,10 @@ function versionCompare(a, b)
   return 1;
 }
 
-/* Preliminary tests */
+/* !Preliminary tests module */
 QUnit.module('Preliminary checks');
 
-/* Browser support */
+/* !Browser support */
 QUnit.test('Browser support', function()
 {
   QUnit.ok(typeof window.localStorage != 'undefined', 'Support local storage');
@@ -112,7 +119,7 @@ QUnit.test('Browser support', function()
   QUnit.equal('bar', window.localStorage.getItem('foo'), 'Local storage returns the same string as its initial input');
 });
 
-/* Version compare tests */
+/* !Version compare tests */
 QUnit.test('versionCompare', function()
 {
   QUnit.expect(13);
@@ -169,7 +176,7 @@ var Glome = new jQuery.Glome();
 /* !Glome generic method tests */
 QUnit.module('Glome generic method tests');
 
-/* !- Test methods*/
+/* !Test methods*/
 QUnit.test('Glome methods', function()
 {
   QUnit.ok(Glome.get, 'Local storage getter is defined');
@@ -260,8 +267,8 @@ QUnit.test('Glome methods', function()
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
-/* !- Test API */
-QUnit.asyncTest('Glome API', function()
+/* !Glome API basics */
+QUnit.test('Glome API basics', function()
 {
   var method, callback;
   
@@ -308,6 +315,106 @@ QUnit.asyncTest('Glome API', function()
   QUnit.ok(Glome.Api.get(method, callback), 'Glome.Api.get supports function as second argument');
   
   QUnit.ok(Glome.Api.get(method, callbacks), 'Glome.Api.get supports an array of callbacks');
+});
+
+QUnit.asyncTest('Login', function()
+{
+  var id, callback;
+  
+  // Create an empty function
+  callback = function()
+  {
+    
+  }
+  
+  QUnit.ok(Glome.Api.login, 'Login method is available');
+  QUnit.ok(Glome.Api.logout, 'Logout method is available');
+  
+  id = Glome.id();
+  
+  QUnit.throws
+  (
+    function()
+    {
+      console.log(id);
+      
+      Glome.glomeid = null;
+      Glome.pref('glomeid', null);
+      Glome.Api.login();
+    },
+    'There is no available Glome ID',
+    'Login throws an error when there is no ID available'
+  );
+  
+  // Return the ID
+  Glome.pref('glomeid', id);
+  Glome.glomeid = id;
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Api.login(id, callback, 'foobar');
+    },
+    'Password has to be a string',
+    'Password has to be a string'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Api.login(id, '', 'foobar');
+    },
+    'Callback has to be an array or a function',
+    'Callback has to be an array or a function'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Api.login(id, '', callback, 'foo');
+    },
+    'Callback has to be an array or a function',
+    'Callback has to be an array or a function'
+  );
+  
+  Glome.API.login(id, '', function(data, status, jqXHR)
+  {
+    console.log('Response headers', jqXHR.getResponseHeader('Set-Cookie'), jqXHR.getResponseHeader('Cache-Control'), jqXHR);
+    QUnit.start();
+  });
+});
+
+QUnit.asyncTest('Session ID is kept', function()
+{
+  Glome.API.login(Glome.id(), '', function(data, status, jqXHR)
+  {
+    QUnit.equal(Glome.sessionId, jqXHR, 'Session ID did not change after the previous request');
+    QUnit.start();
+  });
+});
+
+QUnit.asyncTest('Login failure', function()
+{
+  Glome.API.login(Glome.id(), 'foobar', null, function()
+  {
+    QUnit.equal(Glome.API.loginAttempts, 1, 'There should be exactly one failed login attempt due to wrong password');
+    QUnit.start();
+  });
+});
+
+QUnit.asyncTest('Get ads', function()
+{
+  var method, callback; 
+  
+  method = 'ads';
+  
+  callback = function(d)
+  {
+    window.glomeCallback = 'callback called successfully';
+  };
   
   Glome.Api.get(method, callback);
   
@@ -315,14 +422,14 @@ QUnit.asyncTest('Glome API', function()
   (
     function()
     {
-      QUnit.start();
       QUnit.equal(window.glomeCallback, 'callback called successfully', 'Glome callback does what was expected');
+      QUnit.start();
     },
-    networkLatency * 3
+    networkLatency
   );
 });
 
-/* !- Creating a new Glome ID */
+/* !Creating a new Glome ID */
 QUnit.asyncTest('Creating a new Glome ID', function()
 {
   // Set a test ID for the test runs
@@ -381,6 +488,7 @@ QUnit.asyncTest('Creating a new Glome ID', function()
   );
 });
 
+/* !Duplicate Glome ID */
 QUnit.asyncTest('Duplicate Glome ID', function()
 {
   // Try to recreate exactly same Glome ID
@@ -412,9 +520,7 @@ QUnit.asyncTest('Duplicate Glome ID', function()
 /* !Glome usage tests */
 QUnit.module('Glome Ads class');
 
-/**
- * Test ad object
- */
+/* !Test ad object */
 QUnit.test('Glome.Ads.ad object', function()
 {
   QUnit.equal(typeof Glome.Ads.ad, 'function', 'There is a method for creating a new ad prototype object');
@@ -484,24 +590,74 @@ QUnit.test('Glome.Ads.ad object', function()
   QUnit.equal(Glome.Ads.ad(gad.id), null, 'Ad was removed successfully from the stack');
 });
 
-/* !Test Ads API */
+/* !Glome.Ads API */
 QUnit.test('Glome.Ads API', function()
 {
+  QUnit.ok(Glome.Ads.onchange, 'There is an onchange method');
+  QUnit.ok(Glome.Ads.addListener, 'There is an addListener method');
+  QUnit.ok(Glome.Ads.removeListener, 'There is a removeListener method');
+  QUnit.ok(Glome.Ads.count, 'There is a count method');
+  
   Glome.Ads.stack = {};
+  
+  var categoryid = 1000000;
   
   var ad =
   {
     id: 1,
-    title: 'Test'
+    title: 'Test',
+    adcategories: [categoryid]
   }
   
   var id = ad.id;
   
+  var filters =
+  {
+    category: categoryid
+  }
+  
   var gad = Glome.Ads.ad(ad);
+  Glome.Ads.ad
+  (
+    {
+      id: 2,
+      title: 'Test 2',
+      adcategories: []
+    }
+  );
+  
+  QUnit.equal(Glome.Ads.count(), Object.keys(Glome.Ads.stack).length, 'Glome.Ads.count gives the same as stack length');
+  QUnit.equal(Glome.Ads.count(filters), Object.keys(Glome.Ads.listAds(filters)).length, 'Glome.Ads.count gives the same as stack length');
+  
   QUnit.ok(Glome.Ads.removeAd(id), 'Removing an ad was successful');
   QUnit.equal(typeof Glome.Ads.stack[id], 'undefined', 'Ad was removed successfully from the stack');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.addListener('foo');
+    },
+    'Glome.Ads.addListener requires a function as argument, when one is given'
+  );
+  
+  var listener = function()
+  {
+    jQuery('#qunit-fixture').attr('data-listener', 'true');
+  }
+  
+  Glome.Ads.addListener(listener);
+  QUnit.equal(Glome.Ads.listeners.length, 1, 'Listener was successfully registered according to length');
+  QUnit.strictEqual(Glome.Ads.listeners[0], listener, 'Listener was successfully registered to stored data');
+  
+  Glome.Ads.onchange();
+  QUnit.equal(jQuery('#qunit-fixture').attr('data-listener'), 'true', 'Listener was successfully triggered');
+  
+  Glome.Ads.removeListener(listener);
+  QUnit.equal(Glome.Ads.listeners.length, 0, 'Listener was successfully removed according to length');
 });
 
+/* !Ads list filters */
 QUnit.test('Ads list filters', function()
 {
   // Add an ad
@@ -585,7 +741,7 @@ QUnit.test('Ads list filters', function()
   );
 });
 
-/* !Test handling ads */
+/* !Fetch ads */
 QUnit.asyncTest('Fetch ads', function()
 {
   // Ad loading callback has to be a function
@@ -617,11 +773,10 @@ QUnit.asyncTest('Fetch ads', function()
   );
 });
 
-/* !Glome user interface tests */
-/* !- Initialize user interface */
+/* !Glome user interface  */
 QUnit.module('Glome user interface');
 
-/* !Glome templates tests */
+/* !Glome templates */
 QUnit.asyncTest('Glome templates', function()
 {
   QUnit.throws
@@ -692,6 +847,7 @@ QUnit.asyncTest('Glome templates', function()
 
 // These tests have to be asynchronous to ensure that template test
 // has been run already
+/* Glome UI */
 QUnit.asyncTest('Glome UI', function()
 {
   window.setTimeout
@@ -724,13 +880,14 @@ QUnit.asyncTest('Glome UI', function()
       
       QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully');
       QUnit.equal(fx.find('#glomeWidget').size(), 1, 'Glome widget can be found');
-      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads');
+      
       QUnit.start();
     },
     networkLatency
   )
 });
 
+/* !Initialize with constructor */
 // These tests have to be asynchronous to ensure that template test
 // has been run already
 QUnit.asyncTest('Initialize with constructor', function()
@@ -744,24 +901,56 @@ QUnit.asyncTest('Initialize with constructor', function()
     {
       QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
       QUnit.ok(Glome.id(), 'There is a Glome ID');
-      QUnit.start();
-    },
-    networkLatency * 2
-  );
-});
-
-QUnit.asyncTest('Glome templates work as expected', function()
-{
-  window.setTimeout
-  (
-    function()
-    {
-      QUnit.ok(Glome.DOM.resize, 'Resize method is available');
-      QUnit.start();
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads');
       
-      QUnit.ok((jQuery(window).height() >= jQuery('#glomePopupWrapper').height()), 'Popup fits inside the window');
+      var id = 123456789;
+      
+      Glome.Ads.ad
+      (
+        {
+          id: id
+        }
+      );
+      
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads after a new ad was added');
+      
+      Glome.Ads.removeAd(id);
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads after the temporary ad was removed');
+      
+      // Get the first ad
+      var ids = Object.keys(Glome.Ads.stack);
+      var id = ids[0];
+      var ad = Glome.Ads.stack[id];
+      
+      // Verify that widget displays the first ad title
+      QUnit.equal(fx.find('.glome-widget-title a').text(), ad.title, 'Ad title is displayed as it should be');
+      QUnit.equal(fx.find('.glome-widget-title a').attr('data-glome-ad-id'), ad.id, 'Ad id was correctly set');
+      QUnit.equal(fx.find('.glome-widget-subtext').text(), ad.bonus, 'Ad bonus is displayed as it should be');
+      
+      // Widget display toggling
+      fx.find('.glome-icon').trigger('click');
+      QUnit.equal(fx.find('#glomeWidget').hasClass('display'), true, 'Glome widget is displayed');
+      QUnit.equal(Number(fx.find('#glomeWidget .glome-pager.glome-pager-max').text()), Object.keys(Glome.Ads.stack).length, 'Pager has the correct number of ads');
+      
+      fx.find('.glome-icon').trigger('click');
+      QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed');
+      
+      fx.find('.glome-icon').trigger('click');
+      fx.find('#glomeWidgetClose').trigger('click');
+      QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed after clicking on close button');
+      
+      fx.find('.glome-icon').trigger('click');
+      fx.find('#glomeWidget').find('.glome-widget-title a').trigger('click');
+      QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed after clicking on an ad');
+      
+      // Remove all ads and verify that ticker displays zero
+      Glome.Ads.stack = {};
+      Glome.Ads.onchange();
+      QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), 0, 'Ticker has the correct number of ads after all ads were removed');
+      
+      QUnit.start();
     },
-    networkLatency
+    networkLatency * 3
   );
 });
 

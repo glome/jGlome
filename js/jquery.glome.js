@@ -10,12 +10,15 @@
    */
   jQuery.Glome = function(el)
   {
+    'use strict';
+    
     var plugin = this;
     var context = jQuery(el);
     
     this.glomeid = null;
     this.ads = {};
     this.container = null;
+    this.sessionId = null;
     
     /**
      * Return the current Glome ID
@@ -171,6 +174,8 @@
           throw new Error('Unexpected error: failed to clone a new template');
         }
         
+        tmp.find('*[data-glome-template]').remove();
+        
         return tmp;
       },
       
@@ -187,10 +192,12 @@
         (
           function(data)
           {
+            var regs, tmp, elements, index;
+            
             this.masterTemplate = jQuery(data);
-            var tmp = data;
-            var elements = [];
-            var index = 0;
+            tmp = data;
+            elements = [];
+            index = 0;
             
             var parts = this.masterTemplate.find('[data-glome-template]');
             
@@ -259,6 +266,9 @@
     }
     
     /* !API */
+    /**
+     * Data access API
+     */
     plugin.Api =
     {
       server: 'https://api.glome.me/',
@@ -274,6 +284,11 @@
         user:
         {
           url: 'users.json',
+          allowed: ['get', 'set']
+        },
+        login:
+        {
+          url: 'users/login.json',
           allowed: ['get', 'set']
         }
       },
@@ -371,9 +386,10 @@
         
         // Type check for callback
         if (   callback
-            && typeof callback !== 'function')
+            && typeof callback !== 'function'
+            && !jQuery.isArray(callback))
         {
-          throw new Error('Callback has to be a function, now received typeof ' + typeof callback);
+          throw new Error('Callback has to be a function or an array, now received typeof ' + typeof callback);
         }
         
         if (!onerror)
@@ -383,9 +399,10 @@
         
         // Type check for callback
         if (   onerror
-            && typeof onerror !== 'function')
+            && typeof onerror !== 'function'
+            && !jQuery.isArray(onerror))
         {
-          throw new Error('onerror has to be a function, now received typeof ' + typeof onerror);
+          throw new Error('onerror has to be a function or an array, now received typeof ' + typeof onerror);
         }
         
         var request = jQuery.ajax
@@ -396,12 +413,146 @@
             type: 'POST',
             dataType: 'json',
             success: callback,
-            error: onerror
+            error: onerror,
+            xhrFields:
+            {
+              withCredentials: false
+            }
           }
         );
         return request;
+      },
+      
+      /**
+       * Login a user
+       * 
+       * @param string id, Glome ID
+       * @param string password, Glome ID password, optional; by default an empty password is used
+       * @param function callback, optional login callback
+       * @param function onerror, optional login onerror fallback
+       */
+      login: function(id, passwd, callback, onerror)
+      {
+        if (!id)
+        {
+          id = plugin.id();
+        }
+        
+        if (!id)
+        {
+          throw new Error('Glome ID not available');
+        }
+        
+        if (   !id
+            || !id.toString().match(/^[a-z0-9]+$/))
+        {
+          throw new Error('Glome ID not available');
+        }
+        
+        // Typecast password to be a string
+        if (!passwd)
+        {
+          passwd = '';
+        }
+        else if (typeof passwd != 'string')
+        {
+          throw new Error('Password has to be a string');
+        }
+        
+        if (   callback
+            && typeof callback !== 'function'
+            && !jQuery.isArray(callback))
+        {
+          throw new Error('Callback has to be a function or an array of functions');
+        }
+        
+        if (   onerror
+            && typeof onerror !== 'function'
+            && !jQuery.isArray(onerror))
+        {
+          throw new Error('onerror has to be a function or an array of functions');
+        }
+        
+        var callbacks = [];
+        var onerrors = [];
+        
+        
+        callbacks.push(function(data)
+        {
+          console.log(data);
+        });
+        
+        // Increase counter for failed login attempts
+        onerrors.push(function()
+        {
+          plugin.API.loginAttempts++;
+        });
+        
+        // Array merge
+        if (callback)
+        {
+          if (jQuery.isArray(callback))
+          {
+            callbacks.concat(callback);
+          }
+          else
+          {
+            callbacks.push(callback);
+          }
+        }
+        
+        // Array merge
+        if (onerror)
+        {
+          if (jQuery.isArray(onerror))
+          {
+            onerrors.concat(onerror);
+          }
+          else
+          {
+            onerrors.push(onerror);
+          }
+        }
+        
+        // Default error handling
+        
+        plugin.Api.set
+        (
+          'login',
+          {
+            user:
+            {
+              glomeid: id,
+              password: passwd
+            }
+          },
+          callbacks,
+          onerrors
+        );
+        
+        return true;
+      },
+      
+      /**
+       * How many times has the user attampted to login
+       */
+      loginAttempts: 0,
+      
+      /**
+       * Logout a user
+       * 
+       * @param int Glome ID, optional; by default the current user ID is used, if available
+       */
+      logout: function(id)
+      {
+        
       }
     };
+    
+    /**
+     * Alias for the sake of typing errors
+     */
+    plugin.API = plugin.Api;
     
     /**
      * Initialize Glome
@@ -472,8 +623,30 @@
       /**
        * Ad stack for storing the ads
        * 
+       * @param object
        */
       stack: {},
+      
+      /**
+       * Ad view history as retrieved from Glome server
+       * 
+       * @param Array
+       */
+      history: [],
+      
+      /**
+       * Registered listener functions that will be called on change event
+       * 
+       * @param Array
+       */
+      listeners: [],
+      
+      /**
+       * Is ads updating in progress right now? This is to prevent flooding of onchange events
+       * 
+       * @param boolean
+       */
+      disableListeners: false,
       
       /**
        * Create a new ad or fetch an existing from stack. Constructor
@@ -498,6 +671,7 @@
           }
         }
         
+        /* !adObject interface */
         var adObject =
         {
           /**
@@ -537,7 +711,7 @@
            */
           update: function()
           {
-            // @TODO: onchange event trigger
+            //plugin.Ads.onchange();
           },
           
           /**
@@ -592,9 +766,26 @@
         {
           var id = adObject.id.toString();
           plugin.Ads.stack[id] = adObject;
+          plugin.Ads.onchange();
         }
         
         return adObject;
+      },
+      
+      /**
+       * Count ads
+       * 
+       * @param Object filters    Optional filters. @see listAds for more details
+       * @return integer          Number of ads matching the filters
+       */
+      count: function(filters)
+      {
+        if (filters)
+        {
+          return Object.keys(this.listAds(filters)).length;
+        }
+        
+        return Object.keys(this.stack).length;
       },
       
       /**
@@ -605,7 +796,7 @@
        */
       listAds: function(filters)
       {
-        var found;
+        var found, i, k, n;
         
         if (   filters
             && !jQuery.isPlainObject(filters))
@@ -652,7 +843,7 @@
                 {
                   var tmp = filters;
                   
-                  for (var n = 0; n < filter.length; n++)
+                  for (n = 0; n < filter.length; n++)
                   {
                     tmp.category = filter[n];
                     jQuery.extend(ads, this.listAds(tmp));
@@ -680,7 +871,7 @@
                 {
                   var tmp = filters;
                   
-                  for (var n = 0; n < filter.length; n++)
+                  for (n = 0; n < filter.length; n++)
                   {
                     tmp.category = filter[n];
                     jQuery.extend(ads, this.listAds(tmp));
@@ -704,8 +895,6 @@
           }
         }
         
-        console.log('stack', plugin.Ads.stack);
-        console.log('found', ads);
         return ads;
       },
       
@@ -722,7 +911,8 @@
         }
         
         delete this.stack[id];
-        // @TODO: onchange event trigger
+        plugin.Ads.onchange();
+        
         
         if (typeof this.stack[id] == 'undefined')
         {
@@ -759,6 +949,7 @@
           throw new Error('Glome.Ads.load onerror has to be a function');
         }
         
+        // Get ads
         plugin.Api.get
         (
           'ads',
@@ -771,23 +962,94 @@
           [
             function(data)
             {
+              var i, id, ad;
+              
               // Reset the ad stack
               plugin.Ads.stack = {};
               
-              for (var i = 0; i < data.length; i++)
+              // Temporarily store the listeners
+              plugin.Ads.disableListeners = true;
+              
+              for (i = 0; i < data.length; i++)
               {
-                var id = data[i].id;
-                var ad = new plugin.Ads.ad(data[i]);
+                id = data[i].id;
+                ad = new plugin.Ads.ad(data[i]);
               }
+              
+              plugin.Ads.disableListeners = false;
+              plugin.Ads.onchange();
             },
             callback
           ],
           onerror
         );
+      },
+      
+      /**
+       * Add a listener to observe data changes
+       * 
+       * @param function listener    Listerner function that should be added
+       */
+      addListener: function(listener)
+      {
+        if (typeof listener != 'function')
+        {
+          throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
+        }
+        
+        plugin.Ads.listeners.push(listener);
+        return true;
+      },
+      
+      /**
+       * Remove a listener
+       * 
+       * @param function listener    Listerner function that should be removed
+       * @return boolean
+       */
+      removeListener: function(listener)
+      {
+        var i;
+        
+        if (typeof listener != 'function')
+        {
+          throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
+        }
+        
+        for (i = 0; i < plugin.Ads.listeners.length; i++)
+        {
+          if (plugin.Ads.listeners[i] == listener)
+          {
+            plugin.Ads.listeners.splice(i, 1);
+            return true;
+          }
+        }
+        
+        return true;
+      },
+      
+      /**
+       * When stack changes, this method is triggered or when present, a function will be
+       * registered to listeners list
+       * 
+       * @param function listener    Listener function
+       */
+      onchange: function()
+      {
+        if (this.disableListeners)
+        {
+          return;
+        }
+        
+        for (var i = 0; i < plugin.Ads.listeners.length; i++)
+        {
+          plugin.Ads.listeners[i].context = plugin.Ads;
+          plugin.Ads.listeners[i]();  
+        }
       }
     };
     
-    /* !DOM manipulation */
+    /* !DOM */
     plugin.DOM =
     {
       /**
@@ -824,33 +1086,122 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        jQuery(plugin.container).append(plugin.Templates.get('window'));
+        plugin.container.append(plugin.Templates.get('window'));
         
-        if (!jQuery(plugin.container).find('#glomeWindow').size())
+        if (!plugin.container.find('#glomeWindow').size())
         {
           return false;
         }
         
-        jQuery('#glomeWidget')
-          .on('change.glome', function()
-          {
-            jQuery(this).find('.glome-counter').attr('data-count', (Object.keys(plugin.Ads.stack).length));
-          })
-          .trigger('change.glome');
+        plugin.container.find('#glomeWindow').append(plugin.Templates.get('widget'));
+        
+        // Listen to ads
+        plugin.Ads.addListener(function()
+        {
+          plugin.container.find('#glomeWidget')
+            .on('adchange.glome', function()
+            {
+              jQuery(this).find('.glome-counter').attr('data-count', (Object.keys(plugin.Ads.stack).length));
+              jQuery(this).find('.glome-pager.glome-pager-max').text(Object.keys(plugin.Ads.stack).length);
+              plugin.DOM.Widget.init();
+            })
+            .trigger('adchange.glome');
+        });
         
         return true;
       },
       
       /**
-       * Bind resize to window
+       * Widget actions
        */
-      resize: function()
+      Widget:
       {
-        jQuery(window)
-          .on('resize.glome', function()
+        init: function()
+        {
+          var ids = Object.keys(plugin.Ads.stack);
+          
+          if (ids[0])
           {
+            plugin.DOM.Widget.pagerAd(ids[0]);
+          }
+          else
+          {
+            // @TODO: display categories
+          }
+          
+          // Toggle widget display status on clicks
+          plugin.container.find('#glomeWidget').find('.glome-icon')
+            .off('click.glome')
+            .on('click.glome', function()
+            {
+              if (plugin.container.find('#glomeWidget').hasClass('display'))
+              {
+                plugin.DOM.Widget.hide();
+              }
+              else
+              {
+                plugin.DOM.Widget.show();
+              }
+              
+              return false;
+            });
             
-          });
+          plugin.container.find('#glomeWidgetClose')
+            .off('click.glome')
+            .on('click.glome', function()
+            {
+              plugin.DOM.Widget.hide();
+            });
+        },
+        
+        /**
+         * Display widget
+         */
+        show: function()
+        {
+          plugin.container.find('#glomeWidget').addClass('display');
+        },
+        
+        /**
+         * Hide widget
+         */
+        hide: function()
+        {
+          plugin.container.find('#glomeWidget').removeClass('display');
+        },
+        pagerAd: function(id)
+        {
+          var ad = plugin.Ads.ad(id);
+          
+          plugin.container.find('#glomeWidgetContent').find('[data-glome-template]').remove();
+          plugin.container.find('#glomeWidgetContent').prepend(plugin.Templates.get('widget-ad'));
+          
+          var pager = plugin.Templates.get('widget-pager');
+          pager.insertAfter(plugin.container.find('#glomeWidgetContent').find('[data-glome-template="widget-ad"]'));
+          
+          // @TODO: set pager max text
+          //pager.find('.glome-pager.glome-pager-max').text();
+          
+          plugin.container.find('#glomeWidget').find('.glome-widget-title a')
+            .attr('data-glome-ad-id', ad.id)
+            .text(ad.title)
+            .off('click.glome')
+            .on('click.glome', function()
+            {
+              plugin.DOM.Widget.displayAd(jQuery(this).attr('data-glome-ad-id'));
+              return false;
+            });
+          
+          plugin.container.find('#glomeWidget').find('.glome-widget-subtext').text(ad.bonus);
+        },
+        
+        displayAd: function(id)
+        {
+          plugin.DOM.Widget.hide();
+          
+          var popup = plugin.Templates.get('popup');
+          popup.prependTo(plugin.container);
+        }
       }
     };
     
@@ -876,6 +1227,8 @@
           plugin.DOM.init();
         });
       }
+      
+      plugin.Ads.load();
       
       return true;
     };
