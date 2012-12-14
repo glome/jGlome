@@ -18,7 +18,8 @@
     this.glomeid = null;
     this.ads = {};
     this.container = null;
-    this.sessionId = null;
+    this.sessionCookies = null;
+    this.sessionToken = null;
     
     /**
      * Return the current Glome ID
@@ -348,6 +349,11 @@
             type: 'GET',
             dataType: 'json',
             success: callback,
+            crossDomain: true,
+            xhrFields:
+            {
+              withCredentials: true
+            },
             error: onerror
           }
         );
@@ -366,6 +372,11 @@
        */
       set: function(type, data, callback, onerror)
       {
+        if (arguments.length < 2)
+        {
+          throw new Error('Glome.Api.set expects at least two arguments');
+        }
+        
         if (typeof this.types[type] == 'undefined')
         {
           throw new Error('Glome.Api.set does not support request ' + type);
@@ -412,12 +423,12 @@
             data: data,
             type: 'POST',
             dataType: 'json',
-            success: callback,
-            error: onerror,
             xhrFields:
             {
-              withCredentials: false
-            }
+              withCredentials: true
+            },
+            success: callback,
+            error: onerror
           }
         );
         return request;
@@ -476,16 +487,20 @@
         var callbacks = [];
         var onerrors = [];
         
-        
-        callbacks.push(function(data)
-        {
-          console.log(data);
-        });
-        
         // Increase counter for failed login attempts
         onerrors.push(function()
         {
           plugin.API.loginAttempts++;
+        });
+        
+        callbacks.push(function(data, status, jqXHR)
+        {
+          console.log('login callback', jqXHR, jqXHR.getResponseHeader('X-CSRF-Token'));
+        });
+        
+        onerrors.push(function(jqXHR)
+        {
+          console.log('login onerror', jqXHR, jqXHR.getResponseHeader('X-CSRF-Token'));
         });
         
         // Array merge

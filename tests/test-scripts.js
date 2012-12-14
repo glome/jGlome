@@ -336,8 +336,6 @@ QUnit.asyncTest('Login', function()
   (
     function()
     {
-      console.log(id);
-      
       Glome.glomeid = null;
       Glome.pref('glomeid', null);
       Glome.Api.login();
@@ -382,8 +380,9 @@ QUnit.asyncTest('Login', function()
   
   Glome.API.login(id, '', function(data, status, jqXHR)
   {
-    console.log('Response headers', jqXHR.getResponseHeader('Set-Cookie'), jqXHR.getResponseHeader('Cache-Control'), jqXHR);
     QUnit.start();
+    QUnit.ok(Glome.sessionCookies, 'Glome session cookies are set');
+    QUnit.equal(Glome.sessionCookies, jqXHR.getResponseHeader('Set-Cookie'), 'Glome session cookies are the same as the one of AJAX request');
   });
 });
 
