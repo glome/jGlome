@@ -1,6 +1,7 @@
 // Network latency for asynchronous testing
 var networkLatency = 500;
 var previousId = null;
+var testAvailable = [];
 
 /* !Preliminary tests module */
 QUnit.module('Preliminary checks');
@@ -69,6 +70,9 @@ QUnit.test('Dependency tests', function()
 
 var Glome = new jQuery.Glome();
 
+// Test on local server
+Glome.API.server = '/';
+
 /* !Glome generic method tests */
 QUnit.module('Glome generic method tests');
 
@@ -84,6 +88,16 @@ QUnit.test('Glome methods', function()
     function()
     {
       Glome.get();
+    },
+    'Glome.get expects exactly one argument',
+    'set method requires exact argument count of one'
+  );
+  
+  // Test argument counts
+  QUnit.throws
+  (
+    function()
+    {
       Glome.get('foo', 'bar');
     },
     'Glome.get expects exactly one argument',
@@ -95,7 +109,25 @@ QUnit.test('Glome methods', function()
     function()
     {
       Glome.set();
+    },
+    'Glome.set expects exactly two argument',
+    'set method requires exact argument count of two'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
       Glome.set('foo');
+    },
+    'Glome.set expects exactly two argument',
+    'set method requires exact argument count of two'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
       Glome.set('foo', 'bar', 'foobar');
     },
     'Glome.set expects exactly two argument',
@@ -168,8 +200,8 @@ QUnit.test('Glome API basics', function()
 {
   var method, callback;
   
-  QUnit.ok(Glome.Api, 'API is accessible in general');
-  QUnit.equal('function', typeof Glome.Api.get, 'API get is accessible');
+  QUnit.ok(Glome.API, 'API is accessible in general');
+  QUnit.equal('function', typeof Glome.API.get, 'API get is accessible');
   
   method = 'foobar';
   
@@ -177,14 +209,14 @@ QUnit.test('Glome API basics', function()
   (
     function()
     {
-      Glome.Api.get(method);
+      Glome.API.get(method);
     },
-    'Glome.Api.get does not support request ' + method,
-    'Glome.Api.get should not support arbitrary request ' + method
+    'Glome.API.get does not support request ' + method,
+    'Glome.API.get should not support arbitrary request ' + method
   );
   
   // Use ads method
-  method = 'ads';
+  method = 'login';
   
   QUnit.throws
   (
@@ -193,7 +225,7 @@ QUnit.test('Glome API basics', function()
       var data = {};
       var callback = 'foo';
       
-      Glome.Api.get(method, data, callback);
+      Glome.API.get(method, data, callback);
     },
     'String "foo" is not a function'
   );
@@ -206,11 +238,11 @@ QUnit.test('Glome API basics', function()
   var callbacks = new Array();
   callbacks.push(callback);
   
-  QUnit.ok(Glome.Api.get(method, null, callback), 'Glome.Api.get supports null as second argument, function as third');
-  QUnit.ok(Glome.Api.get(method, {}, callback), 'Glome.Api.get supports an object as second argument, function as third');
-  QUnit.ok(Glome.Api.get(method, callback), 'Glome.Api.get supports function as second argument');
+  QUnit.ok(Glome.API.get(method, null, callback), 'Glome.API.get supports null as second argument, function as third');
+  QUnit.ok(Glome.API.get(method, {}, callback), 'Glome.API.get supports an object as second argument, function as third');
+  QUnit.ok(Glome.API.get(method, callback), 'Glome.API.get supports function as second argument');
   
-  QUnit.ok(Glome.Api.get(method, callbacks), 'Glome.Api.get supports an array of callbacks');
+  QUnit.ok(Glome.API.get(method, callbacks), 'Glome.API.get supports an array of callbacks');
 });
 
 QUnit.asyncTest('Login', function()
@@ -223,8 +255,8 @@ QUnit.asyncTest('Login', function()
     
   }
   
-  QUnit.ok(Glome.Api.login, 'Login method is available');
-  QUnit.ok(Glome.Api.logout, 'Logout method is available');
+  QUnit.ok(Glome.API.login, 'Login method is available');
+  QUnit.ok(Glome.API.logout, 'Logout method is available');
   
   id = Glome.id();
   
@@ -234,7 +266,7 @@ QUnit.asyncTest('Login', function()
     {
       Glome.glomeid = null;
       Glome.pref('glomeid', null);
-      Glome.Api.login();
+      Glome.API.login();
     },
     'There is no available Glome ID',
     'Login throws an error when there is no ID available'
@@ -248,7 +280,7 @@ QUnit.asyncTest('Login', function()
   (
     function()
     {
-      Glome.Api.login(id, callback, 'foobar');
+      Glome.API.login(id, callback, 'foobar');
     },
     'Password has to be a string',
     'Password has to be a string'
@@ -258,7 +290,7 @@ QUnit.asyncTest('Login', function()
   (
     function()
     {
-      Glome.Api.login(id, '', 'foobar');
+      Glome.API.login(id, '', 'foobar');
     },
     'Callback has to be an array or a function',
     'Callback has to be an array or a function'
@@ -268,10 +300,10 @@ QUnit.asyncTest('Login', function()
   (
     function()
     {
-      Glome.Api.login(id, '', callback, 'foo');
+      Glome.API.login(id, '', callback, 'foo');
     },
     'Callback has to be an array or a function',
-    'Callback has to be an array or a function'
+    'Caught string callback exception'
   );
   
   Glome.API.login(id, '', function(data, status, jqXHR)
@@ -311,17 +343,11 @@ QUnit.asyncTest('Get ads', function()
     window.glomeCallback = 'callback called successfully';
   };
   
-  Glome.Api.get(method, callback);
-  
-  window.setTimeout
-  (
-    function()
-    {
-      QUnit.equal(window.glomeCallback, 'callback called successfully', 'Glome callback does what was expected');
-      QUnit.start();
-    },
-    networkLatency
-  );
+  Glome.API.get(method, function()
+  {
+    QUnit.ok(true, 'Callback run after successful get');
+    QUnit.start();
+  });
 });
 
 /* !Creating a new Glome ID */
