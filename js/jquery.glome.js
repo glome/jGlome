@@ -444,7 +444,7 @@
       },
       
       /**
-       * Get request
+       * Get request. Shorthand and backwards compatibility for API.read
        * 
        * @access public
        * @param string type         Purpose of the request i.e. API identifier
@@ -455,28 +455,22 @@
        */
       get: function(type, data, callback, onerror)
       {
-        if (   !this.types[type].allowed
-            || (   jQuery.inArray('get', this.types[type].allowed) == -1
-                && jQuery.inArray('read', this.types[type].allowed) == -1))
-        {
-          throw new Error('Creating this type "' + type + '" is not allowed');
-        }
-        
-        if (   typeof data == 'undefined'
-            || typeof data == 'function'
-            || jQuery.isArray(data))
-        {
-          onerror = callback;
-          callback = data;
-          data = {};
-        }
-        
-        if (!data)
-        {
-          data = {};
-        }
-        
-        return this.request(type, data, callback, onerror, 'GET');
+        return this.get(type, data, callback, onerror);
+      },
+      
+      /**
+       * Set request. Shorthand and backwards compatibility for API.create
+       * 
+       * @access public
+       * @param string type         Purpose of the request i.e. API identifier
+       * @param object data         Data used for the GET request, @optional
+       * @param function callback   Callback function, @optional
+       * @param function onerror    Onerror function, @optional
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      set: function(type, data, callback, onerror)
+      {
+        return this.create(type, data, callback, onerror);
       },
       
       /**
@@ -511,7 +505,28 @@
        */
       read: function(type, data, callback, onerror)
       {
-        return this.get(type, data, callback, onerror);
+        if (   !this.types[type].allowed
+            || (   jQuery.inArray('get', this.types[type].allowed) == -1
+                && jQuery.inArray('read', this.types[type].allowed) == -1))
+        {
+          throw new Error('Creating this type "' + type + '" is not allowed');
+        }
+        
+        if (   typeof data == 'undefined'
+            || typeof data == 'function'
+            || jQuery.isArray(data))
+        {
+          onerror = callback;
+          callback = data;
+          data = {};
+        }
+        
+        if (!data)
+        {
+          data = {};
+        }
+        
+        return this.request(type, data, callback, onerror, 'GET');
       },
       
       /**
