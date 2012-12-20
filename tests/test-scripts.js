@@ -754,54 +754,58 @@ QUnit.test('Login with password', function()
 /* !Glome Ads class */
 QUnit.module('Glome Ads class');
 
-/* !Glome.Ads.ad object */
-QUnit.test('Glome.Ads.ad object', function()
+/* !Glome.Ads.Ad object */
+QUnit.test('Glome.Ads.Ad object', function()
 {
-  QUnit.equal(typeof Glome.Ads.ad, 'function', 'There is a method for creating a new ad prototype object');
+  QUnit.equal(typeof Glome.Ads.Ad, 'function', 'There is a method for creating a new Ad prototype object');
   
   QUnit.throws
   (
     function()
     {
-      Glome.Ads.ad('foo');
+      new Glome.Ads.Ad('foo');
     },
-    'Glome.Ads.ad requires an object or an integer (ad id) as a constructor',
-    'Glome.Ads.ad constructor did not accept a string as constructor'
-  );
-  
-  QUnit.equal
-  (
-    Glome.Ads.ad(1),
-    null,
-    'Glome.Ads.ad with ID 1 is not available (yet)'
+    'Glome.Ads.Ad requires an object or an integer (ad id) as a constructor',
+    'Glome.Ads.Ad constructor did not accept a string as constructor'
   );
   
   QUnit.throws
   (
     function()
     {
-      Glome.Ads.ad({foo: 'bar'});
+      new Glome.Ads.Ad(1);
     },
-    'There has to be an ID present in the Glome.Ads.ad constructor object'
+    'Glome.Ads.Ad with ID 1 is not available (yet)'
   );
   
   QUnit.throws
   (
     function()
     {
-      Glome.Ads.ad({id: 'bar'});
+      new Glome.Ads.Ad({foo: 'bar'});
+    },
+    'There has to be an ID present in the Glome.Ads.Ad constructor object'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Ads.Ad({id: 'bar'});
     },
     'Property id of the constructor has to be an integer'
   );
   
   // Dummy ad content
   var ad =
-  {
-    id: 1,
-    title: 'Test'
-  }
+  (
+    {
+      id: 1,
+      title: 'Test'
+    }
+  );
   
-  var gad = Glome.Ads.ad(ad);
+  var gad = new Glome.Ads.Ad(ad);
   
   for (var i in ad)
   {
@@ -820,8 +824,14 @@ QUnit.test('Glome.Ads.ad object', function()
   
   // Remove newly created ad
   QUnit.ok(gad.remove(), 'Removing the ad was successful');
-  
-  QUnit.equal(Glome.Ads.ad(gad.id), null, 'Ad was removed successfully from the stack');
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.Ad(gad.id);
+    },
+    'Ad was removed successfully from the stack'
+  );
 });
 
 
@@ -851,8 +861,8 @@ QUnit.test('Glome.Ads API', function()
     category: categoryid
   }
   
-  var gad = Glome.Ads.ad(ad);
-  Glome.Ads.ad
+  var gad = Glome.Ads.Ad(ad);
+  Glome.Ads.Ad
   (
     {
       id: 2,
@@ -909,7 +919,7 @@ QUnit.test('Ads list filters', function()
   var categoryId = 2;
   var statusCode = 2;
   
-  var gad = Glome.Ads.ad(ad);
+  var gad = Glome.Ads.Ad(ad);
   gad.adcategories.push(categoryId);
   gad.setStatus(statusCode);
   
@@ -1078,6 +1088,14 @@ QUnit.test('Glome templates', function()
   });
 });
 
+/* !Glome Categories class */
+QUnit.module('Glome Categories class');
+QUnit.test('Glome.Categories.category object', function()
+{
+  QUnit.ok(Glome.Categories, 'There is a categories subclass');
+  QUnit.ok(Glome.Categories.Category, 'There is a category object');
+});
+
 // These tests have to be asynchronous to ensure that template test has been run already
 /* Glome UI */
 /*
@@ -1153,7 +1171,7 @@ QUnit.asyncTest('Initialize with constructor', function()
     
     var id = 123456789;
     
-    Glome.Ads.ad
+    Glome.Ads.Ad
     (
       {
         id: id

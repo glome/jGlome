@@ -926,71 +926,55 @@
        * 
        * @param mixed data
        */
-      ad: function(data)
+      Ad: function(data)
       {
         // Return an existing ad if it is in the stack, otherwise return null
-        if (   data
-            && data.toString().match(/^[1-9][0-9]*$/))
-        {
-          var id = data.toString();
-          
-          if (typeof this.stack[id] != 'undefined')
-          {
-            return this.stack[id];
-          }
-          else
-          {
-            return null;
-          }
-        }
-        
-        /* !adObject interface */
-        var adObject =
+        function Ad(data)
         {
           /**
            * Ad ID
            *  
            * @var Integer
            */
-          id: null,
+          this.id = null;
           
           /**
            * Ad view status
            * 
            * @var Integer
            */
-          status: 0,
+          this.status = 0;
           
           /**
            * List of categories this ad belongs to
            * 
            * @var Array
            */
-          adcategories: [],
+          this.adcategories = [];
           
           /**
            * Set the view status of this ad
            * 
            * @param Integer statusCode    Status code
            */
-          setStatus: function(statusCode)
+          this.setStatus = function(statusCode)
           {
             this.status = statusCode;
             return true;
-          },
+          };
           
           /**
            * Update this ad
            */
-          update: function()
+          this.update = function()
           {
             //plugin.Ads.onchange();
-          },
+          };
           
           /**
            * Remove this ad
            */
-          remove: function()
+          this.remove = function()
           {
             var id = this.id;
             
@@ -1010,18 +994,29 @@
               return false;
             }
           }
-        };
-        
-        if (data)
-        {
+          
+          if (typeof data == 'string')
+          {
+            var id = data.toString();
+            
+            if (typeof plugin.Ads.stack[id] != 'undefined')
+            {
+              return plugin.Ads.stack[id];
+            }
+            else
+            {
+              throw new Error('No ad with id ' + id + ' available');
+            }
+          }
+          
           if (!jQuery.isPlainObject(data))
           {
-            throw new Error('Glome.Ads.ad requires an object or an integer (ad id) as a constructor');
+            throw new Error('Glome.Ads.Ad requires an object or an integer (ad id) as a constructor');
           }
           
           if (!data.id)
           {
-            throw new Error('There has to be an ID present in the Glome.Ads.ad constructor object');
+            throw new Error('There has to be an ID present in the Glome.Ads.Ad constructor object');
           }
           
           if (!data.id.toString().match(/^[1-9][0-9]*$/))
@@ -1031,18 +1026,18 @@
           
           for (var i in data)
           {
-            adObject[i] = data[i];
+            this[i] = data[i];
           }
-        }
+          
+          if (this.id)
+          {
+            var id = this.id.toString();
+            plugin.Ads.stack[id] = this;
+            plugin.Ads.onchange();
+          }
+        };
         
-        if (adObject.id)
-        {
-          var id = adObject.id.toString();
-          plugin.Ads.stack[id] = adObject;
-          plugin.Ads.onchange();
-        }
-        
-        return adObject;
+        return new Ad(data);
       },
       
       /**
@@ -1241,7 +1236,7 @@
               for (i = 0; i < data.length; i++)
               {
                 id = data[i].id;
-                ad = new plugin.Ads.ad(data[i]);
+                ad = new plugin.Ads.Ad(data[i]);
               }
               
               plugin.Ads.disableListeners = false;
@@ -1314,6 +1309,53 @@
           plugin.Ads.listeners[i].context = plugin.Ads;
           plugin.Ads.listeners[i]();  
         }
+      }
+    };
+    
+    /* !Categories */
+    /**
+     * Categories interface object
+     * 
+     * Methods:
+     * 
+     * GLome.Categories.load
+     */
+    plugin.Categories =
+    {
+      /**
+       * Category stack for storing the categories
+       * 
+       * @param object
+       */
+      stack: {},
+      
+      /**
+       * Registered listener functions that will be called on change event
+       * 
+       * @param Array
+       */
+      listeners: [],
+      
+      /**
+       * Is categories updating in progress right now? This is to prevent flooding of onchange events
+       * 
+       * @param boolean
+       */
+      disableListeners: false,
+      
+      /**
+       * Create a new category or fetch an existing from stack. Constructor
+       * 
+       * @param mixed data
+       */
+      Category: function(data)
+      {
+        function Category(data)
+        {
+          this.foo = 'bar';
+        }
+        
+        return new Category;
       }
     };
     
@@ -1440,7 +1482,7 @@
         },
         pagerAd: function(id)
         {
-          var ad = plugin.Ads.ad(id);
+          var ad = plugin.Ads.Ad(id);
           
           plugin.container.find('#glomeWidgetContent').find('[data-glome-template]').remove();
           plugin.container.find('#glomeWidgetContent').prepend(plugin.Templates.get('widget-ad'));
@@ -1497,7 +1539,7 @@
       }
       else
       {
-        plugin.API.login
+        plugin.Auth.login
         (
           plugin.id(),
           '',
