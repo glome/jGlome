@@ -8,7 +8,7 @@
   /**
    * Glome master class, which is responsible for all of the non-DOM interactions
    */
-  jQuery.Glome = function(el)
+  jQuery.Glome = function(el, callback, onerror)
   {
     'use strict';
     
@@ -18,7 +18,7 @@
     this.glomeid = null;
     this.ads = {};
     this.container = null;
-    this.sessionCookies = null;
+    this.sessionCookie = null;
     this.sessionToken = null;
     
     /**
@@ -46,65 +46,71 @@
       }
     }
     
+    /* !Data */
     /**
-     * Get a locally stored value
-     * 
-     * @param string key
-     * @return mixed        Returns the typecasted value
+     * Data access
      */
-    plugin.get = function(key)
+    plugin.Data =
     {
-      if (arguments.length !== 1)
+      /**
+       * Get a locally stored value
+       * 
+       * @param string key
+       * @return mixed        Returns the typecasted value
+       */
+      get: function(key)
       {
-        throw new Error('Glome.get expects exactly one argument');
-      }
+        if (arguments.length !== 1)
+        {
+          throw new Error('Glome.get expects exactly one argument');
+        }
+        
+        // @TODO: support extensions and store the information on their local storage or preferences
+        // via their own interfaces
+        
+        var storage = JSON.parse(window.localStorage.getItem(key));
+        
+        // If there is nothing in the storage, return null
+        if (   !storage
+            || typeof storage.val == 'undefined')
+        {
+          return null;
+        }
+        
+        // Check the type
+        if (typeof storage.val !== storage.type)
+        {
+          throw new Error('Type mismatch error: ' + storage.type + ' is not ' + typeof storage.val);
+        }
+        
+        return storage.val;
+      },
       
-      // @TODO: support extensions and store the information on their local storage or preferences
-      // via their own interfaces
-      
-      var storage = JSON.parse(window.localStorage.getItem(key));
-      
-      // If there is nothing in the storage, return null
-      if (   !storage
-          || typeof storage.val == 'undefined')
+      /**
+       * Set a value for the local storage
+       * 
+       * @param String key    Storage identifier
+       * @param mixed value   Storage value
+       * @return mixed        True on successful storage
+       */
+      set: function(key, value)
       {
-        return null;
+        if (arguments.length !== 2)
+        {
+          throw new Error('Glome.set expects exactly two arguments');
+        }
+        
+        // Store typecasted object
+        var storage =
+        {
+          type: typeof value,
+          val: value
+        }
+        
+        window.localStorage.setItem(key, JSON.stringify(storage));
+        return true;
       }
-      
-      // Check the type
-      if (typeof storage.val !== storage.type)
-      {
-        throw new Error('Type mismatch error: ' + storage.type + ' is not ' + typeof storage.val);
-      }
-      
-      return storage.val;
-    };
-    
-    /**
-     * Set a value for the local storage
-     * 
-     * @param String key    Storage identifier
-     * @param mixed value   Storage value
-     * @return mixed        True on successful storage
-     */
-    plugin.set = function(key, value)
-    {
-      if (arguments.length !== 2)
-      {
-        throw new Error('Glome.set expects exactly two arguments');
-      }
-      
-      // Store typecasted object
-      var storage =
-      {
-        type: typeof value,
-        val: value
-      }
-      
-      window.localStorage.setItem(key, JSON.stringify(storage));
-      return true;
-    };
-    
+    }
     /**
      * Set or get preferences
      * 
@@ -118,11 +124,11 @@
       {
         // Get preference
         case 1:
-          return plugin.get(key);
+          return plugin.Data.get(key);
           
         // Set preference
         case 2:
-          return plugin.set(key, value);
+          return plugin.Data.set(key, value);
         
         default:
           throw new Error('Glome.pref excepts either one argument for get or two arguments for set');
@@ -214,7 +220,7 @@
             // Get all links directly from the raw text source
             while (regs = tmp.match(/(<link.+?>)/))
             {
-              var str = Glome.Tools.escape(regs[1]);
+              var str = plugin.Tools.escape(regs[1]);
               var regexp = new RegExp(str, 'g');
               tmp = tmp.replace(regexp, '');
               
@@ -272,7 +278,7 @@
      */
     plugin.Api =
     {
-      server: 'https://api.glome.me/',
+      server: plugin.pref('server') || 'https://api.glome.me/',
       
       // Store the handles here
       types:
@@ -280,18 +286,71 @@
         ads:
         {
           url: 'ads.json',
-          allowed: ['get', 'set']
+          allowed: ['get', 'create']
         },
         user:
         {
           url: 'users.json',
-          allowed: ['get', 'set']
+          allowed: ['get', 'create']
         },
         login:
         {
           url: 'users/login.json',
-          allowed: ['get', 'set']
+          allowed: ['get', 'create']
+        },
+        me:
+        {
+          'url': 'users/{glomeid}.json',
+          allowed: ['get', 'update', 'delete'],
         }
+      },
+      
+      /**
+       * Parse URL
+       * 
+       * @param string url    URL to be parsed
+       * @return string       Parsed URL where some variables are parsed
+       */
+      parseURL: function(url)
+      {
+        var re = new RegExp('\{([a-zA-Z0-9]+)\}');
+        
+        while (url.match(re))
+        {
+          var regs = url.match(re);
+          var key = regs[1];
+          
+          var from = new RegExp(plugin.Tools.escape(regs[0]), 'g');
+          
+          switch (key)
+          {
+            case 'glomeid':
+              var to = plugin.id();
+              break;
+            
+            default:
+              if (!plugin[key])
+              {
+                throw new Error('Undefined variable "' + key + '" in URL');
+              }
+              var to = plugin[key];
+          }
+          
+          url = url.replace(from, to);
+        }
+        
+        return url;
+      },
+      
+      /**
+       * Camel case shorthand for parseURL method
+       * 
+       * @param string url    URL to be parsed
+       * @return string       Parsed URL where some variables are parsed
+       */
+      parseUrl: function(url)
+      {
+        return this.parseURL(url);
       },
         
       /**
@@ -344,17 +403,20 @@
         var request = jQuery.ajax
         (
           {
-            url: this.server + this.types[type].url,
+            url: plugin.API.parseURL(this.server + this.types[type].url),
             data: data,
             type: 'GET',
             dataType: 'json',
             success: callback,
-            crossDomain: true,
             xhrFields:
             {
               withCredentials: true
             },
-            error: onerror
+            error: onerror,
+            beforeSend: function(jqXHR, settings)
+            {
+              jqXHR.settings = settings;
+            }
           }
         );
         
@@ -366,11 +428,12 @@
        * 
        * @param string type
        * @param Object data
-       * @param function callback   Callback function, @optional
-       * @param function onerror    On error function, @optional
+       * @param function callback   @optional Callback function
+       * @param function onerror    @optional On error function
+       * @param string method       @optional Request method (POST, PUT, DELETE)
        * @return jqXHR              jQuery XMLHttpRequest
        */
-      set: function(type, data, callback, onerror)
+      set: function(type, data, callback, onerror, method)
       {
         if (arguments.length < 2)
         {
@@ -382,17 +445,11 @@
           throw new Error('Glome.Api.set does not support request ' + type);
         }
         
-        if (   !this.types[type].allowed
-            || jQuery.inArray('set', this.types[type].allowed) == -1)
-        {
-          throw new Error('Setting this type ' + type + ' is not allowed');
-        }
-        
         // Type check for data
         if (   data
             && !jQuery.isPlainObject(data))
         {
-          throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
+          throw new Error('When passing data to Glome.Api.set, it has to be an object. Now received typeof ' + typeof data);
         }
         
         // Type check for callback
@@ -416,24 +473,117 @@
           throw new Error('onerror has to be a function or an array, now received typeof ' + typeof onerror);
         }
         
+        if (!method)
+        {
+          method = 'POST';
+        }
+        
+        if (!method.toString().match(/^(POST|PUT|DELETE)$/))
+        {
+          throw new Error('"' + method.toString() + '" is not a valid method');
+        }
+        
         var request = jQuery.ajax
         (
           {
-            url: this.server + this.types[type].url,
+            url: plugin.API.parseURL(this.server + this.types[type].url),
             data: data,
-            type: 'POST',
+            type: method.toString(),
             dataType: 'json',
             xhrFields:
             {
               withCredentials: true
             },
             success: callback,
-            error: onerror
+            error: onerror,
+            beforeSend: function(jqXHR, settings)
+            {
+              jqXHR.settings = settings;
+            }
           }
         );
         return request;
       },
       
+      /**
+       * Create data on Glome server. This is a shorthand for calling API.set with POST as method
+       * 
+       * @param string type
+       * @param Object data
+       * @param function callback   @optional Callback function
+       * @param function onerror    @optional On error function
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      create: function(type, data, callback, onerror)
+      {
+        if (   !this.types[type].allowed
+            || jQuery.inArray('create', this.types[type].allowed) == -1)
+        {
+          throw new Error('Creating this type "' + type + '" is not allowed');
+        }
+        
+        return this.set(type, data, callback, onerror, 'POST');
+      },
+      
+      /**
+       * Update data on Glome server. This is a shorthand for calling API.set with PUT as method
+       * 
+       * @param string type
+       * @param Object data
+       * @param function callback   @optional Callback function
+       * @param function onerror    @optional On error function
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      update: function(type, data, callback, onerror)
+      {
+        if (   !this.types[type].allowed
+            || jQuery.inArray('update', this.types[type].allowed) == -1)
+        {
+          throw new Error('Updating this type "' + type + '" is not allowed');
+        }
+        
+        return this.set(type, data, callback, onerror, 'PUT');
+      },
+      
+      /**
+       * Update data on Glome server. This is a shorthand for calling API.set with PUT as method
+       * 
+       * @param string type
+       * @param Object data
+       * @param function callback   @optional Callback function
+       * @param function onerror    @optional On error function
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      delete: function(type, data, callback, onerror)
+      {
+        if (   !this.types[type].allowed
+            || jQuery.inArray('delete', this.types[type].allowed) == -1)
+        {
+          throw new Error('Deleting this type "' + type + '" is not allowed');
+        }
+        
+        if (typeof data == 'function')
+        {
+          onerror = callback;
+          callback = data;
+          data = {};
+        }
+        
+        return this.set(type, data, callback, onerror, 'DELETE');
+      }
+    };
+    
+    /**
+     * Alias for the sake of typing errors
+     */
+    plugin.API = plugin.Api;
+    
+    /* !Auth */
+    /**
+     * Authentication
+     */
+    plugin.Auth =
+    {
       /**
        * Login a user
        * 
@@ -490,17 +640,37 @@
         // Increase counter for failed login attempts
         onerrors.push(function()
         {
-          plugin.API.loginAttempts++;
+          //passwd = prompt('Login failed, please enter the password');
+          plugin.Auth.loginAttempts++;
         });
         
+        // First callback has to store any possible cookie and token
         callbacks.push(function(data, status, jqXHR)
         {
-          console.log('login callback', jqXHR, jqXHR.getResponseHeader('X-CSRF-Token'));
+          var token = jqXHR.getResponseHeader('X-CSRF-Token');
+          
+          if (token)
+          {
+            plugin.sessionToken = token;
+            jQuery.ajaxSetup
+            (
+              {
+                xhrFields:
+                {
+                  withCredentials: true
+                },
+                headers:
+                {
+                  'X-CSRF-Token': plugin.sessionToken
+                }
+              }
+            );
+          }
         });
         
         onerrors.push(function(jqXHR)
         {
-          console.log('login onerror', jqXHR, jqXHR.getResponseHeader('X-CSRF-Token'));
+          console.warn('Login error');
         });
         
         // Array merge
@@ -561,69 +731,151 @@
       logout: function(id)
       {
         
-      }
-    };
-    
-    /**
-     * Alias for the sake of typing errors
-     */
-    plugin.API = plugin.Api;
-    
-    /**
-     * Initialize Glome
-     * 
-     * @param string ID
-     * @param int counter Recursive call counter
-     */
-    plugin.createGlomeId = function(id, counter)
-    {
-      if (!counter)
+      },
+      
+      /**
+       * Initialize Glome
+       * 
+       * @param string ID
+       * @param int counter Recursive call counter
+       */
+      createGlomeId: function(id, callback, onerror, counter)
       {
-        counter = 1;
-      }
-      
-      if (counter >= 10)
-      {
-        throw new Error('Exceeded maximum number of times to create a Glome ID');
-      }
-      
-      if (!id)
-      {
-        throw new Error('Glome ID creation requires a parameter');
-      }
-      
-      if (!id.toString().match(/^[0-9a-z]+$/i))
-      {
-        throw new Error('Glome ID has to be alphanumeric in lowercase');
-      }
-      
-      var glomeId = String(id);
-      
-      if (counter > 1)
-      {
-        glomeId += counter;
-      }
-      
-      this.Api.set
-      (
-        'user',
+        if (!counter)
         {
-          user:
-          {
-            glomeid: glomeId
-          }
-        },
-        function(data)
-        {
-          plugin.pref('glomeid', data.glomeid);
-          plugin.glomeid = data.glomeid;
-        },
-        function()
-        {
-          plugin.createGlomeId(id, counter + 1);
+          counter = 1;
         }
-      );
-    };
+        
+        if (counter >= 10)
+        {
+          throw new Error('Exceeded maximum number of times to create a Glome ID');
+        }
+        
+        if (!id)
+        {
+          throw new Error('Glome ID creation requires a parameter');
+        }
+        
+        if (!id.toString().match(/^[0-9a-z]+$/i))
+        {
+          throw new Error('Glome ID has to be alphanumeric in lowercase');
+        }
+        
+        var glomeId = String(id);
+        
+        if (counter > 1)
+        {
+          glomeId += counter;
+        }
+        
+        var callbacks = [];
+        var onerrors = [];
+        
+        callbacks.push
+        (
+          function(data)
+          {
+            plugin.pref('glomeid', data.glomeid);
+            plugin.glomeid = data.glomeid;
+            
+            // Login immediately
+            plugin.Auth.login(data.glomeid, '', callback, onerror);
+          }
+        );
+        
+        onerrors.push
+        (
+          function()
+          {
+            plugin.Auth.createGlomeId(id, callback, onerror, counter + 1);
+          }
+        );
+        
+        if (callback)
+        {
+          if (typeof callback !== 'function')
+          {
+            throw new Error('Callback has to be a function');  
+          }
+          
+          callbacks.push(callback);
+        }
+        
+        if (onerror)
+        {
+          if (typeof callback !== 'function')
+          {
+            throw new Error('Onerror has to be a function');  
+          }
+          
+          onerrors.push(onerror);
+        }
+        
+        plugin.API.set
+        (
+          'user',
+          {
+            user:
+            {
+              glomeid: glomeId
+            }
+          },
+          callbacks,
+          onerrors
+        );
+      },
+      
+      /**
+       * Update password
+       * 
+       * @param string pw1         Password
+       * @param string pw2         Password confirmation
+       * @param string oldpass     Existing password - this is a placeholder at the moment as sessioning takes care of it already
+       * @param function callback  @optional callback
+       * @param function onerror   @optional onerror
+       */
+      setPassword: function(pw1, pw2, oldpass, callback, onerror)
+      {
+        if (!plugin.id())
+        {
+          throw new Error('Glome ID is not available');
+        }
+        
+        if (   typeof pw1 !== 'string'
+            || typeof pw2 !== 'string')
+        {
+          throw new Error('Passwords have to be strings');
+        }
+        
+        if (pw1 !== pw2)
+        {
+          if (onerror)
+          {
+            return onerror();
+          }
+          else
+          {
+            throw new Error('Password mismatch error');
+          }
+        }
+        
+        var request = plugin.API.update
+        (
+          'me',
+          {
+            user:
+            {
+              password: pw1,
+              password_confirmation: pw2
+            }
+          },
+          callback,
+          onerror
+        );
+        
+        console.log('Update request', request);
+      }
+    }
     
     /* !Ads */
     /**
@@ -968,12 +1220,7 @@
         plugin.Api.get
         (
           'ads',
-          {
-            user:
-            {
-              glomeid: plugin.id()
-            }
-          },
+          null,
           [
             function(data)
             {
@@ -1105,6 +1352,7 @@
         
         if (!plugin.container.find('#glomeWindow').size())
         {
+          console.warn('There is no #glomeWindow, abort mission');
           return false;
         }
         
@@ -1223,15 +1471,42 @@
     /**
      * Initialize Glome
      * 
-     * @param mixed el     DOM object (either plain of jQuery wrapped) or a string with traversable path
+     * @param mixed el           @optional DOM object (either plain of jQuery wrapped) or a string with traversable path
+     * @param function callback  @optional Callback, triggered after initialization is complete
+     * @param function onerror   @optional Onerror, triggered in the initialization fails
      */
-    plugin.initialize = function(el)
+    plugin.initialize = function(el, callback, onerror)
     {
+      if (   callback
+          && typeof callback !== 'function')
+      {
+        throw new Error('Constructor callback has to be a function');
+      }
+      
       // Create a new Glome ID if previous ID does not exist
       if (!plugin.id())
       {
         var date = new Date();
-        this.createGlomeId(date.getTime());
+        this.createGlomeId(date.getTime(), callback, onerror);
+      }
+      else
+      {
+        plugin.API.login
+        (
+          plugin.id(),
+          '',
+          function()
+          {
+            plugin.Ads.load(callback, onerror);
+          },
+          function()
+          {
+            if (typeof onerror === 'function')
+            {
+              onerror();
+            }
+          }
+        );
       }
       
       if (el)
@@ -1239,18 +1514,16 @@
         this.Templates.load(function()
         {
           plugin.DOM.bindTo(el);
-          plugin.DOM.init();
+          plugin.DOM.init(callback, onerror);
         });
       }
-      
-      plugin.Ads.load();
       
       return true;
     };
     
     if (el)
     {
-      plugin.initialize(el);
+      return plugin.initialize(el, callback, onerror);
     }
   };
 }(jQuery)
