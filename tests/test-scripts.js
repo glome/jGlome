@@ -199,6 +199,84 @@ QUnit.test('Glome methods', function()
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
+/* !Glome data prototype object */
+QUnit.module('Glome data prototype object');
+
+/* !Constructor */
+QUnit.test('Constructor', function()
+{
+  QUnit.ok(Glome.Data.Prototype, 'There is a data prototype object');
+  var p = new Glome.Data.Prototype();
+  
+  QUnit.notEqual('undefined', typeof p.id, 'Prototype object has ID, which all prototype objects should have');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Data.Prototype('foobar');
+    },
+    'Constructor never accepts a string, only integers and plain objects',
+    'Non-object constructor has to be an integer'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Data.Prototype(1);
+    },
+    'ID retrieval has to be added in the derived class',
+    'Prototype class constructor cannot be directly initialized'
+  );
+  
+  var dataset =
+  {
+    id: 1,
+    Zaphod: 'Beeblebrox',
+    planets: ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptunus'],
+    status:
+    {
+      Earth: 'Mostly harmless'
+    },
+    onerror: function(){}
+  };
+  
+  var o = new Glome.Data.Prototype(dataset);
+  
+  for (var i in dataset)
+  {
+    QUnit.deepEqual(o[i], dataset[i], 'Property ' + i + ' was copied successfully');
+  }
+  
+  dataset.id = 'foobar';
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Data.Prototype(dataset);
+    },
+    'ID has to be an integer'
+  );
+});
+
+/* !Extend */
+QUnit.test('Extend', function()
+{
+  QUnit.ok(Glome.Data.Prototype().Extends, 'There is a helper method for extending objects');
+  
+  // Create a new object with a method called newMethod
+  var n = new function()
+  {
+    this.newMethod = function()
+    {}
+  }
+  
+  var k = new Glome.Data.Prototype();
+  k.Extends(n);
+  QUnit.equal(typeof k.newMethod, 'function', 'New method was copied successfully');
+});
+
 QUnit.module('Glome API');
 /* !Glome API basics */
 QUnit.test('Glome API basics', function()
@@ -708,7 +786,6 @@ QUnit.test('Login with password', function()
 {
   QUnit.expect(1);
   QUnit.stop();
-  console.log('Login with password');
   
   Glome.Auth.login
   (
@@ -723,7 +800,6 @@ QUnit.test('Login with password', function()
         null,
         function()
         {
-          console.log('Password set');
           Glome.Auth.login
           (
             testGlomeId,
@@ -731,19 +807,16 @@ QUnit.test('Login with password', function()
             function()
             {
               QUnit.start();
-              console.log('Login callback');
               QUnit.equal(testGlomeId, Glome.id(), 'Logging with a password was successful');
             },
             function()
             {
-              console.log('Login onerror');
               QUnit.start();
             }
           );
         },
         function()
         {
-          console.log('setPassword callback');
           QUnit.start();
         }
       );
@@ -763,7 +836,7 @@ QUnit.test('Glome.Ads.Ad object', function()
   (
     function()
     {
-      new Glome.Ads.Ad('foo');
+      var ad = new Glome.Ads.Ad('foo');
     },
     'Glome.Ads.Ad requires an object or an integer (ad id) as a constructor',
     'Glome.Ads.Ad constructor did not accept a string as constructor'
@@ -782,15 +855,6 @@ QUnit.test('Glome.Ads.Ad object', function()
   (
     function()
     {
-      new Glome.Ads.Ad({foo: 'bar'});
-    },
-    'There has to be an ID present in the Glome.Ads.Ad constructor object'
-  );
-  
-  QUnit.throws
-  (
-    function()
-    {
       new Glome.Ads.Ad({id: 'bar'});
     },
     'Property id of the constructor has to be an integer'
@@ -798,14 +862,13 @@ QUnit.test('Glome.Ads.Ad object', function()
   
   // Dummy ad content
   var ad =
-  (
-    {
-      id: 1,
-      title: 'Test'
-    }
-  );
+  {
+    id: 1,
+    title: 'Test'
+  };
   
   var gad = new Glome.Ads.Ad(ad);
+  console.log('gad', gad);
   
   for (var i in ad)
   {
@@ -1090,10 +1153,23 @@ QUnit.test('Glome templates', function()
 
 /* !Glome Categories class */
 QUnit.module('Glome Categories class');
-QUnit.test('Glome.Categories.category object', function()
+QUnit.test('Glome.Categories.Category object', function()
 {
   QUnit.ok(Glome.Categories, 'There is a categories subclass');
   QUnit.ok(Glome.Categories.Category, 'There is a category object');
+  
+  var category = new Glome.Categories.Category();
+  
+  QUnit.notEqual('undefined', typeof category.id, 'Category can be initialized with a constructor');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Categories.Category('foobar');
+    },
+    'Category with invented id is not accessible'
+  );
 });
 
 // These tests have to be asynchronous to ensure that template test has been run already

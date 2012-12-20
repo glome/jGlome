@@ -54,6 +54,75 @@
     plugin.Data =
     {
       /**
+       * Prototype object for data
+       */
+      Prototype: function(data)
+      {
+        function Prototype(data)
+        {
+          this.constructor(data);
+        }
+        
+        Prototype.prototype.constructor = function(data)
+        {
+          // Data is set
+          if (!data)
+          {
+            data = {};
+          }
+          
+          /**
+           * There is always an ID for all of the data objects
+           */
+          this.id = null;
+          
+          this.getById = function(id)
+          {
+            throw new Error('Prototype class constructor cannot be directly initialized');
+          }
+          
+          if (!jQuery.isPlainObject(data))
+          {
+            if (!data.toString().match(/^[1-9][0-9]*$/))
+            {
+              throw new Error('Non-object constructor has to be an integer');
+            }
+            
+            this.getById(data);
+            return;
+          }
+          
+          // Copy all of the properties
+          for (var i in data)
+          {
+            switch (i)
+            {
+              case 'id':
+                if (!data[i].toString().match(/^[1-9][0-9]*$/))
+                {
+                  throw new Error('Property "id" has to be an integer');
+                }
+                this[i] = data[i];
+                break;
+              
+              default:
+                this[i] = data[i];
+            }
+          }
+        }
+        
+        Prototype.prototype.Extends = function(newClass)
+        {
+          for (var i in newClass)
+          {
+            this[i] = newClass[i];
+          }
+        }
+        
+        return new Prototype(data);
+      },
+      
+      /**
        * Get a locally stored value
        * 
        * @param string key
@@ -380,7 +449,6 @@
         if (   data
             && !jQuery.isPlainObject(data))
         {
-          console.log(type, data, callback, onerror, method);
           throw new Error('When passing data to Glome.Api.request, it has to be an object. Now received typeof ' + typeof data);
         }
         
@@ -931,113 +999,28 @@
         // Return an existing ad if it is in the stack, otherwise return null
         function Ad(data)
         {
-          /**
-           * Ad ID
-           *  
-           * @var Integer
-           */
-          this.id = null;
-          
-          /**
-           * Ad view status
-           * 
-           * @var Integer
-           */
-          this.status = 0;
-          
-          /**
-           * List of categories this ad belongs to
-           * 
-           * @var Array
-           */
-          this.adcategories = [];
-          
-          /**
-           * Set the view status of this ad
-           * 
-           * @param Integer statusCode    Status code
-           */
-          this.setStatus = function(statusCode)
-          {
-            this.status = statusCode;
-            return true;
-          };
-          
-          /**
-           * Update this ad
-           */
-          this.update = function()
-          {
-            //plugin.Ads.onchange();
-          };
-          
-          /**
-           * Remove this ad
-           */
-          this.remove = function()
-          {
-            var id = this.id;
-            
-            if (!plugin.Ads.stack[id])
-            {
-              return true;
-            }
-            
-            plugin.Ads.removeAd(id);
-            
-            if (!plugin.Ads.stack[id])
-            {
-              return true;
-            }
-            else
-            {
-              return false;
-            }
-          }
-          
-          if (typeof data == 'string')
-          {
-            var id = data.toString();
-            
-            if (typeof plugin.Ads.stack[id] != 'undefined')
-            {
-              return plugin.Ads.stack[id];
-            }
-            else
-            {
-              throw new Error('No ad with id ' + id + ' available');
-            }
-          }
-          
-          if (!jQuery.isPlainObject(data))
-          {
-            throw new Error('Glome.Ads.Ad requires an object or an integer (ad id) as a constructor');
-          }
-          
-          if (!data.id)
-          {
-            throw new Error('There has to be an ID present in the Glome.Ads.Ad constructor object');
-          }
-          
-          if (!data.id.toString().match(/^[1-9][0-9]*$/))
-          {
-            throw new Error('ID has to be an integer');
-          }
-          
-          for (var i in data)
-          {
-            this[i] = data[i];
-          }
-          
-          if (this.id)
-          {
-            var id = this.id.toString();
-            plugin.Ads.stack[id] = this;
-            plugin.Ads.onchange();
-          }
-        };
+          this.constructor(data);
+        }
         
-        return new Ad(data);
+        Ad.prototype = new plugin.Data.Prototype();
+        
+        Ad.prototype.status = 0;
+        Ad.prototype.adcategories = [];
+        Ad.prototype.setStatus = function(statusCode)
+        {
+          this.status = statusCode;
+          return true;
+        }
+        
+        var ad = new Ad(data);
+        
+        if (ad.id)
+        {
+          var id = ad.id;
+          plugin.Ads.stack[id] = ad;
+        }
+        
+        return ad;
       },
       
       /**
@@ -1352,10 +1335,44 @@
       {
         function Category(data)
         {
-          this.foo = 'bar';
+          /**
+           * Category ID
+           */
+          this.id = null;
+          
+          /**
+           * Category title
+           */
+          this.title = null;
+          
+          /**
+           * List ads of this category
+           */
+/*
+          this.listAds = function(filters)
+          {
+            
+          }
+*/
+          
+          if (   typeof data == 'string'
+              || typeof data == 'number')
+          {
+            var id = data.toString();
+            
+            if (typeof plugin.Categories.stack[id] != 'undefined')
+            {
+              return plugin.Categories.stack[id];
+            }
+            else
+            {
+              throw new Error('No category with id ' + id + ' available');
+            }
+          }
+          
         }
         
-        return new Category;
+        return new Category(data);
       }
     };
     
