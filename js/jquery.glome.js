@@ -15,6 +15,7 @@
     var plugin = this;
     var context = jQuery(el);
     
+    this.version = version;
     this.glomeid = null;
     this.ads = {};
     this.container = null;
@@ -647,6 +648,9 @@
         // First callback has to store any possible cookie and token
         callbacks.push(function(data, status, jqXHR)
         {
+          plugin.glomeid = id;
+          plugin.pref('glomeid', id);
+          
           var token = jqXHR.getResponseHeader('X-CSRF-Token');
           
           if (token)
@@ -872,8 +876,6 @@
           callback,
           onerror
         );
-        
-        console.log('Update request', request);
       }
     }
     

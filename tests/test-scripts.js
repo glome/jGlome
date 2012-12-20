@@ -306,7 +306,7 @@ QUnit.test('Glome API basics', function()
     'Undefined variable "hubbabubba" in URL'
   );
   
-  QUnit.equal(Glome.API.parseURL('{glomeid}'), Glome.id(), 'Variable name in URL was parsed correctly');
+  QUnit.equal(Glome.API.parseURL('{version}'), Glome.version, 'Variable name in URL was parsed correctly');
 });
 
 /* !Glome API requests */
@@ -444,12 +444,21 @@ QUnit.test('Creating a new Glome ID', function()
   
   QUnit.stop();
   
-  Glome.Auth.createGlomeId(testGlomeId, function()
-  {
-    QUnit.ok(Glome.id(), 'Glome ID is initialized');
-    QUnit.equal(Glome.id(), Glome.pref('glomeid'), 'Initialized and stored Glome ID is the same');
-    QUnit.start();
-  });
+  Glome.Auth.createGlomeId
+  (
+    testGlomeId,
+    function()
+    {
+      QUnit.start();
+      QUnit.ok(Glome.id(), 'Glome ID is initialized');
+      QUnit.equal(Glome.id(), Glome.pref('glomeid'), 'Initialized and stored Glome ID is the same');
+    },
+    function()
+    {
+      QUnit.start();
+      QUnit.ok(false, 'Create a new Glome ID');
+    }
+  );
 });
 
 /* Set password */
@@ -585,7 +594,7 @@ QUnit.test('Login', function()
   (
     function()
     {
-      Glome.Auth.login(id, '', 'foobar');
+      Glome.Auth.login(testGlomeId, '', 'foobar');
     },
     'Caught callback as a string exception',
     'Callback has to be an array or a function'
@@ -603,20 +612,26 @@ QUnit.test('Login', function()
   
   QUnit.stop();
   
-  Glome.Auth.login(testGlomeId, '', function(data, status, jqXHR)
-  {
-    QUnit.ok(Glome.sessionToken, 'CSRF token is set');
-    QUnit.equal(Glome.sessionToken, jqXHR.getResponseHeader('X-CSRF-Token'), 'CSRF token is the same as the one of AJAX request');
-    QUnit.start();
-  }, function(jqXHR)
-  {
-    QUnit.start();
-    QUnit.expect(8);
-  });
+  Glome.Auth.login
+  (
+    testGlomeId,
+    '',
+    function(data, status, jqXHR)
+    {
+      QUnit.start();
+      QUnit.ok(Glome.sessionToken, 'CSRF token is set');
+      QUnit.equal(Glome.sessionToken, jqXHR.getResponseHeader('X-CSRF-Token'), 'CSRF token is the same as the one of AJAX request');
+    },
+    function(jqXHR)
+    {
+      QUnit.start();
+      QUnit.expect(8);
+    }
+  );
 });
 
-/* !Set password */
-QUnit.test('Set password', function()
+/* !Set password fails */
+QUnit.test('Set password fails', function()
 {
   var currentId = Glome.id();
   Glome.glomeid = null;
@@ -634,46 +649,6 @@ QUnit.test('Set password', function()
   
   Glome.pref('glomeid', currentId);
   Glome.glomeid = currentId;
-});
-
-/* !Login with password */
-QUnit.test('Login with password', function()
-{
-  QUnit.expect(1);
-  QUnit.stop();
-  
-  Glome.Auth.setPassword
-  (
-    testPassword,
-    testPassword,
-    null,
-    function()
-    {
-      console.log('Password set');
-      Glome.Auth.login
-      (
-        testGlomeId,
-        testPassword,
-        function()
-        {
-          QUnit.start();
-          console.log('Login callback');
-          QUnit.equal(username, Glome.id(), 'Logging with a password was successful');
-          testSet.login = true;
-        },
-        function()
-        {
-          console.log('Login onerror');
-          QUnit.start();
-        }
-      );
-    },
-    function()
-    {
-      console.log('setPassword callback');
-      QUnit.start();
-    }
-  );
 });
 
 /* !CSRF token is kept */
@@ -716,6 +691,54 @@ QUnit.asyncTest('Get ads', function()
     {
       console.warn('URL', this.url)
       QUnit.expect(1);
+    }
+  );
+});
+
+/* !Login with password */
+QUnit.test('Login with password', function()
+{
+  QUnit.expect(1);
+  QUnit.stop();
+  console.log('Login with password');
+  
+  Glome.Auth.login
+  (
+    testGlomeId,
+    '',
+    function()
+    {
+      Glome.Auth.setPassword
+      (
+        testPassword,
+        testPassword,
+        null,
+        function()
+        {
+          console.log('Password set');
+          Glome.Auth.login
+          (
+            testGlomeId,
+            testPassword,
+            function()
+            {
+              QUnit.start();
+              console.log('Login callback');
+              QUnit.equal(testGlomeId, Glome.id(), 'Logging with a password was successful');
+            },
+            function()
+            {
+              console.log('Login onerror');
+              QUnit.start();
+            }
+          );
+        },
+        function()
+        {
+          console.log('setPassword callback');
+          QUnit.start();
+        }
+      );
     }
   );
 });
