@@ -455,7 +455,7 @@
        */
       get: function(type, data, callback, onerror)
       {
-        return this.get(type, data, callback, onerror);
+        return this.read(type, data, callback, onerror);
       },
       
       /**
