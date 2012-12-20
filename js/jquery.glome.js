@@ -287,22 +287,22 @@
         ads:
         {
           url: 'ads.json',
-          allowed: ['get', 'create']
+          allowed: ['create', 'read']
         },
         user:
         {
           url: 'users.json',
-          allowed: ['get', 'create']
+          allowed: ['create', 'read']
         },
         login:
         {
           url: 'users/login.json',
-          allowed: ['get', 'create']
+          allowed: ['create', 'read']
         },
         me:
         {
           'url': 'users/{glomeid}.json',
-          allowed: ['get', 'update', 'delete'],
+          allowed: ['read', 'update', 'delete'],
         }
       },
       
@@ -355,102 +355,33 @@
       },
         
       /**
-       * Get request
-       * 
-       * @access public
-       * @param string type         Purpose of the request i.e. API identifier
-       * @param object data         Data used for the GET request, @optional
-       * @param function callback   Callback function, @optional
-       * @param function onerror    Onerror function, @optional
-       * @return jqXHR              jQuery XMLHttpRequest
-       */
-      get: function(type, data, callback, onerror)
-      {
-        if (typeof this.types[type] == 'undefined')
-        {
-          throw new Error('Glome.Api.get does not support request ' + type);
-        }
-        
-        if (   !this.types[type].allowed
-            || jQuery.inArray('get', this.types[type].allowed) == -1)
-        {
-          throw new Error('Getting this type ' + type + ' is not allowed');
-        }
-        
-        // Callback function defined, but no data
-        if (   typeof data == 'function'
-            || jQuery.isArray(data))
-        {
-          onerror = callback;
-          callback = data;
-          data = {};
-        }
-        
-        // Type check for data
-        if (   data
-            && !jQuery.isPlainObject(data))
-        {
-          throw new Error('When passing data to Glome.Api.get, it has to be an object. Now received typeof ' + typeof data);
-        }
-        
-        // Type check for callback. Allowed are function and array.
-        if (   callback
-            && typeof callback !== 'function'
-            && !jQuery.isArray(callback))
-        {
-          throw new Error('Callback has to be a function or an array, now received typeof ' + typeof callback);
-        }
-        
-        var request = jQuery.ajax
-        (
-          {
-            url: plugin.API.parseURL(this.server + this.types[type].url),
-            data: data,
-            type: 'GET',
-            dataType: 'json',
-            success: callback,
-            xhrFields:
-            {
-              withCredentials: true
-            },
-            error: onerror,
-            beforeSend: function(jqXHR, settings)
-            {
-              jqXHR.settings = settings;
-            }
-          }
-        );
-        
-        return request;
-      },
-      
-      /**
        * Set data on Glome server
        * 
        * @param string type
        * @param Object data
        * @param function callback   @optional Callback function
        * @param function onerror    @optional On error function
-       * @param string method       @optional Request method (POST, PUT, DELETE)
+       * @param string method       @optional Request method (GET, POST, PUT, DELETE)
        * @return jqXHR              jQuery XMLHttpRequest
        */
-      set: function(type, data, callback, onerror, method)
+      request: function(type, data, callback, onerror, method)
       {
         if (arguments.length < 2)
         {
-          throw new Error('Glome.Api.set expects at least two arguments');
+          throw new Error('Glome.API.request expects at least two arguments');
         }
         
         if (typeof this.types[type] == 'undefined')
         {
-          throw new Error('Glome.Api.set does not support request ' + type);
+          throw new Error('Glome.Api.request does not support request ' + type);
         }
         
         // Type check for data
         if (   data
             && !jQuery.isPlainObject(data))
         {
-          throw new Error('When passing data to Glome.Api.set, it has to be an object. Now received typeof ' + typeof data);
+          console.log(type, data, callback, onerror, method);
+          throw new Error('When passing data to Glome.Api.request, it has to be an object. Now received typeof ' + typeof data);
         }
         
         // Type check for callback
@@ -479,9 +410,15 @@
           method = 'POST';
         }
         
-        if (!method.toString().match(/^(POST|PUT|DELETE)$/))
+        if (!method.toString().match(/^(GET|POST|PUT|DELETE)$/))
         {
           throw new Error('"' + method.toString() + '" is not a valid method');
+        }
+        
+        if (   method.toString() === 'POST'
+            && !jQuery.isPlainObject(data))
+        {
+          throw new Error('Glome.API.request does not allow function as second argument for method "' + method + '"');
         }
         
         var request = jQuery.ajax
@@ -507,7 +444,43 @@
       },
       
       /**
-       * Create data on Glome server. This is a shorthand for calling API.set with POST as method
+       * Get request
+       * 
+       * @access public
+       * @param string type         Purpose of the request i.e. API identifier
+       * @param object data         Data used for the GET request, @optional
+       * @param function callback   Callback function, @optional
+       * @param function onerror    Onerror function, @optional
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      get: function(type, data, callback, onerror)
+      {
+        if (   !this.types[type].allowed
+            || (   jQuery.inArray('get', this.types[type].allowed) == -1
+                && jQuery.inArray('read', this.types[type].allowed) == -1))
+        {
+          throw new Error('Creating this type "' + type + '" is not allowed');
+        }
+        
+        if (   typeof data == 'undefined'
+            || typeof data == 'function'
+            || jQuery.isArray(data))
+        {
+          onerror = callback;
+          callback = data;
+          data = {};
+        }
+        
+        if (!data)
+        {
+          data = {};
+        }
+        
+        return this.request(type, data, callback, onerror, 'GET');
+      },
+      
+      /**
+       * Create data on Glome server. This is a shorthand for calling API.request with POST as method
        * 
        * @param string type
        * @param Object data
@@ -523,11 +496,26 @@
           throw new Error('Creating this type "' + type + '" is not allowed');
         }
         
-        return this.set(type, data, callback, onerror, 'POST');
+        return this.request(type, data, callback, onerror, 'POST');
       },
       
       /**
-       * Update data on Glome server. This is a shorthand for calling API.set with PUT as method
+       * Read request. This is effectively an alias to API.get
+       * 
+       * @access public
+       * @param string type         Purpose of the request i.e. API identifier
+       * @param object data         Data used for the GET request, @optional
+       * @param function callback   Callback function, @optional
+       * @param function onerror    Onerror function, @optional
+       * @return jqXHR              jQuery XMLHttpRequest
+       */
+      read: function(type, data, callback, onerror)
+      {
+        return this.get(type, data, callback, onerror);
+      },
+      
+      /**
+       * Update data on Glome server. This is a shorthand for calling API.request with PUT as method
        * 
        * @param string type
        * @param Object data
@@ -543,11 +531,11 @@
           throw new Error('Updating this type "' + type + '" is not allowed');
         }
         
-        return this.set(type, data, callback, onerror, 'PUT');
+        return this.request(type, data, callback, onerror, 'PUT');
       },
       
       /**
-       * Update data on Glome server. This is a shorthand for calling API.set with PUT as method
+       * Update data on Glome server. This is a shorthand for calling API.request with PUT as method
        * 
        * @param string type
        * @param Object data
@@ -570,7 +558,7 @@
           data = {};
         }
         
-        return this.set(type, data, callback, onerror, 'DELETE');
+        return this.request(type, data, callback, onerror, 'DELETE');
       }
     };
     
@@ -704,8 +692,7 @@
         }
         
         // Default error handling
-        
-        plugin.Api.set
+        plugin.API.request
         (
           'login',
           {
@@ -716,7 +703,8 @@
             }
           },
           callbacks,
-          onerrors
+          onerrors,
+          'POST'
         );
         
         return true;
@@ -815,7 +803,7 @@
           onerrors.push(onerror);
         }
         
-        plugin.API.set
+        plugin.API.request
         (
           'user',
           {
@@ -825,7 +813,8 @@
             }
           },
           callbacks,
-          onerrors
+          onerrors,
+          'POST'
         );
       },
       

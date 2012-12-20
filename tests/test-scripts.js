@@ -206,11 +206,12 @@ QUnit.test('Glome API basics', function()
   var method, callback;
   
   QUnit.ok(Glome.API, 'API is accessible in general');
+  QUnit.equal(typeof Glome.API.request, 'function', 'API request is accessible');
   QUnit.equal(typeof Glome.API.get, 'function', 'API get is accessible');
-  QUnit.equal(typeof Glome.API.set, 'function', 'API set is accessible');
   QUnit.equal(typeof Glome.API.create, 'function', 'API create is accessible');
+  QUnit.equal(typeof Glome.API.read, 'function', 'API get is accessible');
   QUnit.equal(typeof Glome.API.update, 'function', 'API update is accessible');
-  QUnit.equal(typeof Glome.API.delete, 'function', 'API update is accessible');
+  QUnit.equal(typeof Glome.API.delete, 'function', 'API delete is accessible');
   QUnit.equal(typeof Glome.API.parseURL, 'function', 'API parseURL is accessible');
   
   method = 'foobar';
@@ -255,7 +256,14 @@ QUnit.test('Glome API basics', function()
   // Method where create is allowed
   method = 'user';
   
-  QUnit.ok(Glome.API.create(method, null, callback), 'Glome.API.create supports null as second argument, function as third');
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.API.create(method, null, callback);
+    },
+    'Glome.API.create does not support null as second argument, function as third'
+  );
   QUnit.ok(Glome.API.create(method, {}, callback), 'Glome.API.create supports an object as second argument, function as third');
   
   QUnit.throws
@@ -330,7 +338,7 @@ QUnit.test('Glome API requests', function()
   (
     function()
     {
-      Glome.API.set('me', null, null, null, 'loremipsum');
+      Glome.API.request('me', null, null, null, 'loremipsum');
     },
     'Caught correctly an invalid method "loremipsum"',
     '"loremipsum" is not a valid method'
