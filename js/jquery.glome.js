@@ -975,7 +975,7 @@
         
         if (typeof this.onchange === 'function')
         {
-          this.onchange();
+          this.onchange('delete');
         }
         
         return rVal;
@@ -983,8 +983,10 @@
       
       /**
        * Change listener
+       * 
+       * @param string type    Change type
        */
-      Prototype.prototype.onchange = function()
+      Prototype.prototype.onchange = function(type)
       {
         var className = this.className;
         
@@ -994,7 +996,7 @@
         {
           for (var i = 0; i < Glome[className].listeners.length; i++)
           {
-            Glome[className].listeners[i]();
+            Glome[className].listeners[i](type, this);
           }
         }
       }
@@ -1042,7 +1044,16 @@
         
         if (typeof this.onchange == 'function')
         {
-          this.onchange();
+          if (prevId)
+          {
+            var type = 'update';
+          }
+          else
+          {
+            var type = 'create';
+          }
+          
+          this.onchange(type);
         }
       });
       

@@ -388,7 +388,6 @@ QUnit.test('Listeners triggered on update', function()
   };
   
   var o = new Glome.Ads.Ad(dataset);
-  console.log(o);
   
   QUnit.stop();
   
@@ -429,6 +428,33 @@ QUnit.test('Listeners triggered on delete', function()
     QUnit.start();
     QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Onchange event was successfully triggered after delete');
     QUnit.expect(1);
+  });
+  
+  o.delete();
+});
+
+/* !Change type is passed on correctly */
+QUnit.test('Change type is passed on correctly', function()
+{
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox'
+  };
+  
+  var o = new Glome.Prototype(dataset);
+  QUnit.stop();
+  
+  var className = o.className;
+  Glome[className].listeners.push(function(type, object)
+  {
+    // Reset the array
+    Glome[className].listeners = [];
+    
+    QUnit.start();
+    QUnit.equal(type, 'delete', 'Onchange event passes correctly the argument "type"');
+    QUnit.equal(object.id, objectId, 'Onchange event passes correctly the argument "object"');
   });
   
   o.delete();
@@ -1032,8 +1058,6 @@ QUnit.test('Glome.Ads.Ad object', function()
   }
   
   QUnit.ok(Glome.Ads.stack[(gad.id)], 'Newly created ad added itself to ad stack');
-  console.log(gad.className);
-  console.log('Ads stack', Glome.Ads.stack);
   
   // Set the ad status to 2
   gad.setStatus(2);
@@ -1042,8 +1066,6 @@ QUnit.test('Glome.Ads.Ad object', function()
   QUnit.equal(typeof gad.setStatus, 'function', 'setStatus method exists in ad object');
   QUnit.equal(typeof gad.onchange, 'function', 'onchange method exists in ad object');
   QUnit.equal(typeof gad.delete, 'function', 'Delete method exists in ad object');
-  
-  console.log('gad', gad);
   
   // Remove newly created ad
   QUnit.ok(gad.delete(), 'Removing the ad was successful');
