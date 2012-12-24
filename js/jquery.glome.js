@@ -54,75 +54,6 @@
     plugin.Data =
     {
       /**
-       * Prototype object for data
-       */
-      Prototype: function(data)
-      {
-        function Prototype(data)
-        {
-          this.constructor(data);
-        }
-        
-        Prototype.prototype.constructor = function(data)
-        {
-          // Data is set
-          if (!data)
-          {
-            data = {};
-          }
-          
-          /**
-           * There is always an ID for all of the data objects
-           */
-          this.id = null;
-          
-          this.getById = function(id)
-          {
-            throw new Error('Prototype class constructor cannot be directly initialized');
-          }
-          
-          if (!jQuery.isPlainObject(data))
-          {
-            if (!data.toString().match(/^[1-9][0-9]*$/))
-            {
-              throw new Error('Non-object constructor has to be an integer');
-            }
-            
-            this.getById(data);
-            return;
-          }
-          
-          // Copy all of the properties
-          for (var i in data)
-          {
-            switch (i)
-            {
-              case 'id':
-                if (!data[i].toString().match(/^[1-9][0-9]*$/))
-                {
-                  throw new Error('Property "id" has to be an integer');
-                }
-                this[i] = data[i];
-                break;
-              
-              default:
-                this[i] = data[i];
-            }
-          }
-        }
-        
-        Prototype.prototype.Extends = function(newClass)
-        {
-          for (var i in newClass)
-          {
-            this[i] = newClass[i];
-          }
-        }
-        
-        return new Prototype(data);
-      },
-      
-      /**
        * Get a locally stored value
        * 
        * @param string key
@@ -951,6 +882,189 @@
       }
     }
     
+    /* !Prototype */
+    /**
+     * Prototype object for data
+     */
+    plugin.Prototype = function(data)
+    {
+      function Prototype(data)
+      {
+        this.className = 'Prototype';
+        this._constructor(data);
+      }
+      
+      plugin.Prototype.stack = {};
+      
+      /**
+       * Registered listener functions that will be called on change event
+       * 
+       * @param Array
+       */
+      plugin.Prototype.listeners = [];
+      
+      /**
+       * Default constructor. Optionally either leave blank to create a completely new and
+       * unbound object, otherwise 
+       *
+       * @param mixed data    Integer or a plain object with key-value pairs @optional
+       */
+      Prototype.prototype._constructor = function(data)
+      {
+        // Data is set
+        if (!data)
+        {
+          data = {};
+        }
+        
+        this.getById = function(id)
+        {
+          throw new Error('Prototype class constructor cannot be directly initialized');
+        }
+        
+        // If the constructor was given anything else than integer (caught earlier) or
+        // a plain object with data, refuse to accept.
+        if (!jQuery.isPlainObject(data))
+        {
+          if (!data.toString().match(/^[1-9][0-9]*$/))
+          {
+            throw new Error('Non-object constructor has to be an integer');
+          }
+          
+          this.getById(data);
+          return;
+        }
+        
+        // Copy all of the properties
+        for (var i in data)
+        {
+          this[i] = data[i];
+        }
+      }
+      
+      /**
+       * See that there is always an ID
+       * 
+       * @var integer
+       */
+      Prototype.prototype.id = null;
+      
+      /**
+       * Delete an object
+       * 
+       * @return boolean True if object was deleted successfully, false on failure
+       */
+      Prototype.prototype.delete = function()
+      {
+        // There was nothing (important) to delete
+        if (!this.id)
+        {
+          return true;
+        }
+        
+        var className = this.className;
+        var rVal = true;
+        
+        if (   className
+            && Glome[className]
+            && typeof Glome[className].stack !== 'undefined'
+            && Glome[className].stack[this.id])
+        {
+          rVal = delete Glome[className].stack[this.id];
+        }
+        
+        if (typeof this.onchange === 'function')
+        {
+          this.onchange();
+        }
+        
+        return rVal;
+      }
+      
+      /**
+       * Change listener
+       */
+      Prototype.prototype.onchange = function()
+      {
+        var className = this.className;
+        
+        if (   className
+            && Glome[className]
+            && typeof Glome[className].listeners !== 'undefined')
+        {
+          for (var i = 0; i < Glome[className].listeners.length; i++)
+          {
+            Glome[className].listeners[i]();
+          }
+        }
+      }
+      
+      /**
+       * Default setter for property id. Validates the input.
+       */
+      Prototype.prototype.__defineSetter__('id', function(v)
+      {
+        if (!v)
+        {
+          return;
+        }
+        
+        if (!v.toString().match(/^[1-9][0-9]*$/))
+        {
+          throw new Error('ID has to be an integer');
+        }
+        
+        if (this._id)
+        {
+          var prevId = this._id;
+        }
+        else
+        {
+          var prevId = null;
+        }
+        
+        this._id = v;
+        
+        var className = this.className;
+        
+        if (   className
+            && Glome[className]
+            && typeof Glome[className].stack !== 'undefined')
+        {
+          Glome[className].stack[v] = this;
+          
+          if (   prevId
+              && Glome[className].stack[prevId])
+          {
+            delete Glome[className].stack[prevId];
+          }
+        }
+        
+        if (typeof this.onchange == 'function')
+        {
+          this.onchange();
+        }
+      });
+      
+      /**
+       * Default getter for property id. Validates the input.
+       */
+      Prototype.prototype.__defineGetter__('id', function(v)
+      {
+        return this._id;
+      });
+      
+      Prototype.prototype.Extends = function(newClass)
+      {
+        for (var i in newClass)
+        {
+          this[i] = newClass[i];
+        }
+      }
+      
+      return new Prototype(data);
+    };
+      
     /* !Ads */
     /**
      * Ads interface object
@@ -999,10 +1113,11 @@
         // Return an existing ad if it is in the stack, otherwise return null
         function Ad(data)
         {
-          this.constructor(data);
+          this.className = 'Ads';
+          this._constructor(data);
         }
         
-        Ad.prototype = new plugin.Data.Prototype();
+        Ad.prototype = new plugin.Prototype();
         
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
@@ -1013,12 +1128,6 @@
         }
         
         var ad = new Ad(data);
-        
-        if (ad.id)
-        {
-          var id = ad.id;
-          plugin.Ads.stack[id] = ad;
-        }
         
         return ad;
       },
@@ -1333,46 +1442,31 @@
        */
       Category: function(data)
       {
+        // Return an existing category if it is in the stack, otherwise return null
         function Category(data)
         {
-          /**
-           * Category ID
-           */
-          this.id = null;
-          
-          /**
-           * Category title
-           */
-          this.title = null;
-          
-          /**
-           * List ads of this category
-           */
-/*
-          this.listAds = function(filters)
-          {
-            
-          }
-*/
-          
-          if (   typeof data == 'string'
-              || typeof data == 'number')
-          {
-            var id = data.toString();
-            
-            if (typeof plugin.Categories.stack[id] != 'undefined')
-            {
-              return plugin.Categories.stack[id];
-            }
-            else
-            {
-              throw new Error('No category with id ' + id + ' available');
-            }
-          }
-          
+          this.className = 'Categories';
+          this._constructor(data);
         }
         
-        return new Category(data);
+        Category.prototype = new plugin.Prototype();
+        
+        Category.prototype.status = 0;
+        Category.prototype.setStatus = function(statusCode)
+        {
+          this.status = statusCode;
+          return true;
+        }
+        
+        var category = new Category(data);
+        
+        if (category.id)
+        {
+          var id = category.id;
+          plugin.Categories.stack[id] = category;
+        }
+        
+        return category;
       }
     };
     

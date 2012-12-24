@@ -199,22 +199,22 @@ QUnit.test('Glome methods', function()
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
-/* !Glome data prototype object */
-QUnit.module('Glome data prototype object');
+/* !Prototype object */
+QUnit.module('Prototype object');
 
 /* !Constructor */
 QUnit.test('Constructor', function()
 {
-  QUnit.ok(Glome.Data.Prototype, 'There is a data prototype object');
-  var p = new Glome.Data.Prototype();
-  
-  QUnit.notEqual('undefined', typeof p.id, 'Prototype object has ID, which all prototype objects should have');
+  QUnit.ok(Glome.Prototype, 'There is a data prototype object');
+  var p = new Glome.Prototype();
+  QUnit.ok(Glome.Prototype().__lookupGetter__('id'), 'There is a getter method for property "id"');
+  QUnit.ok(Glome.Prototype().__lookupSetter__('id'), 'There is a setter method for property "id"');
   
   QUnit.throws
   (
     function()
     {
-      new Glome.Data.Prototype('foobar');
+      new Glome.Prototype('foobar');
     },
     'Constructor never accepts a string, only integers and plain objects',
     'Non-object constructor has to be an integer'
@@ -224,15 +224,16 @@ QUnit.test('Constructor', function()
   (
     function()
     {
-      new Glome.Data.Prototype(1);
+      new Glome.Prototype(1);
     },
     'ID retrieval has to be added in the derived class',
     'Prototype class constructor cannot be directly initialized'
   );
   
+  var objectId = 1;
   var dataset =
   {
-    id: 1,
+    id: objectId,
     Zaphod: 'Beeblebrox',
     planets: ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptunus'],
     status:
@@ -242,19 +243,28 @@ QUnit.test('Constructor', function()
     onerror: function(){}
   };
   
-  var o = new Glome.Data.Prototype(dataset);
+  var o = new Glome.Prototype(dataset);
   
   for (var i in dataset)
   {
     QUnit.deepEqual(o[i], dataset[i], 'Property ' + i + ' was copied successfully');
   }
   
+  var className = o.className;
+  QUnit.ok(Glome[className].stack, 'There is a Prototype stack');
+  QUnit.deepEqual(Glome[className].stack[objectId], o, 'Object was added to stack');
+  
+  var newId = 2;
+  o.id = newId;
+  QUnit.deepEqual(Glome[className].stack[newId], o, 'Object ID changed the key in the object stack');
+  QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Old object placeholder was removed');
+  
   dataset.id = 'foobar';
   QUnit.throws
   (
     function()
     {
-      new Glome.Data.Prototype(dataset);
+      new Glome.Prototype(dataset);
     },
     'ID has to be an integer'
   );
@@ -263,7 +273,7 @@ QUnit.test('Constructor', function()
 /* !Extend */
 QUnit.test('Extend', function()
 {
-  QUnit.ok(Glome.Data.Prototype().Extends, 'There is a helper method for extending objects');
+  QUnit.ok(Glome.Prototype().Extends, 'There is a helper method for extending objects');
   
   // Create a new object with a method called newMethod
   var n = new function()
@@ -272,9 +282,156 @@ QUnit.test('Extend', function()
     {}
   }
   
-  var k = new Glome.Data.Prototype();
+  var k = new Glome.Prototype();
   k.Extends(n);
   QUnit.equal(typeof k.newMethod, 'function', 'New method was copied successfully');
+});
+
+/* !Prototype methods */
+QUnit.test('Methods', function()
+{
+  QUnit.throws
+  (
+    function()
+    {
+      var newObject = new Glome.Prototype();
+      newObject.id = 'foobar';
+    },
+    'Caught string as ID error',
+    'ID has to be an integer'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      var newObject = new Glome.Prototype();
+      newObject.id = {};
+    },
+    'Caught object as ID error',
+    'ID has to be an integer'
+  );
+  
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox',
+    planets: ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptunus'],
+    status:
+    {
+      Earth: 'Mostly harmless'
+    },
+    onerror: function(){}
+  };
+  
+  var o = new Glome.Prototype(dataset);
+  var className = o.className;
+  
+  QUnit.ok(o.delete, 'There is a delete method');
+  QUnit.ok(o.delete(), 'Delete method returns ok on call');
+  QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Object was successfully removed from the stack');
+});
+
+/* !Listeners */
+QUnit.test('Listeners', function()
+{
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox'
+  };
+  
+  var o = new Glome.Prototype(dataset);
+  
+  var className = o.className;
+  QUnit.ok(Glome[className].listeners, 'There is a placeholder for Prototype listeners');
+  QUnit.ok(o.onchange, 'There is an event trigger method for changes');
+});
+
+/* !Listeners triggered on create */
+QUnit.test('Listeners triggered on create', function()
+{
+  QUnit.stop();
+  
+  // Reset the array
+  Glome.Ads.listeners = [];
+  Glome.Ads.listeners.push(function()
+  {
+    // Reset the array
+    Glome.Ads.listeners = [];
+    
+    QUnit.start();
+    QUnit.ok(typeof Glome.Ads.stack[objectId], 'Onchange event was successfully triggered after create');
+    QUnit.expect(1);
+  });
+  
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox'
+  };
+  
+  var o = new Glome.Ads.Ad(dataset);
+});
+
+/* !Listeners triggered on update */
+QUnit.test('Listeners triggered on update', function()
+{
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox'
+  };
+  
+  var o = new Glome.Ads.Ad(dataset);
+  console.log(o);
+  
+  QUnit.stop();
+  
+  // Reset the array
+  Glome.Ads.listeners = [];
+  Glome.Ads.listeners.push(function()
+  {
+    // Reset the array
+    Glome.Ads.listeners = [];
+    
+    QUnit.start();
+    QUnit.equal(typeof Glome.Ads.stack[objectId], 'undefined', 'Onchange event was successfully triggered after ID change');
+    QUnit.expect(1);
+  });
+  
+  o.id = 2;
+});
+
+/* !Listeners triggered on delete */
+QUnit.test('Listeners triggered on delete', function()
+{
+  var objectId = 1;
+  var dataset =
+  {
+    id: objectId,
+    Zaphod: 'Beeblebrox'
+  };
+  
+  var o = new Glome.Prototype(dataset);
+  QUnit.stop();
+  
+  var className = o.className;
+  Glome[className].listeners.push(function()
+  {
+    // Reset the array
+    Glome[className].listeners = [];
+    
+    QUnit.start();
+    QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Onchange event was successfully triggered after delete');
+    QUnit.expect(1);
+  });
+  
+  o.delete();
 });
 
 QUnit.module('Glome API');
@@ -868,25 +1025,28 @@ QUnit.test('Glome.Ads.Ad object', function()
   };
   
   var gad = new Glome.Ads.Ad(ad);
-  console.log('gad', gad);
   
   for (var i in ad)
   {
     QUnit.strictEqual(gad[i], ad[i], 'Property "' + i + '" was copied successfully');
   }
   
-  QUnit.ok(Glome.Ads.stack[ad.id], 'Newly created ad added itself to ad stack');
+  QUnit.ok(Glome.Ads.stack[(gad.id)], 'Newly created ad added itself to ad stack');
+  console.log(gad.className);
+  console.log('Ads stack', Glome.Ads.stack);
   
   // Set the ad status to 2
   gad.setStatus(2);
   QUnit.equal(gad.status, 2, 'Ad status was set to 2');
   
   QUnit.equal(typeof gad.setStatus, 'function', 'setStatus method exists in ad object');
-  QUnit.equal(typeof gad.update, 'function', 'update method exists in ad object');
-  QUnit.equal(typeof gad.remove, 'function', 'remove method exists in ad object');
+  QUnit.equal(typeof gad.onchange, 'function', 'onchange method exists in ad object');
+  QUnit.equal(typeof gad.delete, 'function', 'Delete method exists in ad object');
+  
+  console.log('gad', gad);
   
   // Remove newly created ad
-  QUnit.ok(gad.remove(), 'Removing the ad was successful');
+  QUnit.ok(gad.delete(), 'Removing the ad was successful');
   QUnit.throws
   (
     function()
@@ -1052,7 +1212,7 @@ QUnit.test('Ads list filters', function()
 });
 
 /* !Fetch ads */
-QUnit.asyncTest('Fetch ads', function()
+QUnit.test('Fetch ads', function()
 {
   // Ad loading callback has to be a function
   QUnit.throws
@@ -1075,11 +1235,17 @@ QUnit.asyncTest('Fetch ads', function()
     'Glome.Ads.load throws an error on Array as onerror callback'
   );
   
+  QUnit.stop();
+  
   // List ads for this Glome user
   Glome.Ads.load(function()
   {
     QUnit.notEqual(0, Object.keys(Glome.Ads.stack).length, 'Glome ads were loaded');
     QUnit.start();
+  }, function()
+  {
+    QUnit.start();
+    QUnit.ok(false, 'Glome ads were loaded (caught on error)');
   });
 });
   
@@ -1159,8 +1325,6 @@ QUnit.test('Glome.Categories.Category object', function()
   QUnit.ok(Glome.Categories.Category, 'There is a category object');
   
   var category = new Glome.Categories.Category();
-  
-  QUnit.notEqual('undefined', typeof category.id, 'Category can be initialized with a constructor');
   
   QUnit.throws
   (
