@@ -890,7 +890,7 @@
     {
       function Prototype(data)
       {
-        this.className = 'Prototype';
+        this.container = 'Prototype';
         this._constructor(data);
       }
       
@@ -911,6 +911,33 @@
        */
       Prototype.prototype._constructor = function(data)
       {
+        // Ensure that container is extended to hold the data
+        if (this.container)
+        {
+          var container = this.container;
+          
+          if (typeof plugin[container] == 'undefined')
+          {
+            plugin[container] = {};
+          }
+          
+          if (typeof plugin[container].stack == 'undefined')
+          {
+            plugin[container].stack = {};
+/*
+            plugin[container].stack.prototype.__defineGetter__('length', function()
+            {
+              return Object.keys(this).length;
+            });
+*/
+          }
+          
+          if (typeof plugin[container].listeners == 'undefined')
+          {
+            plugin[container].listeners = [];
+          }
+        }
+        
         // Data is set
         if (!data)
         {
@@ -962,15 +989,15 @@
           return true;
         }
         
-        var className = this.className;
+        var container = this.container;
         var rVal = true;
         
-        if (   className
-            && Glome[className]
-            && typeof Glome[className].stack !== 'undefined'
-            && Glome[className].stack[this.id])
+        if (   container
+            && Glome[container]
+            && typeof Glome[container].stack !== 'undefined'
+            && Glome[container].stack[this.id])
         {
-          rVal = delete Glome[className].stack[this.id];
+          rVal = delete Glome[container].stack[this.id];
         }
         
         if (typeof this.onchange === 'function')
@@ -988,15 +1015,15 @@
        */
       Prototype.prototype.onchange = function(type)
       {
-        var className = this.className;
+        var container = this.container;
         
-        if (   className
-            && Glome[className]
-            && typeof Glome[className].listeners !== 'undefined')
+        if (   container
+            && Glome[container]
+            && typeof Glome[container].listeners !== 'undefined')
         {
-          for (var i = 0; i < Glome[className].listeners.length; i++)
+          for (var i = 0; i < Glome[container].listeners.length; i++)
           {
-            Glome[className].listeners[i](type, this);
+            Glome[container].listeners[i](type, this);
           }
         }
       }
@@ -1027,18 +1054,18 @@
         
         this._id = v;
         
-        var className = this.className;
+        var container = this.container;
         
-        if (   className
-            && Glome[className]
-            && typeof Glome[className].stack !== 'undefined')
+        if (   container
+            && Glome[container]
+            && typeof Glome[container].stack !== 'undefined')
         {
-          Glome[className].stack[v] = this;
+          Glome[container].stack[v] = this;
           
           if (   prevId
-              && Glome[className].stack[prevId])
+              && Glome[container].stack[prevId])
           {
-            delete Glome[className].stack[prevId];
+            delete Glome[container].stack[prevId];
           }
         }
         
@@ -1124,11 +1151,12 @@
         // Return an existing ad if it is in the stack, otherwise return null
         function Ad(data)
         {
-          this.className = 'Ads';
+          this.container = 'Ads';
           this._constructor(data);
         }
         
         Ad.prototype = new plugin.Prototype();
+        Ad.prototype.constructor = Ad;
         
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
@@ -1456,11 +1484,12 @@
         // Return an existing category if it is in the stack, otherwise return null
         function Category(data)
         {
-          this.className = 'Categories';
+          this.container = 'Categories';
           this._constructor(data);
         }
         
         Category.prototype = new plugin.Prototype();
+        Category.prototype.constructor = Category;
         
         Category.prototype.status = 0;
         Category.prototype.setStatus = function(statusCode)

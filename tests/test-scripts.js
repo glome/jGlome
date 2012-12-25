@@ -250,14 +250,14 @@ QUnit.test('Constructor', function()
     QUnit.deepEqual(o[i], dataset[i], 'Property ' + i + ' was copied successfully');
   }
   
-  var className = o.className;
-  QUnit.ok(Glome[className].stack, 'There is a Prototype stack');
-  QUnit.deepEqual(Glome[className].stack[objectId], o, 'Object was added to stack');
+  var container = o.container;
+  QUnit.ok(Glome[container].stack, 'There is a Prototype stack');
+  QUnit.deepEqual(Glome[container].stack[objectId], o, 'Object was added to stack');
   
   var newId = 2;
   o.id = newId;
-  QUnit.deepEqual(Glome[className].stack[newId], o, 'Object ID changed the key in the object stack');
-  QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Old object placeholder was removed');
+  QUnit.deepEqual(Glome[container].stack[newId], o, 'Object ID changed the key in the object stack');
+  QUnit.equal(typeof Glome[container].stack[objectId], 'undefined', 'Old object placeholder was removed');
   
   dataset.id = 'foobar';
   QUnit.throws
@@ -268,6 +268,8 @@ QUnit.test('Constructor', function()
     },
     'ID has to be an integer'
   );
+  
+  // Constructor creates stack and listeners placeholders for newly created objects
 });
 
 /* !Extend */
@@ -285,6 +287,36 @@ QUnit.test('Extend', function()
   var k = new Glome.Prototype();
   k.Extends(n);
   QUnit.equal(typeof k.newMethod, 'function', 'New method was copied successfully');
+  
+  var Extender = function(data)
+  {
+    // Return an existing ad if it is in the stack, otherwise return null
+    function Extender(data)
+    {
+      this.container = 'Extenders';
+      this._constructor(data);
+    }
+    
+    Extender.prototype = new Glome.Prototype();
+    Extender.prototype.constructor = Extender;
+    
+    Extender.prototype.status = 0;
+    Extender.prototype.adcategories = [];
+    Extender.prototype.setStatus = function(statusCode)
+    {
+      this.status = statusCode;
+      return true;
+    }
+    
+    var extender = new Extender(data);
+    
+    return extender;
+  }
+  
+  var e = new Extender();
+  
+  QUnit.ok(Glome.Extenders.stack, 'Constructor creates stack automatically if it was not available');
+  QUnit.ok(Glome.Extenders.listeners, 'Constructor creates listeners container automatically if it was not available');
 });
 
 /* !Prototype methods */
@@ -326,11 +358,11 @@ QUnit.test('Methods', function()
   };
   
   var o = new Glome.Prototype(dataset);
-  var className = o.className;
+  var container = o.container;
   
   QUnit.ok(o.delete, 'There is a delete method');
   QUnit.ok(o.delete(), 'Delete method returns ok on call');
-  QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Object was successfully removed from the stack');
+  QUnit.equal(typeof Glome[container].stack[objectId], 'undefined', 'Object was successfully removed from the stack');
 });
 
 /* !Listeners */
@@ -345,8 +377,8 @@ QUnit.test('Listeners', function()
   
   var o = new Glome.Prototype(dataset);
   
-  var className = o.className;
-  QUnit.ok(Glome[className].listeners, 'There is a placeholder for Prototype listeners');
+  var container = o.container;
+  QUnit.ok(Glome[container].listeners, 'There is a placeholder for Prototype listeners');
   QUnit.ok(o.onchange, 'There is an event trigger method for changes');
 });
 
@@ -419,14 +451,14 @@ QUnit.test('Listeners triggered on delete', function()
   var o = new Glome.Prototype(dataset);
   QUnit.stop();
   
-  var className = o.className;
-  Glome[className].listeners.push(function()
+  var container = o.container;
+  Glome[container].listeners.push(function()
   {
     // Reset the array
-    Glome[className].listeners = [];
+    Glome[container].listeners = [];
     
     QUnit.start();
-    QUnit.equal(typeof Glome[className].stack[objectId], 'undefined', 'Onchange event was successfully triggered after delete');
+    QUnit.equal(typeof Glome[container].stack[objectId], 'undefined', 'Onchange event was successfully triggered after delete');
     QUnit.expect(1);
   });
   
@@ -446,11 +478,11 @@ QUnit.test('Change type is passed on correctly', function()
   var o = new Glome.Prototype(dataset);
   QUnit.stop();
   
-  var className = o.className;
-  Glome[className].listeners.push(function(type, object)
+  var container = o.container;
+  Glome[container].listeners.push(function(type, object)
   {
     // Reset the array
-    Glome[className].listeners = [];
+    Glome[container].listeners = [];
     
     QUnit.start();
     QUnit.equal(type, 'delete', 'Onchange event passes correctly the argument "type"');
@@ -1052,6 +1084,8 @@ QUnit.test('Glome.Ads.Ad object', function()
   
   var gad = new Glome.Ads.Ad(ad);
   
+  QUnit.equal(gad.constructor.name, 'Ad', 'Constructor name was changed');
+  
   for (var i in ad)
   {
     QUnit.strictEqual(gad[i], ad[i], 'Property "' + i + '" was copied successfully');
@@ -1347,6 +1381,7 @@ QUnit.test('Glome.Categories.Category object', function()
   QUnit.ok(Glome.Categories.Category, 'There is a category object');
   
   var category = new Glome.Categories.Category();
+  QUnit.equal(category.constructor.name, 'Category', 'Constructor name was changed');
   
   QUnit.throws
   (
