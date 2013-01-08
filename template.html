@@ -3,260 +3,36 @@
   <head>
     <title>Glome Template</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery.timers.js"></script>
+    <script type="text/javascript" src="js/jquery.glome_template.js"></script>
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
     <link rel="localization" hreflang="fi" href="locales/glome-fi.json" type="application/l10n+json" data-glome-include="true" />
     <link rel="shortcut icon" href="images/icons/glome-icon-16x16.png" />
   </head>
   <body>
-    <div id="glomeTemplates" data-glome-template="master">
-      <div class="glome-list-container" data-glome-template="list-container">
-        <div class="glome-row" data-glome-template="list-row">
-        </div>
+    <div id="glomeAdmin" data-template="admin-wrapper" data-context="admin" data-glome-container="true">
+      <div class="glome-header" data-template="admin-header">
+        <img src="images/icons/glome-logo-gray-76x106.png" alt="Glome" width="76" height="106" />
+        <ul class="glome-navigation" data-template="navigation-container">
+          <li data-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions"><a href="#admin-subscriptions">Subscriptions</a></li>
+          <li data-template="navigation-item" data-page="statistics" data-i18n="statistics"><a href="#admin-statistics">Statistics</a></li>
+          <li data-template="navigation-item" data-page="rewards" data-i18n="rewards"><a href="#admin-rewards">Rewards</a></li>
+          <li data-template="navigation-item" data-page="settings" data-i18n="settings"><a href="#admin-settings">Settings</a></li>
+        </ul>
       </div>
-      <div class="glome-actions" data-glome-template="actions">
-        <button></button>
-      </div>
-      <div id="glomePopup" data-glome-template="popup">
-        <div id="glomePopupMatte"></div>
-        <div id="glomePopupWrapper">
-          <div class="glome-popup-header">
-            <div class="glome-popup-title"><span class="title">Glome Popup title</span></div>
-            <div class="glome-popup-close"></div>
-          </div>
-          <div class="glome-popup-navigation" data-glome-template="popup-navigation">
-            <a data-i18n="my rules" class="selected">My rules</a>
-            <a data-i18n="my web">My web</a>
-            <a data-i18n="my wallet">My wallet</a>
-          </div>
-          <div class="glome-popup-content">
-            <!-- Glome wizard -->
-            <div id="glomeWizard" data-glome-template="wizard">
-              <h1 data-i18n="welcome to glome">Welcome to Glome</h1>
-              <p data-i18n="start enjoying">
-                You can just start enjoying a clutter free web, but to get started the right way,
-                here are some good things to do:
-              </p>
-              <h2 data-i18n="create a password">Create a password</h2>
-              <p data-i18n="with an optional password">
-                With an optional password you can set an additional layer of security to access your information
-              </p>
-              <form class="glome-oneline glome-actions" id="glomeCreatePasswordForm">
-                <input type="password" placeholder="Type the password" data-i18n="type the password" />
-                <input type="password" placeholder="Repeat it to be sure" data-i18n="repeat it to be sure" />
-                <button data-i18n="save and activate">Save & activate</button>
-              </form>
-              <hr />
-              <h2 data-i18n="pair this device">Pair this device</h2>
-              <p data-i18n="if you already use">
-                If you already use Glome on another device, you can pair this new Glome device with your existing account.
-              </p>
-              <p data-i18n="push the generate">
-                Push the "Generate code" button to generate a PIN code. Insert the code into the existing Glome account
-                to pair these devices. <a href="#" data-i18n="more info">More information »</a>
-              </p>
-              <form class="glome-oneline glome-actions" id="glomePairDevicesForm">
-                <button data-i18n="generate code">Generate code</button>
-                <input type="text" placeholder="Lorem ipsum" />
-                <input type="text" placeholder="Lorem ipsum" />
-                <input type="text" placeholder="Lorem ipsum" />
-              </form>
-              <hr />
-              <h2 data-i18n="control the web">Control the web</h2>
-              <p>
-                You know what you are interested in and what your intentions are - now make the web work for you. We are
-                here to help you get rewarded - just by being you.
-              </p>
-              <p>
-                Your Glome filter is by default not blocking anything - you have to tell us and we will try to learn
-                by how you use the web. <a href="#" data-i18n="read more here">Read more here</a> to be able to make the
-                web work for you.
-              </p>
-              <form class="glome-oneline glome-actions">
-                <button data-i18n="tweak your glome filter">Tweak your Glome filter</button>
-                <button data-i18n="enjoy your clutter free web">Enjoy your clutter free web</button>
-              </form>
-              <hr />
-            </div>
-            <!-- Glome configuration view -->
-            <div id="glomeConfigurationView" data-glome-template="configuration-view">
-            </div>
-            <!-- !List of categories -->
-            <div id="glomeListCategories" class="glome-list-container" data-glome-template="list-ads">
-              <div class="glome-list-container" data-glome-template="list-ads">
-                <div class="glome-row">
-                  <div class="glome-switch-container">
-                    <label class="glome-switch">
-                      <input type="checkbox" checked />
-                      <span class="glome-switch-toggle"></span>
-                    </label>
-                  </div>
-                  <div class="glome-category-title">
-                    <h2>Alcohol & tobacco</h2>
-                    <p data-i18n="there are %s ads in this category">
-                      There are %s ads in this category
-                    </p>
-                  </div>
-                  <div class="glome-actions">
-                    <button data-i18n="see ads">See ads</button>
-                  </div>
-                </div>
-                <div class="glome-row">
-                  <div class="glome-switch-container">
-                    <label class="glome-switch">
-                      <input type="checkbox" checked />
-                      <span class="glome-switch-toggle"></span>
-                    </label>
-                  </div>
-                  <div class="glome-category-title">
-                    <h2>Alcohol & tobacco</h2>
-                    <p data-i18n="there are %s ads in this category">
-                      There are %s ads in this category
-                    </p>
-                  </div>
-                  <div class="glome-actions">
-                    <button data-i18n="see ads">See ads</button>
-                  </div>
-                </div>
-                <div class="glome-row glome-row-disabled">
-                  <div class="glome-switch-container">
-                    <label class="glome-switch">
-                      <input type="checkbox" />
-                      <span class="glome-switch-toggle"></span>
-                    </label>
-                  </div>
-                  <div class="glome-category-title">
-                    <h2>Alcohol & tobacco</h2>
-                    <p data-i18n="there are %s ads in this category">
-                      There are %s ads in this category
-                    </p>
-                  </div>
-                  <div class="glome-actions">
-                    <button data-i18n="see ads">See ads</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- !Glome list ads template -->
-            <div id="glomeListAds" class="glome-list-container">
-              <div class="glome-list-container" data-glome-template="list-ads">
-                <div class="glome-row">
-                  <div class="thumbnail">
-                    <div class="image-wrapper">
-                      <img src="images/template/audi-logo.png" alt="Audi" />
-                    </div>
-                  </div>
-                  <div class="content">
-                    <h2 data-i18n="%s has an offer for you">Audi Quattro Formaggio has an offer for you</h2>
-                    <p data-i18n="up to %s per order">
-                      Up to 13$ per order.
-                    </p>
-                  </div>
-                  <div class="glome-actions">
-                    <button data-i18n="see it">See it</button>
-                    <button data-i18n="not now">Not now</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Glome list ads template ends -->
-            <!-- !Glome inquire about interest in a categry -->
-            <div id="glomeCategoryAsk" data-glome-template="category-ask">
-              <div class="glome-wrapper">
-                <h1 data-i18n="interested in cars">Interested in cars?</h1>
-                <p data-i18n="glome will not spam you with ads you don't want">
-                  Glome will not spam you with ads you don't want.
-                </p>
-                <div class="buttons">
-                  <button class="yes glome-faded glome-glow glome-text-shadow glome-background-gradient">
-                    <h1 data-i18n="yes" class="glome-large">Yes</h1>
-                    <span class="icon"></span>
-                    <span class="sub" data-i18n="show all %s offers">Show all %s offers</span>
-                  </button>
-                  <button class="no">
-                    <h1 data-i18n="not now" class="glome-large">Not now</h1>
-                    <span class="icon"></span>
-                    <span class="sub" data-i18n="no more offers for %s">No more offers for %s</span>
-                  </button>
-                </div>
-                <p data-i18n="remember that you can always change your mind">
-                  (Remember that you can always change your mind.)
-                </p>
-              </div>
-            </div>
-            <!-- !Display a single ad -->
-            <div id="glomeDisplayAd" data-glome-template="ad-display">
-              <div class="glome-ad-image">
-                <img src="images/template/audi-image.jpg" alt="" />
-              </div>
-              <div class="glome-ad-content-wrapper">
-                <div class="glome-ad-content">
-                  <h1>Audi 2012<br />Test Drive weeks</h1>
-                  <p>
-                    You are welcome to meet our new fleet of engineering perfection. Click to find the closest dealer, and book a time for a test drive.
-                  </p>
-                </div>
-                <div class="glome-actions">
-                  <button data-i18n="get it">
-                    <span>Get it</span>
-                    <span class="glome-icon-36x36"></span>
-                  </button>
-                  <button data-i18n="not now">
-                    <span>Not now</span>
-                    <span class="glome-icon-36x36"></span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <!-- End popup templates -->
-          </div>
-          <div class="glome-popup-footer">
-            <label class="glome-switch">
-              <input type="checkbox" checked />
-              <span class="glome-switch-toggle"></span>
-            </label>
-            <div class="glome-icon-container">
-              <a href="about:glome" class="glome-configuration"></a>
-              <a href="about:glome" class="glome-icon"></a>
-            </div>
+      <div class="glome-full-width">
+        <div class="glome-content" data-template="admin-subscriptions">
+          <div class="cols-2 cols-alt-3">
+            <h1></h1>
           </div>
         </div>
+        <div class="glome-content " data-template="admin-brands"></div>
       </div>
-      <div id="glomeWindow" class="glome-on" data-glome-template="window">
-        <div id="glomeWidget" class="knocking" data-glome-template="widget">
-          <div class="glome-counter" data-count="1"></div>
-          <div id="glomeWidgetClose"></div>
-          <div id="glomeWidgetContent" class="glome-widget-contents">
-            <div data-glome-template="widget-ad">
-              <h2 class="glome-widget-title"><a href="#">Audi has an offer for you</a></h2>
-              <p class="glome-widget-subtext" data-i18n="up to %s per order">
-                Up to %s per order
-              </p>
-              <div class="glome-actions">
-                <button data-i18n="see it">See it</button>
-                <button data-i18n="not now">Not now</button>
-              </div>
-            </div>
-            <div id="glomeWidgetPager" data-glome-template="widget-pager">
-              <span class="glome-pager glome-pager-previous"></span>
-              <span class="glome-pager glome-pager-current">1</span>
-              <span class="glome-pager glome-pager-separator">/</span>
-              <span class="glome-pager glome-pager-max">13</span>
-              <span class="glome-pager glome-pager-next"></span>
-            </div>
-            <div id="glomeWidgetFooter">
-              <label class="glome-switch">
-                <input type="checkbox" checked />
-                <span class="glome-switch-toggle"></span>
-              </label>
-              <div class="glome-icon-container">
-                <a href="about:glome" class="glome-configuration"></a>
-              </div>
-            </div>
-          </div>
-          <div class="glome-icon"></div>
-        </div>
-      </div>
+    </div>
+    <div id="glomePublic" data-template="window-wrapper" data-context="window" data-glome-container="true">
+    
     </div>
   </body>
 </html>
