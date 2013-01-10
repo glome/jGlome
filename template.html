@@ -13,22 +13,241 @@
   </head>
   <body>
     <div id="glomeAdmin" data-template="admin-wrapper" data-context="admin" data-glome-container="true">
-      <div class="glome-header" data-template="admin-header">
-        <img src="images/icons/glome-logo-gray-76x106.png" alt="Glome" width="76" height="106" />
-        <ul class="glome-navigation" data-template="navigation-container">
-          <li data-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions"><a href="#admin-subscriptions">Subscriptions</a></li>
-          <li data-template="navigation-item" data-page="statistics" data-i18n="statistics"><a href="#admin-statistics">Statistics</a></li>
-          <li data-template="navigation-item" data-page="rewards" data-i18n="rewards"><a href="#admin-rewards">Rewards</a></li>
-          <li data-template="navigation-item" data-page="settings" data-i18n="settings"><a href="#admin-settings">Settings</a></li>
-        </ul>
+      <div class="glome-header glome-clearfix" data-template="admin-header" id="glomeAdminHeader">
+        <div class="glome-close" data-close-context="admin"></div>
+        <div class="glome-full-width">
+          <img src="images/icons/glome-logo-gray-76x106.png" alt="Glome" width="76" height="106" />
+          <ul class="glome-navigation" data-template="navigation-container">
+            <li class="glome-cols-1" data-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions"><a href="#admin-subscriptions">Subscriptions</a></li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="statistics" data-i18n="statistics"><a href="#admin-statistics">Statistics</a></li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="rewards" data-i18n="rewards"><a href="#admin-rewards">Rewards</a></li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="settings" data-i18n="settings"><a href="#admin-settings">Settings</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="glome-full-width">
-        <div class="glome-content" data-template="admin-subscriptions">
-          <div class="cols-2 cols-alt-3">
-            <h1></h1>
+      <div id="glomeAdminContent">
+        <div class="glome-full-width glome-clearfix">
+          <!-- !Category subscriptions -->
+          <div class="glome-content glome-layout-cols-2" data-template="admin-subscriptions">
+            <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
+              <h1 data-i18n="subscribe from %s categories">Subscribe from 25 categories</h1>
+              <p data-i18n="by subscribing to a category you determine which brands can reach you">
+                By subscribing to a category you determine which brands can reach you.
+              </p>
+              <hr class="glome-short" />
+            </div>
+            <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="off">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <a class="glome-subscribe glome-button glome-cols-1" data-state="on">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </a>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- !Brand subscriptions -->
+          <div class="glome-content " data-template="admin-brands">
+            
+          </div>
+          
+          <!-- !Rewards -->
+          <div class="glome-content glome-layout-cols-2" data-template="admin-rewards">
+            <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
+              <h1 data-i18n="here is your reward">Here is your reward</h1>
+              <p data-i18n="lorem ipsum">
+                Lorem ipsum
+              </p>
+              <hr class="glome-short" />
+              <p>
+                <span data-i18n="total amount">Total amount</span>:
+              </p>
+              <p class="glome-total-rewards" id="glomeTotalRewards">
+                <span data-type="currency">€</span> <span data-type="full">20</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
+              </p>
+              <p>
+                <a class="glome-button" data-i18n="redeem cash">Redeem cash</a>
+              </p>
+            </div>
+            <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
+              <p>
+                <span data-i18n="reclaimed offers">Reclaimed offers</span>:
+              </p>
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-cols-1">
+                  Logo
+                </div>
+                <div class="glome-text-container">
+                  <p class="glome-brand">Audi</p>
+                  <h1 class="glome-category-title">Ad/campaign name</h1>
+                </div>
+                <div class="glome-price-container">
+                  <span data-type="currency">€</span> <span data-type="full">20</span>.<span data-type="cents">20</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="glome-content " data-template="admin-brands"></div>
+      </div>
+      <div class="glome-footer glome-clearfix" data-template="admin-footer" id="glomeAdminFooter">
+        <div class="glome-full-width">
+          &copy; Glome Inc, 2013
+        </div>
       </div>
     </div>
     <div id="glomePublic" data-template="window-wrapper" data-context="window" data-glome-container="true">

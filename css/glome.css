@@ -1,8 +1,21 @@
 /* !Containers */
 [data-glome-container="true"]
 {
-  font-family: Helvetica, Arial, sans-serif;
-  font-size: 12px;
+  font-family: Helvetica, Arial, sans-serif !important;
+  font-size: 13px !important;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  color: #4d4d4d !important;
+  font-weight: 100 !important;
+}
+
+[data-glome-container="true"] .glome-content
+{
+  -moz-box-sizing: border-box;
+  padding: 25px 0;
 }
 
 [data-glome-container="true"].hidden,
@@ -11,37 +24,197 @@
   display: none !important;
 }
 
-[data-glome-container="true"] .cols-1
+[data-glome-container="true"] .glome-clearfix:after
+{
+  display: block;
+  content: '';
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  clear: both;
+}
+
+[data-glome-container="true"] .glome-layout-cols-2 > *
+{
+  float: left;
+}
+
+[data-glome-container="true"] .glome-layout-cols-2 > * + *
+{
+  float: right;
+}
+
+[data-glome-container="true"] .glome-fixed
+{
+  position: fixed;
+}
+
+/* !General rules */
+[data-glome-container="true"] a:link,
+[data-glome-container="true"] a:visited
+{
+  text-decoration: none;
+}
+
+[data-glome-container="true"] a:hover,
+[data-glome-container="true"] a:visited:hover
+{
+  text-decoration: underline;
+}
+
+[data-glome-container="true"] .glome-close
+{
+  position: fixed;
+  right: 0;
+  top: 0;
+  padding: 10px;
+  cursor: pointer;
+}
+
+[data-glome-container="true"] h1
+{
+  font-size: 185%;
+  line-height: 108%;
+  font-weight: 600;
+}
+
+[data-glome-container="true"] p
+{
+  line-height: 115%;
+}
+
+[data-glome-container="true"] * > h1:first-child
+{
+  margin-top: 0;
+}
+
+[data-glome-container="true"] hr,
+[data-glome-container="true"] .glome-with-separator + .glome-with-separator
+{
+  border-style: solid none none;
+  border-color: #b1b1b1;
+  border-width: 1px;
+}
+
+[data-glome-container="true"] hr.glome-short
+{
+  width: 20px;
+  margin: 0;
+}
+
+/* !Button */
+[data-glome-container="true"] .glome-button
+{
+  background-image: -moz-linear-gradient(bottom, #dfdfdf 0%, #ededed 100%);
+  background-color: #dfdfdf;
+  color: #4d4d4d;
+  -moz-box-sizing: border-box;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4), 1px 1px 1px rgba(0, 0, 0, 0.4);
+  height: 35px;
+  line-height: 35px;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none !important;
+  cursor: pointer;
+  padding: 1px 1em 0;
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+}
+
+[data-glome-container="true"] .glome-button[data-state="on"]
+{
+  background-image: -moz-linear-gradient(bottom, #33c901 0%, #6bf33e 100%);
+  background-color: #6bf33e;
+  color: #008800;
+}
+
+[data-glome-container="true"] .glome-button[data-state="off"] [data-state="on"]
+{
+  display: none;
+}
+
+[data-glome-container="true"] .glome-button[data-state="on"] [data-state="off"]
+{
+  display: none;
+}
+
+/* !Next button */
+[data-glome-container="true"] .glome-button-next
+{
+  background-image: url('../images/icons/arrow-right.png');
+  -moz-box-sizing: border-box;
+  width: 24px;
+  height: 17px;
+  display: inline-block;
+}
+
+/* !Table data */
+[data-glome-container="true"] .glome-row
+{
+  clear: both;
+  padding: 10px 0;
+}
+
+[data-glome-container="true"] .glome-row > *
+{
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+}
+
+[data-glome-container="true"] .glome-row > * + *
+{
+  padding-left: 15px;
+}
+
+[data-glome-container="true"] .glome-row > .glome-button-container
+{
+  padding-left: 0;
+}
+
+[data-glome-container="true"] .glome-row > .glome-price-container
+{
+  white-space: nowrap;
+}
+
+[data-glome-container="true"] .glome-row h1,
+[data-glome-container="true"] .glome-row p
+{
+  margin: 0;
+}
+
+/* !Column widths */
+[data-glome-container="true"] .glome-cols-1
 {
   width: 120px;
 }
 
-[data-glome-container="true"] .cols-2
+[data-glome-container="true"] .glome-cols-2
 {
   width: 255px;
 }
 
-[data-glome-container="true"] .cols-3
+[data-glome-container="true"] .glome-cols-3
 {
   width: 390px;
 }
 
-[data-glome-container="true"] .cols-4
+[data-glome-container="true"] .glome-cols-4
 {
   width: 525px;
 }
 
-[data-glome-container="true"] .cols-5
+[data-glome-container="true"] .glome-cols-5
 {
   width: 660px;
 }
 
-[data-glome-container="true"] .cols-6
+[data-glome-container="true"] .glome-cols-6
 {
   width: 795px;
 }
 
-[data-glome-container="true"] .cols-7,
+[data-glome-container="true"] .glome-cols-7,
 [data-glome-container="true"] .glome-full-width
 {
   width: 930px;
@@ -50,5 +223,217 @@
 [data-glome-container="true"] .glome-full-width
 {
   margin: 0 auto;
+}
+
+/* !Admin view */
+#glomeAdmin
+{
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#glomeAdmin .glome-header,
+#glomeAdmin .glome-footer
+{
+  background-color: #ebebeb;
+  -moz-box-sizing: border-box;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+/* !Admin header */
+#glomeAdminHeader
+{
+  height: 177px;
+  padding-top: 35px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10001;
+}
+
+#glomeAdmin .glome-close
+{
+  background-image: url('../images/icons/icon-close-30x30.png');
+  background-position: center center;
+  background-repeat: no-repeat;
+  width: 30px;
+  height: 30px;
+}
+
+/* !Admin navigation */
+#glomeAdmin .glome-navigation
+{
+  display: block;
+  float: right;
+  margin: 45px 0 0;
+  padding: 0;
+}
+
+#glomeAdmin .glome-navigation
+{
+  
+}
+
+#glomeAdmin .glome-navigation li
+{
+  height: 80px;
+  overflow: visible;
+}
+
+#glomeAdmin .glome-navigation li,
+#glomeAdmin .glome-navigation li a
+{
+  display: block;
+  float: left;
+}
+
+#glomeAdmin .glome-navigation li a
+{
+  text-align: center;
+  color: #cfcdcd;
+  height: 55px;
+  line-height: 25px;
+  -moz-box-sizing: border-box;
+  clear: both;
+  font-size: 108%;
+  letter-spacing: 0.05em;
+}
+
+#glomeAdmin .glome-navigation li.selected a,
+#glomeAdmin .glome-navigation li:hover a
+{
+  text-decoration: none !important;
+  color: #33cc00;
+  text-shadow: 1px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+#glomeAdmin .glome-navigation li a:before
+{
+  background-image: url('../images/icons/icon-set.png');
+  background-repeat: no-repeat;
+  background-position: 60px -50px;
+  display: block;
+  clear: both;
+  margin: 0 auto;
+  width: 60px;
+  height: 40px;
+  content: '';
+}
+
+#glomeAdmin .glome-navigation li[data-page="subscriptions"] a:before
+{
+  background-position: 0 -50px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="subscriptions"].selected a:before,
+#glomeAdmin .glome-navigation li[data-page="subscriptions"]:hover a:before
+{
+  background-position: 0 0px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="statistics"] a:before
+{
+  background-position: -60px -50px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="statistics"].selected a:before,
+#glomeAdmin .glome-navigation li[data-page="statistics"]:hover a:before
+{
+  background-position: -60px 0px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="rewards"] a:before
+{
+  background-position: -120px -50px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="rewards"].selected a:before,
+#glomeAdmin .glome-navigation li[data-page="rewards"]:hover a:before
+{
+  background-position: -120px 0px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="settings"] a:before
+{
+  background-position: -180px -50px;
+}
+
+#glomeAdmin .glome-navigation li[data-page="settings"].selected a:before,
+#glomeAdmin .glome-navigation li[data-page="settings"]:hover a:before
+{
+  background-position: -180px 0px;
+}
+
+#glomeAdmin .glome-navigation li.selected a:before
+{
+  background-position-y: 0 !important;
+}
+
+#glomeAdmin .glome-navigation li.selected a:after
+{
+  background-image: url('../images/textures/navigation-triangle.gif');
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  content: '';
+  display: block;
+  margin-top: 16px;
+  height: 20px;
+}
+
+/* !Admin content */
+#glomeAdminContent
+{
+  background-image: url('../images/textures/admin-background-texture.gif');
+  overflow-y: scroll;
+  left: 0;
+  top: 177px;
+  right: 0;
+  bottom: 58px;
+  padding-bottom: 50px;
+  position: fixed;
+  z-index: 10000;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+#glomeAdminContent > .glome-full-width
+{
+  padding-bottom: 50px;
+}
+
+/* !Admin footer */
+#glomeAdmin .glome-footer
+{
+  height: 58px;
+  line-height: 58px;
+  position: fixed;
+  z-index: 10001;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* !Admin pages: rewards */
+#glomeAdmin .glome-total-rewards
+{
+  display: table-cell;
+  vertical-align: bottom;
+  padding: 0.5em 0;
+}
+
+#glomeAdmin .glome-total-rewards [data-type="currency"],
+#glomeAdmin .glome-total-rewards [data-type="full"],
+#glomeAdmin .glome-total-rewards [data-type="decimal-separator"]
+{
+  font-size: 300%;
+  font-weight: bold;
+}
+
+#glomeAdmin .glome-total-rewards [data-type="cents"]
+{
+  font-size: 175%;
 }
 
