@@ -4,11 +4,16 @@
  */
 jQuery(function()
 {
+  'use strict';
+  
   // Set the default view
   if (!window.location.hash.match(/#.+/))
   {
     window.location.hash = '#admin-subscriptions';
   }
+  
+  jQuery('#glomeAdminContent').find('[data-template="admin-subscriptions"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomeAdminContent').find('[data-template="admin-rewards"] .glome-row').eq(0).cloneTimes(15);
   
   jQuery('.glome-button[data-state]')
     .on('click', function(e)
@@ -22,6 +27,17 @@ jQuery(function()
         jQuery(this).attr('data-state', 'on');
       }
     });
+  
+  jQuery('[data-template="admin-subscriptions"] .glome-button[data-state]')
+    .on('click', function(e)
+    {
+      var total = jQuery(this).parents('.glome-content').find('.glome-button[data-state]').size();
+      var on = jQuery(this).parents('.glome-content').find('.glome-button[data-state="on"]').size();
+      
+      jQuery('#glomeAdminSubscriptions').find('.glome-counter .glome-current').text(on);
+      jQuery('#glomeAdminSubscriptions').find('.glome-counter .glome-max').text(total);
+    });
+  jQuery('[data-template="admin-subscriptions"] .glome-button[data-state]').eq(0).trigger('click');
   
   jQuery(window)
     .on('hashchange', function()
@@ -45,3 +61,12 @@ jQuery(function()
     .trigger('hashchange');
   
 });
+
+jQuery.fn.cloneTimes = function(times)
+{
+  for (var i = 0; i < Number(times); i++)
+  {
+    var cloned = jQuery(this).clone(false);
+    cloned.insertAfter(jQuery(this));
+  }
+}
