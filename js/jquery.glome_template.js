@@ -14,6 +14,7 @@ jQuery(function()
   
   jQuery('#glomeAdminContent').find('[data-template="admin-subscriptions"] .glome-row').eq(0).cloneTimes(15);
   jQuery('#glomeAdminContent').find('[data-template="admin-rewards"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomePublicContent').find('[data-template="public-subscriptions"] .glome-row').eq(0).cloneTimes(15);
   
   jQuery('.glome-button[data-state]')
     .on('click', function(e)
@@ -28,15 +29,23 @@ jQuery(function()
       }
     });
   
-  jQuery('[data-template="admin-subscriptions"] .glome-button[data-state]')
+  jQuery('#glomePublicStartup').find('.glome-button')
+    .off('click')
+    .on('click', function()
+    {
+      window.location.hash = '#public-subscriptions';
+    });
+  
+  jQuery('[data-template="admin-subscriptions"], [data-template="public-subscriptions"]').find('.glome-button[data-state]')
     .on('click', function(e)
     {
       var total = jQuery(this).parents('.glome-content').find('.glome-button[data-state]').size();
       var on = jQuery(this).parents('.glome-content').find('.glome-button[data-state="on"]').size();
       
-      jQuery('#glomeAdminSubscriptions').find('.glome-counter .glome-current').text(on);
-      jQuery('#glomeAdminSubscriptions').find('.glome-counter .glome-max').text(total);
+      jQuery('#glomeAdminSubscriptions, #glomePublicSubscriptions').find('.glome-counter .glome-current').text(on);
+      jQuery('#glomeAdminSubscriptions, #glomePublicSubscriptions').find('.glome-counter .glome-max').text(total);
     });
+  
   jQuery('[data-template="admin-subscriptions"] .glome-button[data-state]').eq(0).trigger('click');
   
   jQuery(window)
@@ -51,8 +60,8 @@ jQuery(function()
       jQuery('[data-context="' + context + '"]').removeClass('hidden');
       
       // Toggle context page
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent > .glome-full-width > .glome-content').not('[data-template="' + hash + '"]').addClass('hidden');
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent > .glome-full-width > .glome-content').filter('[data-template="' + hash + '"]').removeClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('> .glome-full-width > .glome-content').not('[data-template="' + hash + '"]').addClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('> .glome-full-width > .glome-content').filter('[data-template="' + hash + '"]').removeClass('hidden');
       
       // Toggle navigation selected item
       jQuery('[data-context="' + context + '"]').find('> .glome-header').find('[data-page="' + page + '"]').addClass('selected');

@@ -16,12 +16,38 @@
       <div class="glome-header glome-clearfix" data-template="admin-header" id="glomeAdminHeader">
         <div class="glome-close" data-close-context="admin"></div>
         <div class="glome-full-width">
-          <img src="images/icons/glome-logo-gray-76x106.png" alt="Glome" width="76" height="106" />
+          <img src="images/icons/glome-icon.svg" alt="Glome" width="76" height="106" />
           <ul class="glome-navigation" data-template="navigation-container">
-            <li class="glome-cols-1" data-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions"><a href="#admin-subscriptions">Subscriptions</a></li>
-            <li class="glome-cols-1" data-template="navigation-item" data-page="statistics" data-i18n="statistics"><a href="#admin-statistics">Statistics</a></li>
-            <li class="glome-cols-1" data-template="navigation-item" data-page="rewards" data-i18n="rewards"><a href="#admin-rewards">Rewards</a></li>
-            <li class="glome-cols-1" data-template="navigation-item" data-page="settings" data-i18n="settings"><a href="#admin-settings">Settings</a></li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
+              <a href="#admin-subscriptions">Subscriptions</a>
+              <ul>
+                <li class="selected"><a>Subscriptions</a></li>
+                <li><a>Lorem ipsum</a></li>
+              </ul>
+            </li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="statistics" data-i18n="statistics">
+              <a href="#admin-statistics">Statistics</a>
+              <ul>
+                <li class="selected"><a>History</a></li>
+                <li><a>Downloads</a></li>
+                <li><a>Footprint</a></li>
+                <li><a>Social stream</a></li>
+              </ul>
+            </li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="rewards" data-i18n="rewards">
+              <a href="#admin-rewards">Rewards</a>
+              <ul>
+                <li class="selected"><a>Rewards</a></li>
+                <li><a>Lorem ipsum</a></li>
+              </ul>
+            </li>
+            <li class="glome-cols-1" data-template="navigation-item" data-page="settings" data-i18n="settings">
+              <a href="#admin-settings">Settings</a>
+              <ul>
+                <li class="selected"><a>Settings</a></li>
+                <li><a>Lorem ipsum</a></li>
+              </ul>
+            </li>
           </ul>
         </div>
       </div>
@@ -60,17 +86,25 @@
             </div>
           </div>
           
-          <!-- !Brand subscriptions -->
-          <div class="glome-content " data-template="admin-brands">
-            
+          <!-- !Statistics -->
+          <div id="glomeAdminStatistics" class="glome-content glome-layout-cols-2" data-template="admin-statistics">
+            <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
+              <h1 data-i18n="your digital footprint">Your Digital<br /> Footprint</h1>
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
+              </p>
+              <hr class="glome-short" />
+            </div>
+            <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
+            </div>
           </div>
           
           <!-- !Rewards -->
           <div class="glome-content glome-layout-cols-2" data-template="admin-rewards">
             <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
               <h1 data-i18n="here is your reward">Here is your reward</h1>
-              <p data-i18n="lorem ipsum">
-                Lorem ipsum
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt
               </p>
               <hr class="glome-short" />
               <p>
@@ -102,6 +136,47 @@
               </div>
             </div>
           </div>
+          
+          <!-- !Settings -->
+          <div id="glomeAdminSettings" class="glome-content" data-template="admin-settings">
+            <div class="glome-layout-cols-2 glome-clearfix">
+              <div class="glome-cols-2">
+                <h1 data-i18n="create or change your password">Create or Change your password</h1>
+                <p data-i18n="with an optional password you can set an additional layer of security for your information">
+                  With an optional password you can set an additional layer of security for your information.
+                </p>
+              </div>
+              <div id="glomeAdminSettingsChangePassword" class="glome-cols-4">
+                <input type="password" placeholder="type your old password" />
+                <input type="password" placeholder="type your new password" />
+                <input type="password" placeholder="retype your new password" />
+                <button class="glome-button"><span data-i18n="save">Save</span></button>
+              </div>
+            </div>
+            <hr class="glome-short" />
+            <div class="glome-layout-cols-2 glome-clearfix">
+              <div class="glome-cols-2">
+                <h1 data-i18n="create or change your password">Create or Change your password</h1>
+                <p>
+                  <span data-i18n="if you already use glome on one device you can pair all of your devices to use the same account">
+                    If you already use Glome on one device you can pair all of your devices to use the same account
+                  </span>.
+                </p>
+                <p>
+                  <span data-i18n="use the generate code button to create a unique code for pairing your devices with a glome account">
+                    Use the “generate code” button to create a unique code for pairing your devices with a Glome account
+                  </span>.
+                </p>
+              </div>
+              <div id="glomeAdminSettingsPairDevices" class="glome-cols-4">
+                <button class="glome-button"><span data-i18n="generate code">Generate code</span></button>
+                <input type="text" placeholder="0000" readonly />
+                <input type="text" placeholder="0000" readonly />
+                <input type="text" placeholder="0000" readonly />
+              </div>
+            </div>
+          </div>
+          
         </div>
       </div>
       <div class="glome-footer glome-clearfix" data-template="admin-footer" id="glomeAdminFooter">
@@ -111,7 +186,68 @@
       </div>
     </div>
     <div id="glomePublic" data-template="window-wrapper" data-context="window" data-glome-container="true">
-    
+      <div class="glome-header glome-clearfix" data-template="public-header" id="glomePublicHeader">
+        <div class="glome-close" data-close-context="public"></div>
+        <div class="glome-full-width">
+          <img src="images/icons/glome-icon.svg" alt="Glome" width="76" height="106" />
+        </div>
+      </div>
+      <div id="glomePublicContent">
+        <div class="glome-full-width glome-clearfix">
+          <!-- Startup, stage 1 -->
+          <div id="glomePublicStartup" class="glome-content" data-template="public-startup">
+            <h1>
+              <span data-i18n="welcome to glome">Welcome to Glome</span> –
+              <span data-i18n="reward being you">Reward Being You</span>.
+            </h1>
+            <p>
+              <span data-i18n="let us personalize glome for you">Let's personalize Glome for You</span>.
+              <span data-i18n="it will only take a few clicks">It will only take a few clicks</span>.
+            </p>
+            <p>
+              <button class="glome-button glome-cols-2" data-state="on">
+                <span data-state="on" data-i18n="let us go">Let's go!</span>
+              </button>
+            </p>
+            <p>
+              <a data-i18n="skip for now">Skip for now</a>
+            </p>
+          </div>
+          
+          <!-- !Startup, stage 2: category subscriptions -->
+          <div id="glomePublicSubscriptions" class="glome-content glome-layout-cols-2" data-template="public-subscriptions">
+            <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
+              <h1 data-i18n="subscribe from %s categories">Subscribe from 25 categories</h1>
+              <p data-i18n="by subscribing to a category you determine which brands can reach you">
+                By subscribing to a category you determine which brands can reach you.
+              </p>
+              <hr class="glome-short" />
+              <div class="glome-counter">
+                <span class="glome-current">0</span><span class="glome-separator">/</span><span class="glome-max">0</span>
+                <span class="glome-unit" data-i18n="selected">selected</span>
+              </div>
+            </div>
+            <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
+              <!-- Row -->
+              <div class="glome-category glome-row glome-with-separator">
+                <div class="glome-button-container glome-cols-1">
+                  <button class="glome-subscribe glome-button glome-add glome-cols-1" data-state="off">
+                    <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
+                    <span class="glome-subscribed" data-state="on" data-i18n="subscribed">Subscribed</span>
+                  </button>
+                </div>
+                <div class="glome-text-container">
+                  <h1 class="glome-category-title">Automotive</h1>
+                  <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                </div>
+                <div class="glome-button-container">
+                  <a class="glome-button-next"></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </body>
 </html>

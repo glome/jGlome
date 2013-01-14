@@ -1,5 +1,8 @@
 $separator: #b1b1b1
 $text_color: #4d4d4d
+$text_color_light: #e8e8e8
+
+$button_height: 35px
 $button_gray_light: #f3f3f3
 $button_gray_medium: #dfdfdf
 $button_gray_dark: darken($button_gray_medium, 15)
@@ -9,21 +12,39 @@ $button_green_dark: darken($button_green_medium, 15)
 $button_red_light: #ff5d86
 $button_red_medium: #e11548
 $button_red_dark: darken($button_red_medium, 25)
+
 $col_width: 120px
+$col_margin: 15px
+$full_width: ($col_width + $col_margin) * 7 - $col_margin
+
+$navigation_height: 42px
+$header_height: 177px
+$font_size: 13px
+
+$public_content_height: 340px
+$public_header_height: 140px
+
+/* !Mixins */
+@mixin vendor-specific($property, $value)
+  -webkit-#{$property}: $value
+  -moz-#{$property}: $value
+  -ms-#{$property}: $value
+  -o-#{$property}: $value
+  #{$property}: $value
 
 @mixin container
-  -webkit-box-sizing: border-box
-  -moz-box-sizing: border-box
-  -ms-box-sizing: border-box
-  -o-box-sizing: border-box
-  box-sizing: border-box
+  @include vendor-specific(box-sizing, border-box)
 
 @mixin appearance-none
-  -webkit-appearance: none
-  -moz-appearance: none
-  -ms-appearance: none
-  -o-appearance: none
-  appearance: none
+  @include vendor-specific("appearance", "none")
+
+@mixin reset
+  @include container
+  @include appearance-none
+  border:
+    style: none
+    width: 0
+    color: transparent
 
 @mixin button
   background:
@@ -59,12 +80,15 @@ $col_width: 120px
   text-shadow: 0 1px rgba(255, 255, 255, 0.4)
 
 @mixin close
-  background-image: url(../images/icons/icon-close-30x30.png)
-  background-position: center center
-  background-repeat: no-repeat
+  background:
+    image: url(../images/icons/icon-x.svg)
+    size: 30px 30px
+    position: center center
+    repeat: no-repeat
   width: 30px
   height: 30px
 
+/* !Main container */
 [data-glome-container="true"]
   position: fixed
   left: 0
@@ -74,6 +98,12 @@ $col_width: 120px
   color: $text_color !important
   font-weight: 100 !important
 
+/* Reveals all boxes */
+//[data-glome-container="true"] *
+//  @include container
+//  border: solid 1px red
+  
+/* !Resets */
 [data-glome-container="true"],
 [data-glome-container="true"] input,
 [data-glome-container="true"] button,
@@ -81,7 +111,21 @@ $col_width: 120px
 [data-glome-container="true"] select
   font:
     family: Helvetica, Arial, sans-serif !important
-    size: 13px !important
+    size: $font_size !important
+
+[data-glome-container="true"] input[type=text],
+[data-glome-container="true"] input[type=email],
+[data-glome-container="true"] input[type=tel],
+[data-glome-container="true"] input[type=password]
+  @include reset
+  background:
+    color: $text_color
+  color: $text_color_light
+  border: none
+  display: block
+  height: $button_height
+  padding-left: 10px
+  
 
 [data-glome-container="true"] .glome-content
   @include container
@@ -155,8 +199,8 @@ $col_width: 120px
   color: $text_color
   box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4), 1px 1px 1px rgba(0, 0, 0, 0.4)
   border: none
-  height: 35px
-  line-height: 35px
+  height: $button_height
+  line-height: $button_height
   display: inline-block
   text-align: center
   font-weight: bold
@@ -185,7 +229,7 @@ $col_width: 120px
 
 [data-glome-container="true"] .glome-button[data-state="on"]:hover [data-state="on"]:before
   background:
-    image: url("data:image/svg+xml;utf8,<?xml version='1.0' encoding='utf-8'?><!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='50px' height='50px' viewBox='0 0 50 50' enable-background='new 0 0 50 50' xml:space='preserve'><path fill-rule='evenodd' clip-rule='evenodd' fill='#464646' d='M25,0C11.193,0,0,11.193,0,25c0,13.807,11.193,25,25,25c13.807,0,25-11.193,25-25 C50,11.193,38.807,0,25,0z M39.884,28.309H10.115v-6.617l29.769,0.001V28.309z'/>")
+    image: url(../images/icons/icon-minus.svg)
     size: 20px 20px
 
 [data-glome-container="true"] .glome-button[data-state="off"] [data-state="on"],
@@ -194,7 +238,7 @@ $col_width: 120px
 
 [data-glome-container="true"] .glome-button.glome-add[data-state="off"] [data-state="off"]:before
   background:
-    image: url("data:image/svg+xml;utf8,<?xml version='1.0' encoding='utf-8'?> <!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'> <svg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' width='50px' height='50px' viewBox='0 0 50 50' enable-background='new 0 0 50 50' xml:space='preserve'> <path fill-rule='evenodd' clip-rule='evenodd' d='M25,0C11.193,0,0,11.193,0,25c0,13.807,11.193,25,25,25c13.807,0,25-11.193,25-25 C50,11.193,38.807,0,25,0z M39.884,28.309H28.857v11.023H21.14V28.309H10.115v-6.617H21.14V10.667h7.718v11.026h11.026V28.309z'/> </svg>")
+    image: url(../images/icons/icon-plus.svg)
     size: 20px 20px
 
 [data-glome-container="true"] .glome-button.glome-add[data-state="off"] [data-state="off"]:before,
@@ -213,15 +257,23 @@ $col_width: 120px
 [data-glome-container="true"] .glome-button-next
   @include container
   background:
-    image: url(../images/icons/arrow-right.png)
+    image: url(../images/icons/arrow-right.svg)
+    size: 24px 17px
   width: 24px
   height: 17px
   display: inline-block
+  opacity: 1 - 180/255
+
+[data-glome-container="true"] .glome-button-next:hover
+  opacity: 1 - 64/255
 
 /* !Table data */
 [data-glome-container="true"] .glome-row
   clear: both
   padding: 10px 0
+
+[data-glome-container="true"] .glome-row:first-child
+  padding-top: 0
 
 [data-glome-container="true"] .glome-row > *
   display: table-cell
@@ -242,29 +294,12 @@ $col_width: 120px
   margin: 0
 
 /* !Column widths */
-[data-glome-container="true"] .glome-cols-1
-  width: $col_width
+@for $i from 1 through 7
+  [data-glome-container="true"] .glome-cols-#{$i}
+    width: ($col_width + $col_margin) * $i - $col_margin
 
-[data-glome-container="true"] .glome-cols-2
-  width: ($col_width + 15) * 1 + $col_width
-
-[data-glome-container="true"] .glome-cols-3
-  width: ($col_width + 15) * 2 + $col_width
-
-[data-glome-container="true"] .glome-cols-4
-  width: ($col_width + 15) * 3 + $col_width
-
-[data-glome-container="true"] .glome-cols-5
-  width: ($col_width + 15) * 4 + $col_width
-
-[data-glome-container="true"] .glome-cols-6
-  width: ($col_width + 15) * 5 + $col_width
-
-[data-glome-container="true"] .glome-cols-7,
 [data-glome-container="true"] .glome-full-width
-  width: ($col_width + 15) * 6 + $col_width
-  
-[data-glome-container="true"] .glome-full-width
+  width: ($col_width + $col_margin) * 7 - $col_margin
   margin: 0 auto
 
 /* !Admin view */
@@ -280,11 +315,16 @@ $col_width: 120px
   @include container
   background:
     color: #ebebeb
+
+#glomeAdmin .glome-footer
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.2)
+
+#glomeAdmin .glome-header
+  box-shadow: 0 $navigation_height 0 rgba(77, 77, 77, 1)
 
 /* !Admin header */
 #glomeAdminHeader
-  height: 177px
+  height: $header_height
   padding-top: 35px
   position: fixed
   top: 0
@@ -305,16 +345,19 @@ $col_width: 120px
 #glomeAdmin .glome-navigation
   
 
-#glomeAdmin .glome-navigation li
+#glomeAdmin .glome-navigation > li
   height: 80px
   overflow: visible
 
-#glomeAdmin .glome-navigation li,
-#glomeAdmin .glome-navigation li a
+#glomeAdmin .glome-navigation > li + li
+  margin-left: $col_margin
+
+#glomeAdmin .glome-navigation > li,
+#glomeAdmin .glome-navigation > li > a
   display: block
   float: left
 
-#glomeAdmin .glome-navigation li a
+#glomeAdmin .glome-navigation > li > a
   @include container
   text-align: center
   color: #cfcdcd
@@ -324,14 +367,14 @@ $col_width: 120px
   font-size: 108%
   letter-spacing: 0.05em
 
-#glomeAdmin .glome-navigation li.selected a,
-#glomeAdmin .glome-navigation li:hover a
+#glomeAdmin .glome-navigation > li.selected > a,
+#glomeAdmin .glome-navigation > li:hover > a
   text:
     decoration: none !important
     shadow: 1px 0 0 rgba(0, 0, 0, 0.2)
   color: #33cc00
 
-#glomeAdmin .glome-navigation li a:before
+#glomeAdmin .glome-navigation > li > a:before
   background:
     image: url(../images/icons/icon-set.png)
     repeat: no-repeat
@@ -343,40 +386,41 @@ $col_width: 120px
   height: 40px
   content: ''
 
-#glomeAdmin .glome-navigation li[data-page="subscriptions"] a:before
+#glomeAdmin .glome-navigation > li[data-page="subscriptions"] > a:before
   background-position: 0 -50px
 
-#glomeAdmin .glome-navigation li[data-page="subscriptions"].selected a:before,
-#glomeAdmin .glome-navigation li[data-page="subscriptions"]:hover a:before
+#glomeAdmin .glome-navigation > li[data-page="subscriptions"].selected > a:before,
+#glomeAdmin .glome-navigation > li[data-page="subscriptions"]:hover > a:before
   background-position: 0 0px
 
-#glomeAdmin .glome-navigation li[data-page="statistics"] a:before
+#glomeAdmin .glome-navigation > li[data-page="statistics"] > a:before
   background-position: -60px -50px
 
-#glomeAdmin .glome-navigation li[data-page="statistics"].selected a:before,
-#glomeAdmin .glome-navigation li[data-page="statistics"]:hover a:before
+#glomeAdmin .glome-navigation > li[data-page="statistics"].selected > a:before,
+#glomeAdmin .glome-navigation > li[data-page="statistics"]:hover > a:before
   background-position: -60px 0px
 
-#glomeAdmin .glome-navigation li[data-page="rewards"] a:before
+#glomeAdmin .glome-navigation > li[data-page="rewards"] > a:before
   background-position: -120px -50px
 
-#glomeAdmin .glome-navigation li[data-page="rewards"].selected a:before,
-#glomeAdmin .glome-navigation li[data-page="rewards"]:hover a:before
+#glomeAdmin .glome-navigation > li[data-page="rewards"].selected > a:before,
+#glomeAdmin .glome-navigation > li[data-page="rewards"]:hover > a:before
   background-position: -120px 0px
 
-#glomeAdmin .glome-navigation li[data-page="settings"] a:before
+#glomeAdmin .glome-navigation > li[data-page="settings"] a:before
   background-position: -180px -50px
 
-#glomeAdmin .glome-navigation li[data-page="settings"].selected a:before,
-#glomeAdmin .glome-navigation li[data-page="settings"]:hover a:before
+#glomeAdmin .glome-navigation > li[data-page="settings"].selected > a:before,
+#glomeAdmin .glome-navigation > li[data-page="settings"]:hover > a:before
   background-position: -180px 0px
 
-#glomeAdmin .glome-navigation li.selected a:before
+#glomeAdmin .glome-navigation > li.selected > a:before
   background-position-y: 0 !important
 
-#glomeAdmin .glome-navigation li.selected a:after
+#glomeAdmin .glome-navigation > li.selected > a:after
   background:
-    image: url(../images/textures/navigation-triangle.gif)
+    image: url(../images/textures/selected-triangle.svg)
+    size: 32px 16px
     position: center bottom
     repeat: no-repeat
   content: ''
@@ -384,22 +428,64 @@ $col_width: 120px
   margin-top: 16px
   height: 20px
 
+/* !Admin navigation, second level */
+#glomeAdmin .glome-navigation > li > ul
+  display: none
+
+#glomeAdmin .glome-navigation > li.selected > ul
+  display: block
+  position: fixed
+  top: $header_height
+  left: 50%
+  margin:
+    left: -1 * (($col_width + $col_margin) - $col_margin) / 2
+    top: 0
+    right: 0
+    bottom: 0
+  padding: 0
+  width: ($col_width + $col_margin) * 4 - $col_margin
+  height: $navigation_height
+  line-height: $navigation_height
+
+#glomeAdmin .glome-navigation > li.selected > ul li
+  display: block
+  float: left
+  width: $col_width
+
+#glomeAdmin .glome-navigation > li.selected > ul li + li
+  margin-left: $col_margin
+
+#glomeAdmin .glome-navigation > li.selected > ul li,
+#glomeAdmin .glome-navigation > li.selected > ul li a
+  color: $text_color_light
+  text-decoration: none !important
+
+#glomeAdmin .glome-navigation > li.selected > ul a:hover,
+#glomeAdmin .glome-navigation > li.selected > ul li.selected a
+  color: #54ec01
+
+#glomeAdmin .glome-navigation > li.selected > ul li.selected a
+  font-weight: 700
+
 /* !Admin content */
 #glomeAdminContent
   @include container
   background-image: url(../images/textures/admin-background-texture.gif)
   overflow-y: scroll
   left: 0
-  top: 177px
+  top: $header_height + $navigation_height
   right: 0
   bottom: 58px
-  padding-bottom: 50px
+  padding:
+    top: 25px
+    left: 15px
+    bottom: 25px
   position: fixed
   z-index: 10000
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2)
 
 #glomeAdminContent > .glome-full-width
-  padding-bottom: 50px
+  padding-bottom: 25px
 
 /* !Admin footer */
 #glomeAdmin .glome-footer
@@ -415,13 +501,13 @@ $col_width: 120px
 #glomeAdminSubscriptions .glome-counter
   position: fixed
   bottom: 90px
-  font-size: 28px
+  font-size: 215%
   vertical-align: bottom
   font-weight: 100
 
 #glomeAdminSubscriptions .glome-counter .glome-unit
   font:
-    size: 13px
+    size: $font_size
     weight: 500
 
 /* !Admin pages: rewards */
@@ -439,3 +525,79 @@ $col_width: 120px
 
 #glomeAdmin .glome-total-rewards [data-type="cents"]
   font-size: 175%
+
+/* !Admin pages: settings */
+#glomeAdminSettingsChangePassword input
+  width: ($col_width + $col_margin) * 2 - $col_margin
+  margin-bottom: $font_size
+
+#glomeAdminSettingsChangePassword
+  @include container
+  padding-left: $col_margin + $col_width
+  padding-right: $col_margin + $col_width
+  border:
+    style: none none solid
+    width: 1px
+    color: $separator
+  padding-bottom: 20px
+
+#glomeAdminSettingsChangePassword button
+  float: right
+  width: $col_width
+
+#glomeAdminSettings hr
+  margin-bottom: 20px
+
+#glomeAdminSettingsPairDevices input
+  width: $col_width
+  display: inline-block
+  margin-left: $col_margin - 0.5px // Some odd layout issue prevents full columns from fitting
+  font:
+    size: 20px !important
+    weight: 600
+
+/* !Public views */
+#glomePublic
+  background:
+    color: rgba(0, 0, 0, 0.95)
+
+#glomePublicHeader
+  position: fixed
+  left: 0
+  right: 0
+  top: 50%
+  margin-top: -1 * ($public_content_height / 2 + $public_header_height)
+  
+#glomePublicContent
+  @extend #glomeAdminContent
+  @include container
+  top: 50%
+  bottom: auto
+  height: $public_content_height
+  margin-top: -1 * $public_content_height / 2
+  padding:
+    top: 25px
+    left: 15px
+    bottom: 25px
+  position: fixed
+  z-index: 10000
+
+/* !First run, stage 1 */
+#glomePublicStartup
+  height: $public_content_height
+  display: table-cell
+  vertical-align: middle
+  text-align: center
+  width: $full_width
+
+#glomePublicStartup .glome-button
+  height: 70px
+  line-height: 70px
+  margin: 1em 0
+  font:
+    size: 185% !important
+
+#glomePublic .glome-close
+  @include close
+  background:
+    image: url('../images/icons/icon-x-white.svg')
