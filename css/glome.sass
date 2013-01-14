@@ -19,10 +19,9 @@ $full_width: ($col_width + $col_margin) * 7 - $col_margin
 
 $navigation_height: 42px
 $header_height: 177px
+$footer_height: 58px
+$pager_height: 64px
 $font_size: 13px
-
-$public_content_height: 340px
-$public_header_height: 140px
 
 /* !Mixins */
 @mixin vendor-specific($property, $value)
@@ -79,6 +78,12 @@ $public_header_height: 140px
   color: darken($button_red_medium, 25%)
   text-shadow: 0 1px rgba(255, 255, 255, 0.4)
 
+@mixin selection-counter
+  position: fixed
+  font-size: 215%
+  vertical-align: bottom
+  font-weight: 100
+
 @mixin close
   background:
     image: url(../images/icons/icon-x.svg)
@@ -87,6 +92,9 @@ $public_header_height: 140px
     repeat: no-repeat
   width: 30px
   height: 30px
+  opacity: 0.8
+  &:hover
+    opacity: 1
 
 /* !Main container */
 [data-glome-container="true"]
@@ -154,13 +162,9 @@ $public_header_height: 140px
 /* !General rules */
 [data-glome-container="true"] a:link,
 [data-glome-container="true"] a:visited
-  text:
-    decoration: none
-
-[data-glome-container="true"] a:hover,
-[data-glome-container="true"] a:visited:hover
-  text:
-    decoration: underline
+  text-decoration: none
+  &:hover
+    text-decoration: underline
 
 [data-glome-container="true"] .glome-close
   right: 0
@@ -190,6 +194,29 @@ $public_header_height: 140px
 [data-glome-container="true"] hr.glome-short
   width: 20px
   margin: 0
+
+/* !Navigation button */
+[data-glome-container="true"] .glome-navigation-button
+  background:
+    image: url(../images/icons/arrow-button-gradient-gray.svg)
+    repeat: no-repeat
+  display: inline-block
+  overflow: hidden
+  width: $col_width
+  text-align: center
+  vertical-align: middle
+  &:hover
+    background-image: url(../images/icons/arrow-button-gradient-green.svg)
+  &:after
+    content: ""
+  &.left
+    background-position: left center
+    border-right: solid 1px rgba(0, 0, 0, 0.1)
+  &.right
+    background-position: right center
+    border-left: solid 1px rgba(255, 255, 255, 0.8)
+    float: right
+    
 
 /* !Button */
 [data-glome-container="true"] .glome-button
@@ -263,9 +290,8 @@ $public_header_height: 140px
   height: 17px
   display: inline-block
   opacity: 1 - 180/255
-
-[data-glome-container="true"] .glome-button-next:hover
-  opacity: 1 - 64/255
+  &:hover
+    opacity: 1 - 64/255
 
 /* !Table data */
 [data-glome-container="true"] .glome-row
@@ -365,20 +391,18 @@ $public_header_height: 140px
   line-height: 25px
   clear: both
   font-size: 108%
-  letter-spacing: 0.05em
 
 #glomeAdmin .glome-navigation > li.selected > a,
 #glomeAdmin .glome-navigation > li:hover > a
   text:
     decoration: none !important
-    shadow: 1px 0 0 rgba(0, 0, 0, 0.2)
   color: #33cc00
 
 #glomeAdmin .glome-navigation > li > a:before
   background:
     repeat: no-repeat
     position: center top
-    size: 30px 30px
+    size: 35px 35px
   display: block
   clear: both
   margin: 0 auto
@@ -452,7 +476,10 @@ $public_header_height: 140px
 /* !Admin content */
 #glomeAdminContent
   @include container
-  background-image: url(../images/textures/admin-background-texture.gif)
+  background:
+    image: url(../images/textures/admin-background-texture.gif)
+    attachment: fixed
+    color: $button_gray_medium
   overflow-y: scroll
   left: 0
   top: $header_height + $navigation_height
@@ -470,9 +497,9 @@ $public_header_height: 140px
   padding-bottom: 25px
 
 /* !Admin footer */
-#glomeAdmin .glome-footer
-  height: 58px
-  line-height: 58px
+#glomeAdminFooter
+  height: $footer_height
+  line-height: $footer_height
   position: fixed
   z-index: 10001
   left: 0
@@ -480,15 +507,12 @@ $public_header_height: 140px
   right: 0
 
 /* !Admin pages: subscriptions */
-#glomeAdminSubscriptions .glome-counter
-  position: fixed
-  bottom: 90px
-  font-size: 215%
-  vertical-align: bottom
-  font-weight: 100
-  mask: url(../images/icons/icon-subscriptions.svg)
+#glomeAdminSubscriptions .glome-selection-counter
+  @include selection-counter
+  bottom: $footer_height + 10
 
-#glomeAdminSubscriptions .glome-counter .glome-unit
+#glomeAdminSubscriptions .glome-selection-counter .glome-unit,
+#glomePublicSubscriptions .glome-selection-counter .glome-unit
   font:
     size: $font_size
     weight: 500
@@ -545,29 +569,64 @@ $public_header_height: 140px
     color: rgba(0, 0, 0, 0.95)
 
 #glomePublicHeader
+  @include container
   position: fixed
+  top: 0
   left: 0
   right: 0
-  top: 50%
-  margin-top: -1 * ($public_content_height / 2 + $public_header_height)
+  padding: 40px 0
+  height: $header_height
+  
+#glomePublicFooter
+  @extend #glomeAdminFooter
   
 #glomePublicContent
   @extend #glomeAdminContent
   @include container
-  top: 50%
-  bottom: auto
-  height: $public_content_height
-  margin-top: -1 * $public_content_height / 2
+  overflow-y: auto
+  top: $header_height
+  bottom: $footer_height
+  padding: 0 0 $pager_height
+  background:
+    image: none
+    color: transparent
+  position: fixed
+  z-index: 10000
+
+#glomePublicContent .glome-content-wrapper
   padding:
     top: 25px
     left: 15px
     bottom: 25px
-  position: fixed
-  z-index: 10000
+  position: absolute
+  left: 0
+  right: 0
+  background:
+    image: url(../images/textures/admin-background-texture.gif)
+    color: $button_gray_medium
+    attachment: fixed
 
+#glomePublicContent .glome-pager
+  @include container
+  $padding: 14px
+  background:
+    image: url(../images/textures/admin-background-texture.gif)
+    attachment: fixed
+    color: $button_gray_medium
+  position: fixed
+  bottom: $footer_height
+  height: $pager_height
+  padding: $padding 0
+  line-height: 35px
+  z-index: 10002
+  border:
+    style: solid none none
+    color: $separator
+    width: 1px
+  
 /* !First run, stage 1 */
 #glomePublicStartup
-  height: $public_content_height
+  height: 100%
   display: table-cell
   vertical-align: middle
   text-align: center
@@ -584,3 +643,8 @@ $public_header_height: 140px
   @include close
   background:
     image: url('../images/icons/icon-x-white.svg')
+
+#glomePublicSubscriptions .glome-selection-counter
+  @include selection-counter
+  bottom: $footer_height + $pager_height + 10
+

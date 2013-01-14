@@ -75,10 +75,9 @@
 [data-glome-container="true"] a:link,
 [data-glome-container="true"] a:visited {
   text-decoration: none; }
-
-[data-glome-container="true"] a:hover,
-[data-glome-container="true"] a:visited:hover {
-  text-decoration: underline; }
+  [data-glome-container="true"] a:link:hover,
+  [data-glome-container="true"] a:visited:hover {
+    text-decoration: underline; }
 
 [data-glome-container="true"] .glome-close {
   right: 0;
@@ -106,6 +105,27 @@
 [data-glome-container="true"] hr.glome-short {
   width: 20px;
   margin: 0; }
+
+/* !Navigation button */
+[data-glome-container="true"] .glome-navigation-button {
+  background-image: url(../images/icons/arrow-button-gradient-gray.svg);
+  background-repeat: no-repeat;
+  display: inline-block;
+  overflow: hidden;
+  width: 120px;
+  text-align: center;
+  vertical-align: middle; }
+  [data-glome-container="true"] .glome-navigation-button:hover {
+    background-image: url(../images/icons/arrow-button-gradient-green.svg); }
+  [data-glome-container="true"] .glome-navigation-button:after {
+    content: ""; }
+  [data-glome-container="true"] .glome-navigation-button.left {
+    background-position: left center;
+    border-right: solid 1px rgba(0, 0, 0, 0.1); }
+  [data-glome-container="true"] .glome-navigation-button.right {
+    background-position: right center;
+    border-left: solid 1px rgba(255, 255, 255, 0.8);
+    float: right; }
 
 /* !Button */
 [data-glome-container="true"] .glome-button {
@@ -208,9 +228,8 @@
   height: 17px;
   display: inline-block;
   opacity: 0.29412; }
-
-[data-glome-container="true"] .glome-button-next:hover {
-  opacity: 0.74902; }
+  [data-glome-container="true"] .glome-button-next:hover {
+    opacity: 0.74902; }
 
 /* !Table data */
 [data-glome-container="true"] .glome-row {
@@ -303,7 +322,10 @@
   background-position: center center;
   background-repeat: no-repeat;
   width: 30px;
-  height: 30px; }
+  height: 30px;
+  opacity: 0.8; }
+  #glomeAdmin .glome-close:hover {
+    opacity: 1; }
 
 /* !Admin navigation */
 #glomeAdmin .glome-navigation {
@@ -335,19 +357,17 @@
   height: 55px;
   line-height: 25px;
   clear: both;
-  font-size: 108%;
-  letter-spacing: 0.05em; }
+  font-size: 108%; }
 
 #glomeAdmin .glome-navigation > li.selected > a,
 #glomeAdmin .glome-navigation > li:hover > a {
   text-decoration: none !important;
-  text-shadow: 1px 0 0 rgba(0, 0, 0, 0.2);
   color: #33cc00; }
 
 #glomeAdmin .glome-navigation > li > a:before {
   background-repeat: no-repeat;
   background-position: center top;
-  background-size: 30px 30px;
+  background-size: 35px 35px;
   display: block;
   clear: both;
   margin: 0 auto;
@@ -447,6 +467,8 @@
   -o-box-sizing: border-box;
   box-sizing: border-box;
   background-image: url(../images/textures/admin-background-texture.gif);
+  background-attachment: fixed;
+  background-color: #dfdfdf;
   overflow-y: scroll;
   left: 0;
   top: 219px;
@@ -463,7 +485,7 @@
   padding-bottom: 25px; }
 
 /* !Admin footer */
-#glomeAdmin .glome-footer {
+#glomeAdminFooter, #glomePublicFooter {
   height: 58px;
   line-height: 58px;
   position: fixed;
@@ -473,15 +495,15 @@
   right: 0; }
 
 /* !Admin pages: subscriptions */
-#glomeAdminSubscriptions .glome-counter {
+#glomeAdminSubscriptions .glome-selection-counter {
   position: fixed;
-  bottom: 90px;
   font-size: 215%;
   vertical-align: bottom;
   font-weight: 100;
-  mask: url(../images/icons/icon-subscriptions.svg); }
+  bottom: 68px; }
 
-#glomeAdminSubscriptions .glome-counter .glome-unit {
+#glomeAdminSubscriptions .glome-selection-counter .glome-unit,
+#glomePublicSubscriptions .glome-selection-counter .glome-unit {
   font-size: 13px;
   font-weight: 500; }
 
@@ -537,11 +559,17 @@
   background-color: rgba(0, 0, 0, 0.95); }
 
 #glomePublicHeader {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
   position: fixed;
+  top: 0;
   left: 0;
   right: 0;
-  top: 50%;
-  margin-top: -310px; }
+  padding: 40px 0;
+  height: 177px; }
 
 #glomePublicContent {
   -webkit-box-sizing: border-box;
@@ -549,19 +577,48 @@
   -ms-box-sizing: border-box;
   -o-box-sizing: border-box;
   box-sizing: border-box;
-  top: 50%;
-  bottom: auto;
-  height: 340px;
-  margin-top: -170px;
-  padding-top: 25px;
-  padding-left: 15px;
-  padding-bottom: 25px;
+  overflow-y: auto;
+  top: 177px;
+  bottom: 58px;
+  padding: 0 0 64px;
+  background-image: none;
+  background-color: transparent;
   position: fixed;
   z-index: 10000; }
 
+#glomePublicContent .glome-content-wrapper {
+  padding-top: 25px;
+  padding-left: 15px;
+  padding-bottom: 25px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  background-image: url(../images/textures/admin-background-texture.gif);
+  background-color: #dfdfdf;
+  background-attachment: fixed; }
+
+#glomePublicContent .glome-pager {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+  background-image: url(../images/textures/admin-background-texture.gif);
+  background-attachment: fixed;
+  background-color: #dfdfdf;
+  position: fixed;
+  bottom: 58px;
+  height: 64px;
+  padding: 14px 0;
+  line-height: 35px;
+  z-index: 10002;
+  border-style: solid none none;
+  border-color: #b1b1b1;
+  border-width: 1px; }
+
 /* !First run, stage 1 */
 #glomePublicStartup {
-  height: 340px;
+  height: 100%;
   display: table-cell;
   vertical-align: middle;
   text-align: center;
@@ -580,4 +637,14 @@
   background-repeat: no-repeat;
   width: 30px;
   height: 30px;
+  opacity: 0.8;
   background-image: url("../images/icons/icon-x-white.svg"); }
+  #glomePublic .glome-close:hover {
+    opacity: 1; }
+
+#glomePublicSubscriptions .glome-selection-counter {
+  position: fixed;
+  font-size: 215%;
+  vertical-align: bottom;
+  font-weight: 100;
+  bottom: 132px; }

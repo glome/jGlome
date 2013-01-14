@@ -42,11 +42,11 @@ jQuery(function()
       var total = jQuery(this).parents('.glome-content').find('.glome-button[data-state]').size();
       var on = jQuery(this).parents('.glome-content').find('.glome-button[data-state="on"]').size();
       
-      jQuery('#glomeAdminSubscriptions, #glomePublicSubscriptions').find('.glome-counter .glome-current').text(on);
-      jQuery('#glomeAdminSubscriptions, #glomePublicSubscriptions').find('.glome-counter .glome-max').text(total);
+      jQuery(this).parents('.glome-content').find('.glome-selection-counter .glome-current').text(on);
+      jQuery(this).parents('.glome-content').find('.glome-selection-counter .glome-max').text(total);
     });
   
-  jQuery('[data-template="admin-subscriptions"] .glome-button[data-state]').eq(0).trigger('click');
+  jQuery('[data-template="admin-subscriptions"], [data-template="public-subscriptions"]').find('.glome-button[data-state]:first').trigger('click');
   
   jQuery(window)
     .on('hashchange', function()
@@ -60,8 +60,8 @@ jQuery(function()
       jQuery('[data-context="' + context + '"]').removeClass('hidden');
       
       // Toggle context page
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('> .glome-full-width > .glome-content').not('[data-template="' + hash + '"]').addClass('hidden');
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('> .glome-full-width > .glome-content').filter('[data-template="' + hash + '"]').removeClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-template="' + hash + '"]').addClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-template="' + hash + '"]').removeClass('hidden');
       
       // Toggle navigation selected item
       jQuery('[data-context="' + context + '"]').find('> .glome-header').find('[data-page="' + page + '"]').addClass('selected');
