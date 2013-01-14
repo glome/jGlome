@@ -376,43 +376,25 @@ $public_header_height: 140px
 
 #glomeAdmin .glome-navigation > li > a:before
   background:
-    image: url(../images/icons/icon-set.png)
     repeat: no-repeat
-    position: 60px -50px
+    position: center top
+    size: 30px 30px
   display: block
   clear: both
   margin: 0 auto
   width: 60px
   height: 40px
   content: ''
+  opacity: (255 - 205) / 255
 
-#glomeAdmin .glome-navigation > li[data-page="subscriptions"] > a:before
-  background-position: 0 -50px
+@each $type in subscriptions, statistics, rewards, settings
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"] > a:before
+    background-image: url(../images/icons/icon-#{$type}.svg)
 
-#glomeAdmin .glome-navigation > li[data-page="subscriptions"].selected > a:before,
-#glomeAdmin .glome-navigation > li[data-page="subscriptions"]:hover > a:before
-  background-position: 0 0px
-
-#glomeAdmin .glome-navigation > li[data-page="statistics"] > a:before
-  background-position: -60px -50px
-
-#glomeAdmin .glome-navigation > li[data-page="statistics"].selected > a:before,
-#glomeAdmin .glome-navigation > li[data-page="statistics"]:hover > a:before
-  background-position: -60px 0px
-
-#glomeAdmin .glome-navigation > li[data-page="rewards"] > a:before
-  background-position: -120px -50px
-
-#glomeAdmin .glome-navigation > li[data-page="rewards"].selected > a:before,
-#glomeAdmin .glome-navigation > li[data-page="rewards"]:hover > a:before
-  background-position: -120px 0px
-
-#glomeAdmin .glome-navigation > li[data-page="settings"] a:before
-  background-position: -180px -50px
-
-#glomeAdmin .glome-navigation > li[data-page="settings"].selected > a:before,
-#glomeAdmin .glome-navigation > li[data-page="settings"]:hover > a:before
-  background-position: -180px 0px
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"].selected > a:before,
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"]:hover > a:before
+    background-image: url(../images/icons/icon-#{$type}-gradient.svg)
+    opacity: 1
 
 #glomeAdmin .glome-navigation > li.selected > a:before
   background-position-y: 0 !important
@@ -504,6 +486,7 @@ $public_header_height: 140px
   font-size: 215%
   vertical-align: bottom
   font-weight: 100
+  mask: url(../images/icons/icon-subscriptions.svg)
 
 #glomeAdminSubscriptions .glome-counter .glome-unit
   font:

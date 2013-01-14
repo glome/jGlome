@@ -345,43 +345,48 @@
   color: #33cc00; }
 
 #glomeAdmin .glome-navigation > li > a:before {
-  background-image: url(../images/icons/icon-set.png);
   background-repeat: no-repeat;
-  background-position: 60px -50px;
+  background-position: center top;
+  background-size: 30px 30px;
   display: block;
   clear: both;
   margin: 0 auto;
   width: 60px;
   height: 40px;
-  content: ""; }
+  content: "";
+  opacity: 0.19608; }
 
 #glomeAdmin .glome-navigation > li[data-page="subscriptions"] > a:before {
-  background-position: 0 -50px; }
+  background-image: url(../images/icons/icon-subscriptions.svg); }
 
 #glomeAdmin .glome-navigation > li[data-page="subscriptions"].selected > a:before,
 #glomeAdmin .glome-navigation > li[data-page="subscriptions"]:hover > a:before {
-  background-position: 0 0px; }
+  background-image: url(../images/icons/icon-subscriptions-gradient.svg);
+  opacity: 1; }
 
 #glomeAdmin .glome-navigation > li[data-page="statistics"] > a:before {
-  background-position: -60px -50px; }
+  background-image: url(../images/icons/icon-statistics.svg); }
 
 #glomeAdmin .glome-navigation > li[data-page="statistics"].selected > a:before,
 #glomeAdmin .glome-navigation > li[data-page="statistics"]:hover > a:before {
-  background-position: -60px 0px; }
+  background-image: url(../images/icons/icon-statistics-gradient.svg);
+  opacity: 1; }
 
 #glomeAdmin .glome-navigation > li[data-page="rewards"] > a:before {
-  background-position: -120px -50px; }
+  background-image: url(../images/icons/icon-rewards.svg); }
 
 #glomeAdmin .glome-navigation > li[data-page="rewards"].selected > a:before,
 #glomeAdmin .glome-navigation > li[data-page="rewards"]:hover > a:before {
-  background-position: -120px 0px; }
+  background-image: url(../images/icons/icon-rewards-gradient.svg);
+  opacity: 1; }
 
-#glomeAdmin .glome-navigation > li[data-page="settings"] a:before {
-  background-position: -180px -50px; }
+#glomeAdmin .glome-navigation > li[data-page="settings"] > a:before {
+  background-image: url(../images/icons/icon-settings.svg); }
 
 #glomeAdmin .glome-navigation > li[data-page="settings"].selected > a:before,
 #glomeAdmin .glome-navigation > li[data-page="settings"]:hover > a:before {
-  background-position: -180px 0px; }
+  background-image: url(../images/icons/icon-settings-gradient.svg);
+  opacity: 1; }
 
 #glomeAdmin .glome-navigation > li.selected > a:before {
   background-position-y: 0 !important; }
@@ -473,7 +478,8 @@
   bottom: 90px;
   font-size: 215%;
   vertical-align: bottom;
-  font-weight: 100; }
+  font-weight: 100;
+  mask: url(../images/icons/icon-subscriptions.svg); }
 
 #glomeAdminSubscriptions .glome-counter .glome-unit {
   font-size: 13px;
