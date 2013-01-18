@@ -14,7 +14,7 @@
   <body>
     <div id="glomeWindow">
       <!-- !Admin interface -->
-      <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container">
+      <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container" style="display: none;">
         <div class="glome-header glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
           <div class="glome-close" data-close-context="admin"></div>
             <div class="glome-full-width">
@@ -191,7 +191,7 @@
       </div>
       
       <!-- !Public side -->
-      <div id="glomePublic" data-glome-template="public-wrapper" data-context="public" data-glome-container="true" class="glome-fullscreen-container">
+      <div id="glomePublic" data-glome-template="public-wrapper" data-context="public" data-glome-container="true" class="glome-fullscreen-container" style="display: none;">
         <div class="glome-header glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
           <div class="glome-close" data-close-context="public"></div>
           <div class="glome-full-width">
@@ -201,6 +201,24 @@
         <div id="glomePublicContent" class="glome-clearfix" data-glome-template="public-content">
           <div class="glome-content-wrapper">
             <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
+              <!-- !Require password -->
+              <div id="glomePublicRequirePassword" class="glome-content" data-glome-template="public-requirepassword" data-page="requirepassword">
+                <div class="glome-layout-cols-2 glome-clearfix">
+                  <div class="glome-cols-2">
+                    <h1 data-i18n="password protected">Password protected</h1>
+                    <p data-i18n="this glome account is protected with a password">
+                      This Glome account is protected with a password
+                    </p>
+                  </div>
+                  <div id="glomePublicSetPassword" class="glome-cols-4">
+                    <div class="glome-cols-2">
+                      <input type="password" placeholder="type in your  password" />
+                      <button class="glome-button"><span data-i18n="login">Login</span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               <!-- !Startup, stage 1: initialize -->
               <div id="glomePublicStartup" class="glome-content" data-glome-template="public-startup" data-page="startup">
                 <h1>
