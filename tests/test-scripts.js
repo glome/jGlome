@@ -6,7 +6,7 @@ var testServer = '/';
 var testGlomeId = null;
 var testPassword = 'loremipsum';
 
-/* !Preliminary tests module */
+/* !Module: Preliminary tests module */
 QUnit.module('Preliminary checks');
 
 /* !Browser support */
@@ -76,10 +76,10 @@ var Glome = new jQuery.Glome();
 // Test on local server
 Glome.API.server = testServer;
 
-/* !Glome generic method tests */
+/* !Module: Glome generic method tests */
 QUnit.module('Glome generic method tests');
 
-/* !Test methods*/
+/* !Test methods */
 QUnit.test('Glome methods', function()
 {
   QUnit.ok(Glome.Data, 'Data subclass is defined');
@@ -199,7 +199,109 @@ QUnit.test('Glome methods', function()
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
-/* !Prototype object */
+/* !Validate callbacks */
+QUnit.test('Validate callbacks', function()
+{
+  QUnit.ok(Glome.Tools.validateCallback, 'Validate callback method is defined');
+  
+  // Check against plain object
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.validateCallback({});
+    },
+    'Caught successfully plain object callback',
+    'Callback has to be a function or an array of functions'
+  );
+  
+  // Check against a string
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.validateCallback('foobar');
+    },
+    'Caught successfully plain object callback',
+    'Callback has to be a function or an array of functions'
+  );
+  
+  var callback = function(){}
+  
+  QUnit.ok(Glome.Tools.validateCallback(null), 'Null is a valid callback');
+  QUnit.ok(Glome.Tools.validateCallback(callback), 'Function is a valid callback');
+  QUnit.ok(Glome.Tools.validateCallback([]), 'An empty array is a valid callback');
+  QUnit.ok(Glome.Tools.validateCallback([callback]), 'An array with functions is a valid callback');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.validateCallback([callback, 'loremipsum'])
+    },
+    'Caught successfully an attempt to use string in a callback array',
+    'Callback has to be a function or an array of functions'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.validateCallback([[callback], 'loremipsum'])
+    },
+    'Caught successfully an attempt to use an array in a callback array',
+    'Callback has to be a function or an array of functions'
+  );
+});
+
+/* !Merge callbacks */
+QUnit.test('Merge callbacks', function()
+{
+  QUnit.ok(Glome.Tools.mergeCallbacks, 'Merge callbacks exists');
+  
+  var callback = function(){}
+  
+  QUnit.equal(Glome.Tools.mergeCallbacks(callback, callback).length, 2, 'All function callbacks were successfully merged');
+  QUnit.equal(Glome.Tools.mergeCallbacks(callback, callback, null).length, 2, 'All function callbacks were successfully merged and null (or false) was skipped');
+  QUnit.equal(Glome.Tools.mergeCallbacks([callback, callback], callback, null).length, 3, 'Mixed array and function callbacks were successfully merged and null (or false) was skipped');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.mergeCallbacks(callback, 'foobar');
+    },
+    'Caught a string in a merge callbacks request',
+    'Callback has to be a function or an array of functions'
+  );
+});
+
+/* !Trigger callbacks */
+QUnit.test('Trigger callbacks', function()
+{
+  QUnit.ok(Glome.Tools.triggerCallbacks, 'Trigger callbacks exists');
+  
+  var callback = function(c)
+  {
+    counter++;
+  }
+  
+  var counter = 0;
+  Glome.Tools.triggerCallbacks(callback, callback);
+  console.log(counter);
+
+  QUnit.equal(counter, 2, 'All function callbacks were successfully triggerd');
+  
+  var counter = 0;
+  Glome.Tools.triggerCallbacks(callback, callback, null);
+  QUnit.equal(counter, 2, 'All function callbacks were successfully triggerd and null (or false) was skipped');
+  
+  var counter = 0;
+  Glome.Tools.triggerCallbacks([callback, callback], callback, null)
+  QUnit.equal(counter, 3, 'Mixed array and function callbacks were successfully triggerd and null (or false) was skipped');
+});
+
+/* !Module: Prototype object */
 QUnit.module('Prototype object');
 
 /* !Constructor */
@@ -492,6 +594,7 @@ QUnit.test('Change type is passed on correctly', function()
   o.delete();
 });
 
+/* !Module: Glome API */
 QUnit.module('Glome API');
 /* !Glome API basics */
 QUnit.test('Glome API basics', function()
@@ -597,6 +700,19 @@ QUnit.test('Glome API basics', function()
   QUnit.ok(Glome.API.delete(method, {}, callback), 'Glome.API.delete supports an object as second argument, function as third');
   QUnit.ok(Glome.API.delete(method, {}, callback, callback), 'Glome.API.delete supports an object as second argument, function as third and fourth');
   
+  // No internet connection throws an error
+  Glome.online = false;
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.API.delete(method);
+    },
+    'Missing Internet connection caught when trying an API call',
+    'No Internet connection'
+  );
+  Glome.online = true;
+  
   QUnit.throws
   (
     function()
@@ -608,6 +724,7 @@ QUnit.test('Glome API basics', function()
   );
   
   QUnit.equal(Glome.API.parseURL('{version}'), Glome.version, 'Variable name in URL was parsed correctly');
+  
 });
 
 /* !Glome API requests */
@@ -1039,7 +1156,7 @@ QUnit.test('Login with password', function()
   );
 });
 
-/* !Glome Ads class */
+/* !Module: Glome Ads class */
 QUnit.module('Glome Ads class');
 
 /* !Glome.Ads.Ad object */
@@ -1270,27 +1387,6 @@ QUnit.test('Ads list filters', function()
 /* !Fetch ads */
 QUnit.test('Fetch ads', function()
 {
-  // Ad loading callback has to be a function
-  QUnit.throws
-  (
-    function()
-    {
-      Glome.Ads.load([]);
-    },
-    'Glome.Ads.load callback has to be a function',
-    'Glome.Ads.load throws an error on Array as callback'
-  );
-  
-  QUnit.throws
-  (
-    function()
-    {
-      Glome.Ads.load(null, []);
-    },
-    'Glome.Ads.load onerror has to be a function',
-    'Glome.Ads.load throws an error on Array as onerror callback'
-  );
-  
   QUnit.stop();
   
   // List ads for this Glome user
@@ -1305,7 +1401,7 @@ QUnit.test('Fetch ads', function()
   });
 });
   
-/* !Glome user interface  */
+/* !Module: Glome user interface  */
 QUnit.module('Glome user interface');
 
 /* !Glome templates */
@@ -1365,7 +1461,7 @@ QUnit.test('Glome templates', function()
     QUnit.ok(Glome.Templates.get('widget'), 'Glome widget template was found');
     
     // Insert a Glome template
-    var template = Glome.Templates.get('popup');
+    var template = Glome.Templates.get('public-wrapper');
     QUnit.notEqual(template.attr('id'), 'glomeTemplates', 'ID of the element was removed to ');
     
     QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome-include]').size(), 1, 'Glome CSS was appended');
@@ -1373,7 +1469,7 @@ QUnit.test('Glome templates', function()
   });
 });
 
-/* !Glome Categories class */
+/* !Module: Glome Categories class */
 QUnit.module('Glome Categories class');
 QUnit.test('Glome.Categories.Category object', function()
 {
@@ -1395,7 +1491,6 @@ QUnit.test('Glome.Categories.Category object', function()
 
 // These tests have to be asynchronous to ensure that template test has been run already
 /* Glome UI */
-/*
 QUnit.asyncTest('Glome UI', function()
 {
   var fx = jQuery('#qunit-fixture');
@@ -1425,7 +1520,94 @@ QUnit.asyncTest('Glome UI', function()
   QUnit.equal(fx.find('#glomeWidget').size(), 1, 'Glome widget can be found');
   QUnit.start();
 });
-*/
+
+/* !Module: MVC */
+QUnit.module('MVC');
+QUnit.test('Basics', function()
+{
+  QUnit.ok(Glome.MVC, 'There is a MVC object');
+  QUnit.ok(Glome.MVC.Prototype, 'There is a prototype for MVC objects');
+  
+  var MVC = new Glome.MVC.Prototype();
+  QUnit.ok(MVC, 'MVC Prototype is callable');
+  QUnit.ok(MVC.run, 'Method "run" exists');
+  QUnit.ok(MVC.model, 'Method "model" exists');
+  QUnit.ok(MVC.view, 'Method "view" exists');
+  QUnit.ok(MVC.controller, 'Method "controller" exists');
+  
+  // Set the model argument from args
+  MVC.model = function(args)
+  {
+    this.model = args.model;
+  }
+  
+  // Set the view argument from args
+  MVC.view = function(args)
+  {
+    this.view = args.view;
+  }
+  
+  // Set the controller argument from args
+  MVC.controller = function(args)
+  {
+    this.controller = args.controller;
+  }
+  
+  // Define args for controller
+  var args = 
+  {
+    model: 'foo',
+    view: 'bar',
+    controller: 'lorem'
+  }
+  
+  MVC.run(args);
+  QUnit.equal(args.model, MVC.model, 'Arguments of "run" were passed successfully to "model"');
+  QUnit.equal(args.view, MVC.view, 'Arguments of "run" were passed successfully to "view"');
+  QUnit.equal(args.controller, MVC.controller, 'Arguments of "run" were passed successfully to "controller"');
+});
+
+/* !MVC: firstRun */
+QUnit.test('firstRun', function()
+{
+  // Bind Glome to QUnit fixture
+  Glome.context = jQuery('#qunit-fixture');
+  
+  // First run
+  QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
+  
+  var firstrun = new Glome.MVC.FirstRunInitialize();
+  QUnit.ok(firstrun.model, 'Firstrun returned an object with model');
+  QUnit.ok(firstrun.view, 'Firstrun returned an object with view');
+  QUnit.ok(firstrun.controller, 'Firstrun returned an object with controller');
+  
+  QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: subscriptions exists');
+  QUnit.ok(Glome.MVC.FirstRunPassword, 'First run: set password exists');
+  QUnit.ok(Glome.MVC.FirstRunFinished, 'First run: finished view exists');
+});
+
+/* !MVC: Show ads */
+QUnit.test('Show', function()
+{
+  QUnit.ok(Glome.MVC.ShowAd);
+  QUnit.ok(Glome.MVC.ShowCategory);
+  QUnit.ok(Glome.MVC.ShowAllCategories);
+});
+
+/* !MVC: Widget */
+QUnit.test('Widget', function()
+{
+  QUnit.ok(Glome.MVC.Widget);
+});
+
+/* !MVC: Admin */
+QUnit.test('Admin', function()
+{
+  QUnit.ok(Glome.MVC.AdminSubscriptions);
+  QUnit.ok(Glome.MVC.AdminStatistics);
+  QUnit.ok(Glome.MVC.AdminRewards);
+  QUnit.ok(Glome.MVC.AdminSettings);
+});
 
 /* !Initialize with constructor */
 // These tests have to be asynchronous to ensure that template test

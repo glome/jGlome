@@ -21,6 +21,16 @@
     this.container = null;
     this.sessionCookie = null;
     this.sessionToken = null;
+    this.templateLocation = 'template.html';
+    
+    /**
+     * Online status and respective event listener
+     */
+    this.online = window.navigator.onLine;
+    jQuery(window).on('online offline', function()
+    {
+      plugin.online = window.navigator.onLine;
+    });
     
     /**
      * Return the current Glome ID
@@ -36,6 +46,7 @@
       return this.glomeid;
     }
     
+    /* !Tools */
     /**
      * Generic tools
      */
@@ -44,6 +55,128 @@
       escape: function(str)
       {
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+      },
+      
+      /**
+       * Validate callbacks
+       * 
+       * @param mixed callback       Callback to validate
+       * @param boolean allowArrays  Should (flat) arrays be allowed for callbacks
+       * @return true                True if the callback is valid, throw an error if not
+       */
+      validateCallback: function(callback, allowArrays)
+      {
+        if (typeof allowArrays === 'undefined')
+        {
+          allowArrays = true;
+        }
+        
+        if (!callback)
+        {
+          return true;
+        }
+        else if (typeof callback == 'function')
+        {
+        }
+        else if (jQuery.isArray(callback)
+            && allowArrays)
+        {
+          for (var i = 0; i < callback.length; i++)
+          {
+            try
+            {
+              plugin.Tools.validateCallback(callback[i], false);
+            }
+            catch (e)
+            {
+              throw e;
+            }
+          }
+        }
+        else
+        {
+          throw new Error('Callback has to be a function or an array of functions');
+        }
+        
+        return true;
+      },
+      
+      /**
+       * Merge callbacks
+       * 
+       * @param mixed     Free number of arrays and functions as arguments
+       */
+      mergeCallbacks: function()
+      {
+        var callbacks = [];
+        
+        for (var i = 0; i < arguments.length; i++)
+        {
+          try
+          {
+            this.validateCallback(arguments[i]);
+            
+            if (!arguments[i])
+            {
+              continue;
+            }
+            else if (typeof arguments[i] === 'function')
+            {
+              callbacks.push(arguments[i]);
+            }
+            else
+            {
+              for (var n = 0; n < arguments[i].length; n++)
+              {
+                callbacks.push(arguments[i][n]);
+              }
+            }
+          }
+          catch (e)
+          {
+            // Pass on the error
+            throw e;
+          }
+        }
+        
+        return callbacks;
+      },
+      
+      /**
+       * Trigger callbacks
+       * 
+       * @param mixed     Free number of arrays and functions as arguments
+       */
+      triggerCallbacks: function()
+      {
+        for (var i = 0; i < arguments.length; i++)
+        {
+          try
+          {
+            this.validateCallback(arguments[i]);
+          }
+          catch (e)
+          {
+            throw e;
+          }
+          
+          if (!arguments[i])
+          {
+            continue;
+          }
+          
+          if (jQuery.isArray(arguments[i]))
+          {
+            for (var n = 0; n < arguments[i].length; n++)
+            {
+              arguments[i][n]();
+            }
+          }
+          else
+          {
+            arguments[i]();
+          }
+        }
       }
     }
     
@@ -172,7 +305,7 @@
         
         if (!this.templates[name])
         {
-          throw new Error('No template with name ' + name + ' found');
+          throw new Error('No template with name "' + name + '" found');
         }
         
         var tmp = this.templates[name].clone();
@@ -194,76 +327,62 @@
        */
       load: function(callback)
       {
-        var callbacks = [];
         
-        callbacks.push
-        (
-          function(data)
+        var default_callback = function(data)
+        {
+          var regs, tmp, elements, index;
+          
+          this.masterTemplate = jQuery(data);
+          tmp = data;
+          elements = [];
+          index = 0;
+          
+          var parts = this.masterTemplate.find('[data-glome-template]');
+          
+          for (var i = 0; i < parts.size(); i++)
           {
-            var regs, tmp, elements, index;
+            var part = parts.eq(i).clone();
+            var templateName = part.attr('data-glome-template');
+            this.templates[templateName] = part;
+          }
+          
+          i = 0;
+          
+          // Get all links directly from the raw text source
+          while (regs = tmp.match(/(<link.+?>)/))
+          {
+            var str = plugin.Tools.escape(regs[1]);
+            var regexp = new RegExp(str, 'g');
+            tmp = tmp.replace(regexp, '');
             
-            this.masterTemplate = jQuery(data);
-            tmp = data;
-            elements = [];
-            index = 0;
+            elements.push(jQuery(regs[1]));
             
-            var parts = this.masterTemplate.find('[data-glome-template]');
+            i++;
+          }
+          
+          for (var i = 0; i < elements.length; i++)
+          {
+            var element = elements[i];
             
-            for (var i = 0; i < parts.size(); i++)
+            // Not related to Glome, no need to add
+            if (!element.attr('data-glome-include'))
             {
-              var part = parts.eq(i).clone();
-              var templateName = part.attr('data-glome-template');
-              this.templates[templateName] = part;
+              continue;
             }
             
-            i = 0;
-            
-            // Get all links directly from the raw text source
-            while (regs = tmp.match(/(<link.+?>)/))
+            if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
             {
-              var str = plugin.Tools.escape(regs[1]);
-              var regexp = new RegExp(str, 'g');
-              tmp = tmp.replace(regexp, '');
-              
-              elements.push(jQuery(regs[1]));
-              
-              i++;
-            }
-            
-            for (var i = 0; i < elements.length; i++)
-            {
-              var element = elements[i];
-              
-              // Not related to Glome, no need to add
-              if (!element.attr('data-glome-include'))
-              {
-                continue;
-              }
-              
-              if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
-              {
-                jQuery('head').append(element);
-              }
+              jQuery('head').append(element);
             }
           }
-        );
-        
-        if (   callback
-            && typeof callback !== 'function'
-            && !jQuery.isArray(callback))
-        {
-          throw new Error('Callback has to be either a function or an array of functions.');  
         }
         
-        if (callback)
-        {
-          callbacks.push(callback);
-        }
+        var callbacks = plugin.Tools.mergeCallbacks(default_callback, callback);
         
         jQuery.ajax
         (
           {
-            url: 'template.html',
+            url: plugin.templateLocation,
             context: this,
             dataType: 'html',
             isLocal: true,
@@ -384,25 +503,15 @@
         }
         
         // Type check for callback
-        if (   callback
-            && typeof callback !== 'function'
-            && !jQuery.isArray(callback))
-        {
-          throw new Error('Callback has to be a function or an array, now received typeof ' + typeof callback);
-        }
+        plugin.Tools.validateCallback(callback);
         
         if (!onerror)
         {
           onerror = null;
         }
         
-        // Type check for callback
-        if (   onerror
-            && typeof onerror !== 'function'
-            && !jQuery.isArray(onerror))
-        {
-          throw new Error('onerror has to be a function or an array, now received typeof ' + typeof onerror);
-        }
+        // Type check for onerror
+        plugin.Tools.validateCallback(onerror);
         
         if (!method)
         {
@@ -418,6 +527,26 @@
             && !jQuery.isPlainObject(data))
         {
           throw new Error('Glome.API.request does not allow function as second argument for method "' + method + '"');
+        }
+        
+        // Check for connection
+        if (!plugin.online)
+        {
+          console.warn('No Internet connection, impossible to do API calls');
+          
+          if (jQuery.isArray(onerror))
+          {
+            for (var i = 0; i < onerror.length(); i++)
+            {
+              onerror[i]();
+            }
+          }
+          else if (onerror)
+          {
+            onerror();
+          }
+          
+          throw new Error('No Internet connection');
         }
         
         var request = jQuery.ajax
@@ -623,87 +752,49 @@
           throw new Error('Password has to be a string');
         }
         
-        if (   callback
-            && typeof callback !== 'function'
-            && !jQuery.isArray(callback))
-        {
-          throw new Error('Callback has to be a function or an array of functions');
-        }
-        
-        if (   onerror
-            && typeof onerror !== 'function'
-            && !jQuery.isArray(onerror))
-        {
-          throw new Error('onerror has to be a function or an array of functions');
-        }
-        
-        var callbacks = [];
-        var onerrors = [];
-        
-        // Increase counter for failed login attempts
-        onerrors.push(function()
-        {
-          //passwd = prompt('Login failed, please enter the password');
-          plugin.Auth.loginAttempts++;
-        });
-        
-        // First callback has to store any possible cookie and token
-        callbacks.push(function(data, status, jqXHR)
-        {
-          plugin.glomeid = id;
-          plugin.pref('glomeid', id);
-          
-          var token = jqXHR.getResponseHeader('X-CSRF-Token');
-          
-          if (token)
+        var callbacks = plugin.Tools.mergeCallbacks
+        (
+          function(data, status, jqXHR)
           {
-            plugin.sessionToken = token;
-            jQuery.ajaxSetup
-            (
-              {
-                xhrFields:
+            plugin.glomeid = id;
+            plugin.pref('glomeid', id);
+            
+            var token = jqXHR.getResponseHeader('X-CSRF-Token');
+            
+            if (token)
+            {
+              plugin.sessionToken = token;
+              jQuery.ajaxSetup
+              (
                 {
-                  withCredentials: true
-                },
-                headers:
-                {
-                  'X-CSRF-Token': plugin.sessionToken
+                  xhrFields:
+                  {
+                    withCredentials: true
+                  },
+                  headers:
+                  {
+                    'X-CSRF-Token': plugin.sessionToken
+                  }
                 }
-              }
-            );
-          }
-        });
+              );
+            }
+          },
+          callback
+        );
         
-        onerrors.push(function(jqXHR)
-        {
-          console.warn('Login error');
-        });
-        
-        // Array merge
-        if (callback)
-        {
-          if (jQuery.isArray(callback))
+        var onerrors = plugin.Tools.mergeCallbacks
+        (
+          function()
           {
-            callbacks.concat(callback);
-          }
-          else
+            //passwd = prompt('Login failed, please enter the password');
+            plugin.Auth.loginAttempts++;
+          },
+          function()
           {
-            callbacks.push(callback);
-          }
-        }
-        
-        // Array merge
-        if (onerror)
-        {
-          if (jQuery.isArray(onerror))
-          {
-            onerrors.concat(onerror);
-          }
-          else
-          {
-            onerrors.push(onerror);
-          }
-        }
+            console.warn('Login error');
+          },
+          onerror
+        );
         
         // Default error handling
         plugin.API.request
@@ -774,10 +865,7 @@
           glomeId += counter;
         }
         
-        var callbacks = [];
-        var onerrors = [];
-        
-        callbacks.push
+        var callbacks = plugin.Tools.mergeCallbacks
         (
           function(data)
           {
@@ -786,36 +874,17 @@
             
             // Login immediately
             plugin.Auth.login(data.glomeid, '', callback, onerror);
-          }
+          },
+          callback
         );
-        
-        onerrors.push
+        var onerrors = plugin.Tools.mergeCallbacks
         (
           function()
           {
             plugin.Auth.createGlomeId(id, callback, onerror, counter + 1);
-          }
+          },
+          onerror
         );
-        
-        if (callback)
-        {
-          if (typeof callback !== 'function')
-          {
-            throw new Error('Callback has to be a function');  
-          }
-          
-          callbacks.push(callback);
-        }
-        
-        if (onerror)
-        {
-          if (typeof callback !== 'function')
-          {
-            throw new Error('Onerror has to be a function');  
-          }
-          
-          onerrors.push(onerror);
-        }
         
         plugin.API.request
         (
@@ -1331,50 +1400,38 @@
        */
       load: function(callback, onerror)
       {
-        if (   callback
-            && typeof callback !== 'function')
-        {
-          throw new Error('Glome.Ads.load callback has to be a function');
-        }
+        plugin.Tools.validateCallback(onerror);
         
-        if (!onerror)
-        {
-          onerror = null;
-        }
-        
-        if (   onerror
-            && typeof onerror !== 'function')
-        {
-          throw new Error('Glome.Ads.load onerror has to be a function');
-        }
+        var callbacks = plugin.Tools.mergeCallbacks
+        (
+          function(data)
+          {
+            var i, id, ad;
+            
+            // Reset the ad stack
+            plugin.Ads.stack = {};
+            
+            // Temporarily store the listeners
+            plugin.Ads.disableListeners = true;
+            
+            for (i = 0; i < data.length; i++)
+            {
+              id = data[i].id;
+              ad = new plugin.Ads.Ad(data[i]);
+            }
+            
+            plugin.Ads.disableListeners = false;
+            plugin.Ads.onchange();
+          },
+          callback
+        );
         
         // Get ads
         plugin.Api.get
         (
           'ads',
           null,
-          [
-            function(data)
-            {
-              var i, id, ad;
-              
-              // Reset the ad stack
-              plugin.Ads.stack = {};
-              
-              // Temporarily store the listeners
-              plugin.Ads.disableListeners = true;
-              
-              for (i = 0; i < data.length; i++)
-              {
-                id = data[i].id;
-                ad = new plugin.Ads.Ad(data[i]);
-              }
-              
-              plugin.Ads.disableListeners = false;
-              plugin.Ads.onchange();
-            },
-            callback
-          ],
+          callbacks,
           onerror
         );
       },
@@ -1547,7 +1604,7 @@
           throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
         }
         
-        plugin.container.append(plugin.Templates.get('window'));
+        plugin.container.append(jQuery('<div />').attr('id', 'glomeWindow'));
         
         if (!plugin.container.find('#glomeWindow').size())
         {
@@ -1667,6 +1724,81 @@
       }
     };
     
+    /* !MVC */
+    /**
+     * Sketch of MVC. @TODO: use backbone.js or something similar in the near future
+     */
+    plugin.MVC =
+    {
+      Prototype: function()
+      {
+        var MVC = function()
+        {
+          // Model
+          this.model = function(args)
+          {
+            
+          };
+          
+          // View
+          this.view = function(args)
+          {
+            
+          };
+          
+          // Controller
+          this.controller = function(args)
+          {
+            
+          };
+          
+          this.run = function(args)
+          {
+            this.model(args);
+            this.view(args);
+            this.controller(args);
+          }
+        }
+        return new MVC();
+      },
+      FirstRunInitialize: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Prototype();
+        mvc.prototype.model = function()
+        {
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      ShowAd:
+      {
+        model: function()
+        {
+          
+        },
+        view: function()
+        {
+          
+        }
+      },
+      ShowCategory:
+      {
+        
+      },
+      ShowAllCategories:
+      {
+        
+      }
+    };
+    
+    /* !Initialize */
     /**
      * Initialize Glome
      * 
@@ -1676,17 +1808,14 @@
      */
     plugin.initialize = function(el, callback, onerror)
     {
-      if (   callback
-          && typeof callback !== 'function')
-      {
-        throw new Error('Constructor callback has to be a function');
-      }
+      plugin.Tools.validateCallback(callback);
+      plugin.Tools.validateCallback(onerror);
       
       // Create a new Glome ID if previous ID does not exist
       if (!plugin.id())
       {
         var date = new Date();
-        this.createGlomeId(date.getTime(), callback, onerror);
+        this.createGlomeId(date.getTime(), callbacks, onerror);
       }
       else
       {
@@ -1700,10 +1829,7 @@
           },
           function()
           {
-            if (typeof onerror === 'function')
-            {
-              onerror();
-            }
+            plugin.Tools.triggerCallbacks(onerror);
           }
         );
       }
