@@ -42,11 +42,11 @@ jQuery(function()
       .appendTo(select);
   }
   
-  jQuery('#glomeAdminContent').find('[data-template="admin-subscriptions"] .glome-row').eq(0).cloneTimes(15);
-  jQuery('#glomeAdminContent').find('[data-template="admin-rewards"] .glome-row').eq(0).cloneTimes(15);
-  jQuery('#glomePublicContent').find('[data-template="public-subscriptions"] .glome-row').eq(0).cloneTimes(15);
-  jQuery('#glomePublicContent').find('[data-template="public-category"] .glome-row').eq(0).cloneTimes(15);
-  jQuery('#glomePublicContent').find('[data-template="public-categorylist"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomeAdminContent').find('[data-glome-template="admin-subscriptions"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomeAdminContent').find('[data-glome-template="admin-rewards"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomePublicContent').find('[data-glome-template="public-subscriptions"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomePublicContent').find('[data-glome-template="public-category"] .glome-row').eq(0).cloneTimes(15);
+  jQuery('#glomePublicContent').find('[data-glome-template="public-categorylist"] .glome-row').eq(0).cloneTimes(15);
   
   jQuery('.glome-close')
     .on('click', function()
@@ -102,7 +102,7 @@ jQuery(function()
       window.location.hash = '#public-subscriptions';
     });
   
-  jQuery('[data-template="admin-subscriptions"], [data-template="public-subscriptions"]').find('.glome-button[data-state]')
+  jQuery('[data-glome-template="admin-subscriptions"], [data-glome-template="public-subscriptions"]').find('.glome-button[data-state]')
     .on('click', function(e)
     {
       var total = jQuery(this).parents('.glome-content').find('.glome-button[data-state]').size();
@@ -112,7 +112,7 @@ jQuery(function()
       jQuery(this).parents('.glome-content').find('.glome-selection-counter .glome-max').text(total);
     });
   
-  jQuery('[data-template="admin-subscriptions"], [data-template="public-subscriptions"]').find('.glome-button[data-state]:first').trigger('click');
+  jQuery('[data-glome-template="admin-subscriptions"], [data-glome-template="public-subscriptions"]').find('.glome-button[data-state]:first').trigger('click');
   
   jQuery('#glomeWidget')
     .on('click', function()
@@ -149,8 +149,8 @@ jQuery(function()
       jQuery('[data-context="' + context + '"]').removeClass('hidden');
       
       // Toggle context page
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-template="' + hash + '"]').addClass('hidden');
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-template="' + hash + '"]').removeClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-glome-template="' + hash + '"]').addClass('hidden');
+      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-glome-template="' + hash + '"]').removeClass('hidden');
       
       // Toggle navigation selected item
       jQuery('[data-context="' + context + '"]').find('> .glome-header').find('[data-page="' + page + '"]').addClass('selected');
