@@ -149,8 +149,11 @@ jQuery(function()
       jQuery('[data-context="' + context + '"]').removeClass('hidden');
       
       // Toggle context page
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-glome-template="' + hash + '"]').addClass('hidden');
-      jQuery('[data-context="' + context + '"]').find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-glome-template="' + hash + '"]').removeClass('hidden');
+      jQuery('[data-context="' + context + '"]').oneTime(1, function()
+      {
+        jQuery(this).find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-glome-template="' + hash + '"]').addClass('hidden');
+        jQuery(this).find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-glome-template="' + hash + '"]').removeClass('hidden');
+      });
       
       // Toggle navigation selected item
       jQuery('[data-context="' + context + '"]').find('> .glome-header').find('[data-page="' + page + '"]').addClass('selected');

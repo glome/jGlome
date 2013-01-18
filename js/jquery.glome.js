@@ -327,6 +327,11 @@
        */
       load: function(callback)
       {
+        if (this.masterTemplate)
+        {
+          plugin.Tools.triggerCallbacks(callback);
+          return;
+        }
         
         var default_callback = function(data)
         {
@@ -1730,6 +1735,7 @@
      */
     plugin.MVC =
     {
+      /* !MVC Prototype */
       Prototype: function()
       {
         var MVC = function()
@@ -1757,11 +1763,15 @@
             this.model(args);
             this.view(args);
             this.controller(args);
+            
+            return true;
           }
         }
         return new MVC();
       },
-      FirstRunInitialize: function()
+      
+      /* !MVC Public */
+      Public: function()
       {
         // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
@@ -1769,8 +1779,83 @@
         }
         
         mvc.prototype = new plugin.MVC.Prototype();
-        mvc.prototype.model = function()
+        
+        // Prototype for initializing a view
+        mvc.prototype.viewInit = function()
         {
+          var wrapper = jQuery('[data-glome-template="public-wrapper"]');
+          
+          if (!wrapper.size())
+          {
+            var wrapper = plugin.Templates.get('public-wrapper')
+              .appendTo(plugin.container);
+          }
+          
+          if (!wrapper.find('[data-glome-template="public-header"]').size())
+          {
+            plugin.Templates.get('public-header').appendTo(wrapper);
+          }
+          
+          if (!wrapper.find('[data-glome-template="public-footer"]').size())
+          {
+            plugin.Templates.get('public-footer').appendTo(wrapper);
+          }
+          
+          if (!wrapper.find('[data-glome-template="public-content"]').size())
+          {
+            plugin.Templates.get('public-content').insertAfter(wrapper.find('[data-glome-template="public-header"]'));
+          }
+          
+          this.contentArea = wrapper.find('[data-glome-template="public-content"]').find('[data-context="glome-content-area"]');
+          this.contentArea.find('> *').remove();
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      FirstRunInitialize: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.view = function()
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-startup');
+          
+          this.content.appendTo(this.contentArea);
+          this.content.find('#glomePublicFirstRunProceed')
+            .on('click', function()
+            {
+              var m = new plugin.MVC.FirstRunSubscriptions();
+              m.run();
+            });
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      FirstRunSubscriptions: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.view = function()
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-subscriptions');
+          
+          this.content.appendTo(this.contentArea);
         }
         
         var m = new mvc();

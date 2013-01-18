@@ -1523,7 +1523,7 @@ QUnit.asyncTest('Glome UI', function()
 
 /* !Module: MVC */
 QUnit.module('MVC');
-QUnit.test('Basics', function()
+QUnit.test('MVC Prototype', function()
 {
   QUnit.ok(Glome.MVC, 'There is a MVC object');
   QUnit.ok(Glome.MVC.Prototype, 'There is a prototype for MVC objects');
@@ -1561,52 +1561,78 @@ QUnit.test('Basics', function()
     controller: 'lorem'
   }
   
-  MVC.run(args);
+  QUnit.ok(MVC.run(args), 'MVC run was executed successfully');;
   QUnit.equal(args.model, MVC.model, 'Arguments of "run" were passed successfully to "model"');
   QUnit.equal(args.view, MVC.view, 'Arguments of "run" were passed successfully to "view"');
   QUnit.equal(args.controller, MVC.controller, 'Arguments of "run" were passed successfully to "controller"');
 });
 
-/* !MVC: firstRun */
-QUnit.test('firstRun', function()
+/* !Public */
+QUnit.asyncTest('Public', function()
 {
-  // Bind Glome to QUnit fixture
-  Glome.context = jQuery('#qunit-fixture');
-  
-  // First run
-  QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
-  
-  var firstrun = new Glome.MVC.FirstRunInitialize();
-  QUnit.ok(firstrun.model, 'Firstrun returned an object with model');
-  QUnit.ok(firstrun.view, 'Firstrun returned an object with view');
-  QUnit.ok(firstrun.controller, 'Firstrun returned an object with controller');
-  
-  QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: subscriptions exists');
-  QUnit.ok(Glome.MVC.FirstRunPassword, 'First run: set password exists');
-  QUnit.ok(Glome.MVC.FirstRunFinished, 'First run: finished view exists');
+  Glome.Templates.load(function()
+  {
+    QUnit.start();
+    
+    // Bind Glome to QUnit fixture
+    Glome.container = jQuery('#qunit-fixture');
+    
+    // Check that there is a wrapper for MVC for the public context
+    QUnit.ok(Glome.MVC.Public, 'Public wrapper exists');
+    
+    var mvc = new Glome.MVC.Public();
+    mvc.viewInit();
+    
+    QUnit.ok(Glome.container.find('[data-glome-template="public-header"]').size(), 'Headers were found from the fixture');
+    QUnit.ok(Glome.container.find('[data-glome-template="public-content"]').size(), 'Content area was found from the fixture');
+    QUnit.ok(Glome.container.find('[data-glome-template="public-footer"]').size(), 'Footers were found from the fixture');
+    QUnit.equal(0, Glome.container.find('[data-context="glome-content-area"]').find('> *').size(), 'Content area is empty');
+    QUnit.ok(mvc.contentArea, 'There is a reference to content area');
+  });
 });
 
-/* !MVC: Show ads */
-QUnit.test('Show', function()
+/* !MVC: First Run: Initialize */
+QUnit.asyncTest('First Run: Initialize', function()
 {
-  QUnit.ok(Glome.MVC.ShowAd);
-  QUnit.ok(Glome.MVC.ShowCategory);
-  QUnit.ok(Glome.MVC.ShowAllCategories);
+  Glome.Templates.load(function()
+  {
+    // Bind Glome to QUnit fixture
+    Glome.context = jQuery('#qunit-fixture');
+    
+    // First run
+    QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
+    
+    var firstrun = new Glome.MVC.FirstRunInitialize();
+    QUnit.ok(firstrun.model, 'Firstrun returned an object with model');
+    QUnit.ok(firstrun.view, 'Firstrun returned an object with view');
+    QUnit.ok(firstrun.controller, 'Firstrun returned an object with controller');
+    QUnit.ok(firstrun.run, 'Firstrun returned runner');
+    
+    QUnit.ok(firstrun.run(), 'Firstrun was successfully run');
+    QUnit.start();
+  });
 });
 
-/* !MVC: Widget */
-QUnit.test('Widget', function()
+  /* !MVC: First Run: Subscriptions */
+QUnit.asyncTest('First Run: Subscriptions', function()
 {
-  QUnit.ok(Glome.MVC.Widget);
-});
-
-/* !MVC: Admin */
-QUnit.test('Admin', function()
-{
-  QUnit.ok(Glome.MVC.AdminSubscriptions);
-  QUnit.ok(Glome.MVC.AdminStatistics);
-  QUnit.ok(Glome.MVC.AdminRewards);
-  QUnit.ok(Glome.MVC.AdminSettings);
+  Glome.Templates.load(function()
+  {
+    // Bind Glome to QUnit fixture
+    Glome.context = jQuery('#qunit-fixture');
+    
+    // First run
+    QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
+    
+    var subscriptions = new Glome.MVC.FirstRunSubscriptions();
+    QUnit.ok(subscriptions.model, 'Subscriptions returned an object with model');
+    QUnit.ok(subscriptions.view, 'Subscriptions returned an object with view');
+    QUnit.ok(subscriptions.controller, 'Subscriptions returned an object with controller');
+    QUnit.ok(subscriptions.run, 'Subscriptions returned runner');
+    
+    QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
+    QUnit.start();
+  });
 });
 
 /* !Initialize with constructor */
