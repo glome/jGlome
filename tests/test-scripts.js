@@ -1413,6 +1413,178 @@ QUnit.test('Fetch ads', function()
   );
 });
   
+/* !Module: Glome Categories class */
+QUnit.module('Glome Categories class');
+
+/* !Glome.Categories.Category object */
+QUnit.test('Glome.Categories.Category object', function()
+{
+  QUnit.equal(typeof Glome.Categories.Category, 'function', 'There is a method for creating a new Category prototype object');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      var category = new Glome.Categories.Category('foo');
+    },
+    'Glome.Categories.Category requires an object or an integer (category id) as a constructor',
+    'Glome.Categories.Category constructor did not accept a string as constructor'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Categories.Category(1323);
+    },
+    'Glome.Categories.Category with ID 1323 is not available (yet)'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      new Glome.Categories.Category({id: 'bar'});
+    },
+    'Property id of the constructor has to be an integer'
+  );
+  
+  // Dummy category content
+  var category =
+  {
+    id: 1,
+    title: 'Test'
+  };
+  
+  var gcategory = new Glome.Categories.Category(category);
+  
+  QUnit.equal(gcategory.constructor.name, 'Category', 'Constructor name was changed');
+  
+  for (var i in category)
+  {
+    QUnit.strictEqual(gcategory[i], category[i], 'Property "' + i + '" was copied successfully');
+  }
+  
+  QUnit.ok(Glome.Categories.stack[(gcategory.id)], 'Newly created category added itself to category stack');
+  
+  // Set the category status to 2
+  gcategory.setStatus(2);
+  QUnit.equal(gcategory.status, 2, 'Category status was set to 2');
+  
+  QUnit.equal(typeof gcategory.setStatus, 'function', 'setStatus method exists in category object');
+  QUnit.equal(typeof gcategory.onchange, 'function', 'onchange method exists in category object');
+  QUnit.equal(typeof gcategory.delete, 'function', 'Delete method exists in category object');
+  
+  // Get the newly created category with constructor
+  var category = new Glome.Categories.Category(gcategory.id);
+  
+  // Remove newly created category
+  QUnit.ok(gcategory.delete(), 'Removing the category was successful');
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Categories.Category(gcategory.id);
+    },
+    'Category was removed successfully from the stack'
+  );
+});
+
+/* !Glome.Categories API */
+QUnit.test('Glome.Categories API', function()
+{
+  QUnit.ok(Glome.Categories.onchange, 'There is an onchange method');
+  QUnit.ok(Glome.Categories.addListener, 'There is an addListener method');
+  QUnit.ok(Glome.Categories.removeListener, 'There is a removeListener method');
+  QUnit.ok(Glome.Categories.count, 'There is a count method');
+  
+  Glome.Categories.stack = {};
+  
+  var categoryid = 1000000;
+  
+  var category =
+  {
+    id: 1,
+    title: 'Test'
+  }
+  
+  var id = category.id;
+  
+  var filters =
+  {
+    subscribed: 1
+  }
+  
+  var gcategory = Glome.Categories.Category(category);
+  Glome.Categories.Category
+  (
+    {
+      id: 2,
+      title: 'Test 2'
+    }
+  );
+  
+  QUnit.equal(Glome.Categories.count(), Object.keys(Glome.Categories.stack).length, 'Glome.Categories.count gives the same as stack length');
+  QUnit.equal(Glome.Categories.count(filters), Object.keys(Glome.Categories.listCategories(filters)).length, 'Glome.Categories.count gives the same as stack length');
+  
+  QUnit.ok(Glome.Categories.removeCategory(id), 'Removing a category was successful');
+  QUnit.equal(typeof Glome.Categories.stack[id], 'undefined', 'Category was removed successfully from the stack');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Categories.addListener('foo');
+    },
+    'Glome.Categories.addListener requires a function as argument, when one is given'
+  );
+  
+  var listener = function()
+  {
+    jQuery('#qunit-fixture').attr('data-listener', 'true');
+  }
+  
+  var length = Glome.Categories.listeners.length;
+  
+  Glome.Categories.addListener(listener);
+  QUnit.equal(Glome.Categories.listeners.length, length + 1, 'Listener was successfully registered according to length');
+  QUnit.strictEqual(Glome.Categories.listeners[length], listener, 'Listener was successfully registered to stored data');
+  
+  Glome.Categories.onchange();
+  QUnit.equal(jQuery('#qunit-fixture').attr('data-listener'), 'true', 'Listener was successfully triggered');
+  
+  Glome.Categories.removeListener(listener);
+  QUnit.equal(Glome.Categories.listeners.length, length, 'Listener was successfully removed according to length');
+});
+
+/* !Fetch categories */
+QUnit.test('Fetch categories', function()
+{
+  QUnit.stop();
+  
+  // List categories for this Glome user
+  Glome.Categories.load
+  (
+    function()
+    {
+      QUnit.notEqual(0, Object.keys(Glome.Categories.stack).length, 'Glome categories were loaded');
+      QUnit.start();
+      
+      for (i in Glome.Categories.stack)
+      {
+        var category = new Glome.Categories.Category(Glome.Categories.stack[i].id);
+        QUnit.deepEqual(category, Glome.Categories.stack[i], 'Constructor gives the same object as was stored to stack')
+        break;
+      }
+    },
+    function()
+    {
+      QUnit.start();
+      QUnit.ok(false, 'Glome categories were loaded (caught on error)');
+    }
+  );
+});
+  
 /* !Module: Glome user interface  */
 QUnit.module('Glome user interface');
 
@@ -1477,6 +1649,18 @@ QUnit.test('Glome templates', function()
     QUnit.notEqual(template.attr('id'), 'glomeTemplates', 'ID of the element was removed to ');
     
     QUnit.equal(jQuery('head').find('link[rel="stylesheet"][href$="glome.css"][data-glome-include]').size(), 1, 'Glome CSS was appended');
+    QUnit.start();
+  });
+});
+
+/* !Populate template */
+QUnit.asyncTest('Populate template', function()
+{
+  Glome.Templates.load(function()
+  {
+    QUnit.ok(Glome.Templates.populate);
+    
+    QUnit.equal('admin-wrapper', Glome.Templates.populate('admin-wrapper', {}).attr('data-glome-template'), 'Populate returned correct template');
     QUnit.start();
   });
 });
@@ -1644,20 +1828,25 @@ QUnit.asyncTest('First Run: Subscriptions', function()
 {
   Glome.Templates.load(function()
   {
-    // Bind Glome to QUnit fixture
-    Glome.container = jQuery('#qunit-fixture');
-    
-    // First run
-    QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
-    
-    var subscriptions = new Glome.MVC.FirstRunSubscriptions();
-    QUnit.ok(subscriptions.model, 'Subscriptions returned an object with model');
-    QUnit.ok(subscriptions.view, 'Subscriptions returned an object with view');
-    QUnit.ok(subscriptions.controller, 'Subscriptions returned an object with controller');
-    QUnit.ok(subscriptions.run, 'Subscriptions returned a runner');
-    
-    QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
-    QUnit.start();
+    Glome.Categories.load(function()
+    {
+      // Bind Glome to QUnit fixture
+      Glome.container = jQuery('#qunit-fixture');
+      
+      // First run
+      QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
+      
+      var subscriptions = new Glome.MVC.FirstRunSubscriptions();
+      QUnit.ok(subscriptions.model, 'Subscriptions returned an object with model');
+      QUnit.ok(subscriptions.view, 'Subscriptions returned an object with view');
+      QUnit.ok(subscriptions.controller, 'Subscriptions returned an object with controller');
+      QUnit.ok(subscriptions.run, 'Subscriptions returned a runner');
+      
+      QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
+      
+      QUnit.equal(subscriptions.contentArea.find('.glome-category').size(), Object.keys(Glome.Categories.stack).length, 'There is a row for each category');
+      QUnit.start();
+    });
   });
 });
 
