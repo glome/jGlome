@@ -288,7 +288,6 @@ QUnit.test('Trigger callbacks', function()
   
   var counter = 0;
   Glome.Tools.triggerCallbacks(callback, callback);
-  console.log(counter);
 
   QUnit.equal(counter, 2, 'All function callbacks were successfully triggerd');
   
@@ -1218,6 +1217,9 @@ QUnit.test('Glome.Ads.Ad object', function()
   QUnit.equal(typeof gad.onchange, 'function', 'onchange method exists in ad object');
   QUnit.equal(typeof gad.delete, 'function', 'Delete method exists in ad object');
   
+  // Get the newly created ad with constructor
+  var ad = new Glome.Ads.Ad(gad.id);
+  
   // Remove newly created ad
   QUnit.ok(gad.delete(), 'Removing the ad was successful');
   QUnit.throws
@@ -1229,7 +1231,6 @@ QUnit.test('Glome.Ads.Ad object', function()
     'Ad was removed successfully from the stack'
   );
 });
-
 
 /* !Glome.Ads API */
 QUnit.test('Glome.Ads API', function()
@@ -1390,15 +1391,26 @@ QUnit.test('Fetch ads', function()
   QUnit.stop();
   
   // List ads for this Glome user
-  Glome.Ads.load(function()
-  {
-    QUnit.notEqual(0, Object.keys(Glome.Ads.stack).length, 'Glome ads were loaded');
-    QUnit.start();
-  }, function()
-  {
-    QUnit.start();
-    QUnit.ok(false, 'Glome ads were loaded (caught on error)');
-  });
+  Glome.Ads.load
+  (
+    function()
+    {
+      QUnit.notEqual(0, Object.keys(Glome.Ads.stack).length, 'Glome ads were loaded');
+      QUnit.start();
+      
+      for (i in Glome.Ads.stack)
+      {
+        var ad = new Glome.Ads.Ad(Glome.Ads.stack[i].id);
+        QUnit.deepEqual(ad, Glome.Ads.stack[i], 'Constructor gives the same object as was stored to stack')
+        break;
+      }
+    },
+    function()
+    {
+      QUnit.start();
+      QUnit.ok(false, 'Glome ads were loaded (caught on error)');
+    }
+  );
 });
   
 /* !Module: Glome user interface  */
@@ -1489,38 +1501,6 @@ QUnit.test('Glome.Categories.Category object', function()
   );
 });
 
-// These tests have to be asynchronous to ensure that template test has been run already
-/* Glome UI */
-QUnit.asyncTest('Glome UI', function()
-{
-  var fx = jQuery('#qunit-fixture');
-  QUnit.throws
-  (
-    function()
-    {
-      Glome.DOM.init();
-    },
-    'Glome has to be bound to an element before initializing'
-  );
-  
-  QUnit.strictEqual(false, Glome.DOM.bindTo('loremipsum'), 'Binding to an invented string returns false');
-  QUnit.ok(Glome.DOM.bindTo(fx), 'Glome was bound to fixture (jQuery object)');
-  
-  // Try to bind the second time
-  Glome.DOM.bindTo(fx)
-  
-  QUnit.ok(Glome.DOM.bindTo('#qunit-fixture'), 'Glome was bound to fixture (CSS selector)');
-  QUnit.ok(Glome.DOM.bindTo(document.getElementById('qunit-fixture')));
-  QUnit.ok(Glome.DOM.init(), 'Glome was initialized successfully');
-  
-  // Reinitializing does not insert second Glome window
-  Glome.DOM.init();
-  QUnit.equal(jQuery('#glomeWindow').size(), 1, 'Glome was initialized successfully and only once');
-  QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully');
-  QUnit.equal(fx.find('#glomeWidget').size(), 1, 'Glome widget can be found');
-  QUnit.start();
-});
-
 /* !Module: MVC */
 QUnit.module('MVC');
 QUnit.test('MVC Prototype', function()
@@ -1528,29 +1508,29 @@ QUnit.test('MVC Prototype', function()
   QUnit.ok(Glome.MVC, 'There is a MVC object');
   QUnit.ok(Glome.MVC.Prototype, 'There is a prototype for MVC objects');
   
-  var MVC = new Glome.MVC.Prototype();
-  QUnit.ok(MVC, 'MVC Prototype is callable');
-  QUnit.ok(MVC.run, 'Method "run" exists');
-  QUnit.ok(MVC.model, 'Method "model" exists');
-  QUnit.ok(MVC.view, 'Method "view" exists');
-  QUnit.ok(MVC.controller, 'Method "controller" exists');
+  var mvc = new Glome.MVC.Prototype();
+  QUnit.ok(mvc, 'MVC Prototype is callable');
+  QUnit.ok(mvc.run, 'Method "run" exists');
+  QUnit.ok(mvc.model, 'Method "model" exists');
+  QUnit.ok(mvc.view, 'Method "view" exists');
+  QUnit.ok(mvc.controller, 'Method "controller" exists');
   
   // Set the model argument from args
-  MVC.model = function(args)
+  mvc.model = function(args)
   {
-    this.model = args.model;
+    this._model = args.model;
   }
   
   // Set the view argument from args
-  MVC.view = function(args)
+  mvc.view = function(args)
   {
-    this.view = args.view;
+    this._view = args.view;
   }
   
   // Set the controller argument from args
-  MVC.controller = function(args)
+  mvc.controller = function(args)
   {
-    this.controller = args.controller;
+    this._controller = args.controller;
   }
   
   // Define args for controller
@@ -1561,10 +1541,10 @@ QUnit.test('MVC Prototype', function()
     controller: 'lorem'
   }
   
-  QUnit.ok(MVC.run(args), 'MVC run was executed successfully');;
-  QUnit.equal(args.model, MVC.model, 'Arguments of "run" were passed successfully to "model"');
-  QUnit.equal(args.view, MVC.view, 'Arguments of "run" were passed successfully to "view"');
-  QUnit.equal(args.controller, MVC.controller, 'Arguments of "run" were passed successfully to "controller"');
+  QUnit.ok(mvc.run(args), 'MVC run was executed successfully');;
+  QUnit.equal(args.model, mvc._model, 'Arguments of "run" were passed successfully to "model"');
+  QUnit.equal(args.view, mvc._view, 'Arguments of "run" were passed successfully to "view"');
+  QUnit.equal(args.controller, mvc._controller, 'Arguments of "run" were passed successfully to "controller"');
 });
 
 /* !Public */
@@ -1591,13 +1571,59 @@ QUnit.asyncTest('Public', function()
   });
 });
 
+/* !MVC: Runner */
+QUnit.test('MVC runner', function()
+{
+  QUnit.ok(Glome.MVC.run, 'Runner exists');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.MVC.run('loremipsum');
+    },
+    'Caught successfully an attemp to run a "loremipsum" path',
+    'No route called "loremipsum"'
+  );
+  
+  // Define args for controller
+  var args = 
+  {
+    model: 'foo',
+    view: 'bar',
+    controller: 'lorem'
+  }
+  
+  var runner = Glome.MVC.run('Prototype', args);
+  QUnit.equal(typeof runner, 'object', 'Runner returned an object');
+});
+
+/* !MVC: Require password */
+QUnit.asyncTest('Require password', function()
+{
+  Glome.Templates.load(function()
+  {
+    // Bind Glome to QUnit fixture
+    Glome.container = jQuery('#qunit-fixture');
+    
+    var pw = new Glome.MVC.RequirePassword();
+    QUnit.ok(pw.model, 'Require password returned an object with model');
+    QUnit.ok(pw.view, 'Require password returned an object with view');
+    QUnit.ok(pw.controller, 'Require password returned an object with controller');
+    QUnit.ok(pw.run, 'Require password returned a runner');
+    
+    QUnit.ok(pw.run(), 'Require password was successfully run');
+    QUnit.start();
+  });
+});
+
 /* !MVC: First Run: Initialize */
 QUnit.asyncTest('First Run: Initialize', function()
 {
   Glome.Templates.load(function()
   {
     // Bind Glome to QUnit fixture
-    Glome.context = jQuery('#qunit-fixture');
+    Glome.container = jQuery('#qunit-fixture');
     
     // First run
     QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
@@ -1606,20 +1632,20 @@ QUnit.asyncTest('First Run: Initialize', function()
     QUnit.ok(firstrun.model, 'Firstrun returned an object with model');
     QUnit.ok(firstrun.view, 'Firstrun returned an object with view');
     QUnit.ok(firstrun.controller, 'Firstrun returned an object with controller');
-    QUnit.ok(firstrun.run, 'Firstrun returned runner');
+    QUnit.ok(firstrun.run, 'Firstrun returned a runner');
     
     QUnit.ok(firstrun.run(), 'Firstrun was successfully run');
     QUnit.start();
   });
 });
 
-  /* !MVC: First Run: Subscriptions */
+/* !MVC: First Run: Subscriptions */
 QUnit.asyncTest('First Run: Subscriptions', function()
 {
   Glome.Templates.load(function()
   {
     // Bind Glome to QUnit fixture
-    Glome.context = jQuery('#qunit-fixture');
+    Glome.container = jQuery('#qunit-fixture');
     
     // First run
     QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
@@ -1628,108 +1654,50 @@ QUnit.asyncTest('First Run: Subscriptions', function()
     QUnit.ok(subscriptions.model, 'Subscriptions returned an object with model');
     QUnit.ok(subscriptions.view, 'Subscriptions returned an object with view');
     QUnit.ok(subscriptions.controller, 'Subscriptions returned an object with controller');
-    QUnit.ok(subscriptions.run, 'Subscriptions returned runner');
+    QUnit.ok(subscriptions.run, 'Subscriptions returned a runner');
     
     QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
     QUnit.start();
   });
 });
 
-/* !Initialize with constructor */
-// These tests have to be asynchronous to ensure that template test
-// has been run already
-/*
-QUnit.asyncTest('Initialize with constructor', function()
+/* !Widget */
+QUnit.asyncTest('Widget', function()
 {
-  var fx = jQuery('<div />')
-    .attr('id', 'glome-fixture')
-    .appendTo('body');
-  
-  QUnit.throws
-  (
-    function()
-    {
-      var Glome = new jQuery.Glome(fx, 'foobar');
-    },
-    'Constructor callback has to be a function',
-    'Caught illegal callback type'
-  );
-  
-  QUnit.throws
-  (
-    function()
-    {
-      var Glome = new jQuery.Glome(fx, null, 'foobar');
-    },
-    'Constructor onerror has to be a function',
-    'Caught illegal onerror type'
-  );
-  
-  var Glome = new jQuery.Glome(fx, function()
+  Glome.Templates.load(function()
   {
-    // Test on local server
-    QUnit.equal(Glome.API.server, testServer, 'Preference was stored and read');
+    // Bind Glome to QUnit fixture
+    Glome.container = jQuery('#qunit-fixture');
     
-    QUnit.equal(fx.find('#glomeWindow').size(), 1, 'Glome main window was inserted successfully and automatically with constructor');
-    QUnit.ok(Glome.id(), 'There is a Glome ID');
-    QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads');
+    var widget = new Glome.MVC.Widget();
+    QUnit.ok(widget.model, 'Widget returned an object with model');
+    QUnit.ok(widget.view, 'Widget returned an object with view');
+    QUnit.ok(widget.controller, 'Widget returned an object with controller');
+    QUnit.ok(widget.run, 'Widget returned a runner');
     
-    var id = 123456789;
+    var ad =
+    {
+      id: 999999999,
+      title: 'This is a test ad',
+      logo: 'images/icons/glome-icon.svg',
+    }
+    var gad = new Glome.Ads.Ad(ad);
     
-    Glome.Ads.Ad
-    (
-      {
-        id: id
-      }
-    );
+    QUnit.ok(widget.run(), 'Widget was successfully run');
+    QUnit.ok(widget.widgetAd, 'Widget ad was selected');
+    QUnit.equal(ad.id, widget.widgetAd.id, 'Last ad was selected');
     
-    QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads after a new ad was added');
+    QUnit.equal(widget.widget.find('.glome-ad-title').text(), ad.title, 'Knocking ad title was changed');
+    QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
+    QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
     
-    Glome.Ads.removeAd(id);
-    QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), Object.keys(Glome.Ads.stack).length, 'Ticker has the correct number of ads after the temporary ad was removed');
+    QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
+    QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
+    QUnit.equal(widget.widget.attr('data-knocking-ad'), '', 'Empty knocking ad id was passed to widget DOM');
+    QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), '', 'Knocking ad logo was hidden');
     
-    // Get the first ad
-    var ids = Object.keys(Glome.Ads.stack);
-    var id = ids[0];
-    var ad = Glome.Ads.stack[id];
+    QUnit.notEqual(widget.widget.attr('data-state'), 'open', 'Widget is closed on startup');
     
-    // Verify that widget displays the first ad title
-    QUnit.equal(fx.find('.glome-widget-title a').text(), ad.title, 'Ad title is displayed as it should be');
-    QUnit.equal(fx.find('.glome-widget-title a').attr('data-glome-ad-id'), ad.id, 'Ad id was correctly set');
-    QUnit.equal(fx.find('.glome-widget-subtext').text(), ad.bonus, 'Ad bonus is displayed as it should be');
-    
-    // Widget display toggling
-    fx.find('.glome-icon').trigger('click');
-    QUnit.equal(fx.find('#glomeWidget').hasClass('display'), true, 'Glome widget is displayed');
-    QUnit.equal(Number(fx.find('#glomeWidget .glome-pager.glome-pager-max').text()), Object.keys(Glome.Ads.stack).length, 'Pager has the correct number of ads');
-    
-    fx.find('.glome-icon').trigger('click');
-    QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed');
-    
-    fx.find('.glome-icon').trigger('click');
-    fx.find('#glomeWidgetClose').trigger('click');
-    QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed after clicking on close button');
-    
-    fx.find('.glome-icon').trigger('click');
-    fx.find('#glomeWidget').find('.glome-widget-title a').trigger('click');
-    QUnit.equal(fx.find('#glomeWidget').hasClass('display'), false, 'Glome widget is not displayed after clicking on an ad');
-    
-    // Remove all ads and verify that ticker displays zero
-    Glome.Ads.stack = {};
-    Glome.Ads.onchange();
-    QUnit.equal(Number(fx.find('#glomeWidget').find('.glome-counter').attr('data-count')), 0, 'Ticker has the correct number of ads after all ads were removed');
     QUnit.start();
   });
 });
-*/
-
-
-/*
-QUnit.asyncTest('Set ad as viewed', function()
-{
-  Glome.Ads.getit(Glome.ads[0].adid, function()
-  {
-    QUnit.start();
-  });
-});
-*/

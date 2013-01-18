@@ -3,6 +3,8 @@ $text_color: #4d4d4d
 $text_color_medium: #cccccc
 $text_color_light: #e8e8e8
 
+$small_screen_height: 550px
+
 $button_height: 35px
 $button_gray_light: #f3f3f3
 $button_gray_medium: #dfdfdf
@@ -376,6 +378,15 @@ $full_page_z_index: 10000
 
 #glomeAdmin .glome-header
   box-shadow: 0 $navigation_height 0 rgba(77, 77, 77, 1)
+  @media screen and (max-height: $small_screen_height)
+    height: $header_height / 2
+    
+  img.glome-icon
+    width: 76px
+    height: 106px
+    @media screen and (max-height: $small_screen_height)
+      width: (76px / 2)
+      height: (106px / 2)
 
 /* !Admin header */
 #glomeAdminHeader
@@ -386,6 +397,9 @@ $full_page_z_index: 10000
   left: 0
   right: 0
   z-index: $full_page_z_index + 1
+  @media screen and (max-height: $small_screen_height)
+    padding-top: 20px
+    height: $header_height / 2
 
 #glomeAdmin .glome-close
   @include close
@@ -396,6 +410,8 @@ $full_page_z_index: 10000
   float: right
   margin: 45px 0 0
   padding: 0
+  @media screen and (max-height: $small_screen_height)
+    margin-top: 0
 
 #glomeAdmin .glome-navigation
   
@@ -420,6 +436,8 @@ $full_page_z_index: 10000
   line-height: 25px
   clear: both
   font-size: 108%
+  @media screen and (max-height: $small_screen_height)
+    height: 35px
 
 #glomeAdmin .glome-navigation > li.selected > a,
 #glomeAdmin .glome-navigation > li:hover > a
@@ -439,6 +457,9 @@ $full_page_z_index: 10000
   height: 40px
   content: ''
   opacity: (255 - 205) / 255
+  @media screen and (max-height: $small_screen_height)
+    height: 30px
+    background-size: 25px 25px
 
 @each $type in subscriptions, statistics, rewards, settings
   #glomeAdmin .glome-navigation > li[data-page="#{$type}"] > a:before
@@ -462,6 +483,8 @@ $full_page_z_index: 10000
   display: block
   margin-top: 16px
   height: 20px
+  @media screen and (max-height: $small_screen_height)
+    margin-top: 0
 
 /* !Admin navigation, second level */
 #glomeAdmin .glome-navigation > li > ul
@@ -481,6 +504,8 @@ $full_page_z_index: 10000
   width: ($col_width + $col_margin) * 4 - $col_margin
   height: $navigation_height
   line-height: $navigation_height
+  @media screen and (max-height: $small_screen_height)
+    top: $header_height / 2
 
 #glomeAdmin .glome-navigation > li.selected > ul li
   display: block
@@ -513,7 +538,7 @@ $full_page_z_index: 10000
   left: 0
   top: $header_height + $navigation_height
   right: 0
-  bottom: 58px
+  bottom: $footer_height
   padding:
     top: 25px
     left: 15px
@@ -521,6 +546,9 @@ $full_page_z_index: 10000
   position: fixed
   z-index: $full_page_z_index
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2)
+  @media screen and (max-height: $small_screen_height)
+    top: $header_height / 2 + $navigation_height
+    bottom: $footer_height / 2
 
 #glomeAdminContent > .glome-full-width
   padding-bottom: 25px
@@ -534,6 +562,9 @@ $full_page_z_index: 10000
   left: 0
   bottom: 0
   right: 0
+  @media screen and (max-height: $small_screen_height)
+    height: $footer_height / 2
+    line-height: $footer_height / 2
 
 /* !Admin pages: subscriptions */
 #glomeAdminSubscriptions .glome-selection-counter
@@ -606,6 +637,16 @@ $full_page_z_index: 10000
   right: 0
   padding: 40px 0
   height: $header_height
+  img.glome-icon
+    @include container
+    width: 76px
+    height: 106px
+  @media screen and (max-height: $small_screen_height)
+    height: $header_height / 2
+    padding: 20px 0
+    img.glome-icon
+      width: (76px / 2)
+      height: (106px / 2)
   
 #glomePublicFooter
   @extend #glomeAdminFooter
@@ -631,6 +672,9 @@ $full_page_z_index: 10000
     color: transparent
   position: fixed
   z-index: $full_page_z_index
+  @media screen and (max-height: $small_screen_height)
+    top: $header_height / 2
+    bottom: $footer_height / 2
 
 #glomePublicContent .glome-content-wrapper
   padding:
@@ -676,6 +720,9 @@ $full_page_z_index: 10000
   a
     color: $button_gray_dark
     font-weight: 600
+  @media screen and (max-height: $small_screen_height)
+    padding-top: 0
+    
 
 #glomePublicStartup .glome-button
   height: 70px
@@ -760,6 +807,11 @@ $full_page_z_index: 10000
   float: left
   display: block
   height: $widget_height
+  .glome-ad-logo img
+    display: inline-block
+    max-height: $widget_height - 10
+    max-width: 150px
+    vertical-align: middle
 
 #glomeWidget[data-state="open"] #glomeWidgetContent > *
   display: table-cell

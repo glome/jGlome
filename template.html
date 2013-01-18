@@ -18,7 +18,7 @@
         <div class="glome-header glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
           <div class="glome-close" data-close-context="admin"></div>
             <div class="glome-full-width">
-              <img src="images/icons/glome-icon.svg" alt="Glome" width="76" height="106" />
+              <img src="images/icons/glome-icon.svg" alt="Glome" class="glome-icon" />
               <ul class="glome-navigation" data-glome-template="navigation-container">
                 <li class="glome-cols-1" data-glome-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
                   <a href="#admin-subscriptions">Subscriptions</a>
@@ -195,12 +195,13 @@
         <div class="glome-header glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
           <div class="glome-close" data-close-context="public"></div>
           <div class="glome-full-width">
-            <img src="images/icons/glome-icon-light.svg" alt="Glome" width="76" height="106" />
+            <img src="images/icons/glome-icon-light.svg" alt="Glome" class="glome-icon" />
           </div>
         </div>
         <div id="glomePublicContent" class="glome-clearfix" data-glome-template="public-content">
           <div class="glome-content-wrapper">
             <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
+            
               <!-- !Require password -->
               <div id="glomePublicRequirePassword" class="glome-content" data-glome-template="public-requirepassword" data-page="requirepassword">
                 <div class="glome-layout-cols-2 glome-clearfix">
@@ -242,7 +243,7 @@
               <!-- !Startup, stage 2: category subscriptions -->
               <div id="glomePublicSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="public-subscriptions" data-page="subscriptions">
                 <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                  <h1 data-i18n="subscribe from %s categories">Subscribe from 25 categories</h1>
+                  <h1 data-i18n="subscribe from %s categories">Subscribe from %s categories</h1>
                   <p data-i18n="by subscribing to a category you determine which brands can reach you">
                     By subscribing to a category you determine which brands can reach you.
                   </p>
@@ -418,9 +419,11 @@
         </div>
       </div>
       <!-- !Widget -->
-      <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="open">
+      <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="open" data-knocking-ad="">
         <div id="glomeWidgetContent" data-page="widget">
-          <a href="#public-ad" class="glome-ad-logo">Audi</a>
+          <a href="#public-ad" class="glome-ad-logo">
+            <img src="images/icons/glome-icon-light.svg" alt="Glome" />
+          </a>
           <a href="#public-ad" class="glome-ad-title">Audi S7 Test Drive Week</a>
           <div class="glome-ad-reward">13 $</div>
         </div>

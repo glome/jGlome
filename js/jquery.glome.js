@@ -24,6 +24,11 @@
     this.templateLocation = 'template.html';
     
     /**
+     * Switch to determine if first run should be the starting point
+     */
+    this.firstrun = true;
+    
+    /**
      * Online status and respective event listener
      */
     this.online = window.navigator.onLine;
@@ -1020,7 +1025,28 @@
         
         this.getById = function(id)
         {
-          throw new Error('Prototype class constructor cannot be directly initialized');
+          var container = this.container;
+          
+          if (   plugin[container]
+              && plugin[container].stack
+              && plugin[container].stack[id])
+          {
+            var o = plugin[container].stack[id];
+            
+            for (i in o)
+            {
+              if (i === 'id')
+              {
+                i = '_id';
+              }
+              
+              this[i] = o[i];
+            }
+            
+            return this;
+          }
+          
+          throw new Error('No ' + container + ' object with id ' + id + ' available');
         }
         
         // If the constructor was given anything else than integer (caught earlier) or
@@ -1032,14 +1058,20 @@
             throw new Error('Non-object constructor has to be an integer');
           }
           
-          this.getById(data);
-          return;
+          return this.getById(data);
         }
         
         // Copy all of the properties
         for (var i in data)
         {
-          this[i] = data[i];
+          if (i === 'id')
+          {
+            this.setId(data[i]);
+          }
+          else
+          {
+            this[i] = data[i];
+          }
         }
       }
       
@@ -1067,11 +1099,11 @@
         var rVal = true;
         
         if (   container
-            && Glome[container]
-            && typeof Glome[container].stack !== 'undefined'
-            && Glome[container].stack[this.id])
+            && plugin[container]
+            && typeof plugin[container].stack !== 'undefined'
+            && plugin[container].stack[this.id])
         {
-          rVal = delete Glome[container].stack[this.id];
+          rVal = delete plugin[container].stack[this.id];
         }
         
         if (typeof this.onchange === 'function')
@@ -1092,12 +1124,12 @@
         var container = this.container;
         
         if (   container
-            && Glome[container]
-            && typeof Glome[container].listeners !== 'undefined')
+            && plugin[container]
+            && typeof plugin[container].listeners !== 'undefined')
         {
-          for (var i = 0; i < Glome[container].listeners.length; i++)
+          for (var i = 0; i < plugin[container].listeners.length; i++)
           {
-            Glome[container].listeners[i](type, this);
+            plugin[container].listeners[i](type, this);
           }
         }
       }
@@ -1106,6 +1138,11 @@
        * Default setter for property id. Validates the input.
        */
       Prototype.prototype.__defineSetter__('id', function(v)
+      {
+        this.setId(v);
+      });
+      
+      Prototype.prototype.setId = function(v)
       {
         if (!v)
         {
@@ -1131,15 +1168,15 @@
         var container = this.container;
         
         if (   container
-            && Glome[container]
-            && typeof Glome[container].stack !== 'undefined')
+            && plugin[container]
+            && typeof plugin[container].stack !== 'undefined')
         {
-          Glome[container].stack[v] = this;
+          plugin[container].stack[v] = this;
           
           if (   prevId
-              && Glome[container].stack[prevId])
+              && plugin[container].stack[prevId])
           {
-            delete Glome[container].stack[prevId];
+            delete plugin[container].stack[prevId];
           }
         }
         
@@ -1156,7 +1193,7 @@
           
           this.onchange(type);
         }
-      });
+      }
       
       /**
        * Default getter for property id. Validates the input.
@@ -1231,6 +1268,7 @@
         
         Ad.prototype = new plugin.Prototype();
         Ad.prototype.constructor = Ad;
+        
         
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
@@ -1363,7 +1401,7 @@
           
           if (found)
           {
-            var id = ad.id;
+            var id = ad._id;
             ads[id] = ad;
           }
         }
@@ -1572,169 +1610,30 @@
       }
     };
     
-    /* !DOM */
-    plugin.DOM =
-    {
-      /**
-       * Bind Glome to DOM object
-       * 
-       * @param mixed el    jQuery object, DOM object or CSS path
-       */
-      bindTo: function(el)
-      {
-        // Ensure that this is a jQuery object
-        el = jQuery(el);
-        
-        // Check that the element exists
-        if (el.size() !== 1)
-        {
-          return false;
-        }
-        
-        plugin.container = el;
-        
-        return true;
-      },
-      
-      /**
-       * Initialize DOM
-       * 
-       * @return boolean True on success, false on failure
-       */
-      init: function()
-      {
-        if (   !plugin.container
-            || !plugin.container.size())
-        {
-          throw new Error('Glome has to be bound to a DOM object with Glome.DOM.bindTo before initializing');
-        }
-        
-        plugin.container.append(jQuery('<div />').attr('id', 'glomeWindow'));
-        
-        if (!plugin.container.find('#glomeWindow').size())
-        {
-          console.warn('There is no #glomeWindow, abort mission');
-          return false;
-        }
-        
-        plugin.container.find('#glomeWindow').append(plugin.Templates.get('widget'));
-        
-        // Listen to ads
-        plugin.Ads.addListener(function()
-        {
-          plugin.container.find('#glomeWidget')
-            .on('adchange.glome', function()
-            {
-              jQuery(this).find('.glome-counter').attr('data-count', (Object.keys(plugin.Ads.stack).length));
-              jQuery(this).find('.glome-pager.glome-pager-max').text(Object.keys(plugin.Ads.stack).length);
-              plugin.DOM.Widget.init();
-            })
-            .trigger('adchange.glome');
-        });
-        
-        return true;
-      },
-      
-      /**
-       * Widget actions
-       */
-      Widget:
-      {
-        init: function()
-        {
-          var ids = Object.keys(plugin.Ads.stack);
-          
-          if (ids[0])
-          {
-            plugin.DOM.Widget.pagerAd(ids[0]);
-          }
-          else
-          {
-            // @TODO: display categories
-          }
-          
-          // Toggle widget display status on clicks
-          plugin.container.find('#glomeWidget').find('.glome-icon')
-            .off('click.glome')
-            .on('click.glome', function()
-            {
-              if (plugin.container.find('#glomeWidget').hasClass('display'))
-              {
-                plugin.DOM.Widget.hide();
-              }
-              else
-              {
-                plugin.DOM.Widget.show();
-              }
-              
-              return false;
-            });
-            
-          plugin.container.find('#glomeWidgetClose')
-            .off('click.glome')
-            .on('click.glome', function()
-            {
-              plugin.DOM.Widget.hide();
-            });
-        },
-        
-        /**
-         * Display widget
-         */
-        show: function()
-        {
-          plugin.container.find('#glomeWidget').addClass('display');
-        },
-        
-        /**
-         * Hide widget
-         */
-        hide: function()
-        {
-          plugin.container.find('#glomeWidget').removeClass('display');
-        },
-        pagerAd: function(id)
-        {
-          var ad = plugin.Ads.Ad(id);
-          
-          plugin.container.find('#glomeWidgetContent').find('[data-glome-template]').remove();
-          plugin.container.find('#glomeWidgetContent').prepend(plugin.Templates.get('widget-ad'));
-          
-          var pager = plugin.Templates.get('widget-pager');
-          pager.insertAfter(plugin.container.find('#glomeWidgetContent').find('[data-glome-template="widget-ad"]'));
-          
-          // @TODO: set pager max text
-          //pager.find('.glome-pager.glome-pager-max').text();
-          
-          plugin.container.find('#glomeWidget').find('.glome-widget-title a')
-            .attr('data-glome-ad-id', ad.id)
-            .text(ad.title)
-            .off('click.glome')
-            .on('click.glome', function()
-            {
-              plugin.DOM.Widget.displayAd(jQuery(this).attr('data-glome-ad-id'));
-              return false;
-            });
-          
-          plugin.container.find('#glomeWidget').find('.glome-widget-subtext').text(ad.bonus);
-        },
-        
-        displayAd: function(id)
-        {
-          plugin.DOM.Widget.hide();
-          
-          var popup = plugin.Templates.get('popup');
-          popup.prependTo(plugin.container);
-        }
-      }
-    };
-    
     /* !MVC */
     /**
      * Sketch of MVC. @TODO: use backbone.js or something similar in the near future
      */
     plugin.MVC =
     {
+      /* !MVC Runner */
+      run: function(route, args)
+      {
+        if (typeof plugin.MVC[route] !== 'function')
+        {
+          throw new Error('No route called "' + route.toString() + '"');
+        }
+        
+        var mvc = new plugin.MVC[route];
+        
+        if (typeof mvc.run !== 'undefined')
+        {
+          mvc.run(args);
+        }
+        
+        return mvc;
+      },
+      
       /* !MVC Prototype */
       Prototype: function()
       {
@@ -1770,6 +1669,107 @@
         return new MVC();
       },
       
+      /* !MVC: Widget */
+      Widget: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Prototype();
+        mvc.prototype.widgetAd = null;
+        
+        mvc.prototype.model = function(args)
+        {
+          // If there is no widgetAd, use the last
+          if (!this.widgetAd)
+          {
+            var ids = Object.keys(plugin.Ads.stack);
+            
+            if (ids.length)
+            {
+              var last = ids.length - 1;
+              var id = ids[last];
+              
+              this.widgetAd = new plugin.Ads.Ad(id);
+            }
+          }
+          else if (args
+              && args.adid)
+          {
+            try
+            {
+              this.widgetAd = new plugin.Ads.Ad(args.adid);
+            }
+            catch (e)
+            {
+              this.widgetAd = null;
+            }
+          }
+        }
+        
+        mvc.prototype.view = function(args)
+        {
+          this.widget = plugin.container.find('[data-glome-template="widget"]');
+          
+          // Reuse the old widget or create new
+          if (!this.widget.size())
+          {
+            this.widget = plugin.Templates.get('widget').appendTo(plugin.container);
+          }
+          
+          if (this.widgetAd)
+          {
+            this.widget.find('.glome-ad-title').text(this.widgetAd.title);
+            this.widget.find('.glome-ad-logo img').attr('src', this.widgetAd.logo);
+            this.widget.attr('data-knocking-ad', this.widgetAd.id);
+          }
+          else
+          {
+            this.widget.attr('data-knocking-ad', '');
+            this.widget.find('.glome-ad-logo img').attr('src', '');
+          }
+        }
+        
+        mvc.prototype.controller = function(args)
+        {
+          // Open and close the widget. Closing widget hides always the knocking
+          // until a new knock is initialized
+          this.widget.find('#glomeWidgetIcon')
+            .off('click')
+            .on('click', function()
+            {
+              if (jQuery(this).parent().attr('data-state') === 'open')
+              {
+                jQuery(this).parent().attr('data-state', 'closed');
+              }
+              else if (jQuery(this).parent().attr('data-knocking-ad'))
+              {
+               jQuery(this).parent().attr('data-state', 'open'); 
+              }
+            });
+          
+          // Start with the widget closed if no arguments were passed
+          if (!args)
+          {
+            this.widget
+              .attr('data-state', 'closed');
+          }
+          
+          this.widget.find('a')
+            .off('click')
+            .on('click', function()
+            {
+              plugin.MVC.run('DisplayAd', this.widgetAd);
+            });
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
       /* !MVC Public */
       Public: function()
       {
@@ -1783,13 +1783,10 @@
         // Prototype for initializing a view
         mvc.prototype.viewInit = function()
         {
-          var wrapper = jQuery('[data-glome-template="public-wrapper"]');
+          jQuery('[data-glome-template="public-wrapper"]').remove();
           
-          if (!wrapper.size())
-          {
-            var wrapper = plugin.Templates.get('public-wrapper')
-              .appendTo(plugin.container);
-          }
+          var wrapper = plugin.Templates.get('public-wrapper')
+            .appendTo(plugin.container);
           
           if (!wrapper.find('[data-glome-template="public-header"]').size())
           {
@@ -1815,6 +1812,50 @@
         return m;
       },
       
+      /* !MVC: Require password */
+      RequirePassword: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.view = function()
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-password');
+          
+          this.content.appendTo(this.contentArea);
+        }
+        
+        mvc.prototype.controller = function()
+        {
+          this.content.find('form')
+            .on('submit', function(e)
+            {
+              plugin.API.login
+              (
+                plugin.id(),
+                jQuery(this).find('input[type="password"]').val(),
+                function()
+                {
+                  var mvc = new plugin.MVC.Widget();
+                  mvc.run();
+                }
+              );
+              
+              e.preventDefault();
+              return false;
+            });
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      /* !First run: initialize */
       FirstRunInitialize: function()
       {
         // Return an existing ad if it is in the stack, otherwise return null
@@ -1842,6 +1883,7 @@
         return m;
       },
       
+      /* !First run: subscriptions */
       FirstRunSubscriptions: function()
       {
         // Return an existing ad if it is in the stack, otherwise return null
@@ -1854,6 +1896,8 @@
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-subscriptions');
+          
+          console.log('contentArea', this.contentArea);
           
           this.content.appendTo(this.contentArea);
         }
@@ -1888,8 +1932,8 @@
      * Initialize Glome
      * 
      * @param mixed el           @optional DOM object (either plain of jQuery wrapped) or a string with traversable path
-     * @param function callback  @optional Callback, triggered after initialization is complete
-     * @param function onerror   @optional Onerror, triggered in the initialization fails
+     * @param function callback  @optional @see Callback, triggered after initialization is complete
+     * @param function onerror   @optional @see Onerror, triggered in the initialization fails
      */
     plugin.initialize = function(el, callback, onerror)
     {
@@ -1897,24 +1941,52 @@
       plugin.Tools.validateCallback(onerror);
       
       // Create a new Glome ID if previous ID does not exist
-      if (!plugin.id())
+      if (!plugin.id()
+          || window.location.hash == '#debug')
       {
         var date = new Date();
-        this.createGlomeId(date.getTime(), callbacks, onerror);
+        var callbacks = plugin.Tools.mergeCallbacks
+        (
+          function()
+          {
+            plugin.MVC.run('FirstRunInitialize');
+          },
+          callback
+        );
+        this.Auth.createGlomeId(date.getTime(), callbacks, onerror);
       }
       else
       {
+        this.firstrun = false;
+        
         plugin.Auth.login
         (
           plugin.id(),
           '',
           function()
           {
-            plugin.Ads.load(callback, onerror);
+            var callbacks = plugin.Tools.mergeCallbacks
+            (
+              function()
+              {
+                plugin.MVC.run('Widget');
+              },
+              callback
+            );
+            plugin.Ads.load(callbacks, onerror);
           },
           function()
           {
-            plugin.Tools.triggerCallbacks(onerror);
+            var onerrors = plugin.Tools.mergeCallbacks
+            (
+              function()
+              {
+                plugin.MVC.run('RequirePassword');
+              },
+              onerror
+            );
+            
+            plugin.Tools.triggerCallbacks(onerrors);
           }
         );
       }
@@ -1923,8 +1995,7 @@
       {
         this.Templates.load(function()
         {
-          plugin.DOM.bindTo(el);
-          plugin.DOM.init(callback, onerror);
+          plugin.container = jQuery(el);
         });
       }
       
