@@ -1,6 +1,7 @@
 /* !Mixins */
-/* !Main container */
+/* !Main containers */
 .glome-fullscreen-container {
+  display: block !important;
   position: fixed;
   left: 0;
   top: 0;
