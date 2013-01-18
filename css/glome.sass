@@ -110,6 +110,7 @@ $full_page_z_index: 10000
 .glome-fullscreen-container
   display: block !important
   position: fixed
+  z-index: $full_page_z_index
   left: 0
   top: 0
   right: 0
@@ -626,6 +627,7 @@ $full_page_z_index: 10000
 
 /* !Public views */
 #glomePublic
+  z-index: $full_page_z_index
   background:
     color: rgba(0, 0, 0, 0.95)
 
@@ -786,7 +788,7 @@ $full_page_z_index: 10000
   min-width: $widget_height
   height: $widget_height
   line-height: $widget_height
-  z-index: $full_page_z_index + 10
+  z-index: $full_page_z_index - 10
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4)
   background:
     color: $widget_gray_dark

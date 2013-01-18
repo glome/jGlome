@@ -3,6 +3,7 @@
 .glome-fullscreen-container {
   display: block !important;
   position: fixed;
+  z-index: 10000;
   left: 0;
   top: 0;
   right: 0;
@@ -623,6 +624,7 @@
 
 /* !Public views */
 #glomePublic {
+  z-index: 10000;
   background-color: rgba(0, 0, 0, 0.95); }
 
 #glomePublicHeader {
@@ -796,7 +798,7 @@
   min-width: 50px;
   height: 50px;
   line-height: 50px;
-  z-index: 10010;
+  z-index: 9990;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
   background-color: #2a2a2a;
   background-image: -webkit-linear-gradient(bottom, #2a2a2a 0%, #404040 100%);
