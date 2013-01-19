@@ -1416,6 +1416,41 @@ QUnit.test('Fetch ads', function()
 /* !Module: Glome Categories class */
 QUnit.module('Glome Categories class');
 
+/* ! Set subscription status */
+QUnit.asyncTest('Set subscription status', function()
+{
+  QUnit.ok(Glome.Categories.setSubscriptionStatus, 'Categories.setSubscriptionStatus exists');
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Categories.setSubscriptionStatus('foo', 'bar');
+    },
+    'Allow only integer as ID'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Categories.setSubscriptionStatus(1, 'bar');
+    },
+    'Allow only on and off'
+  );
+  
+  QUnit.ok(Glome.Categories.setSubscriptionStatus(1, 0), 'Zero is accepted as a status');
+  QUnit.ok(Glome.Categories.setSubscriptionStatus(1, 1), 'One is accepted as a status');
+  QUnit.ok(Glome.Categories.setSubscriptionStatus(1, 'on'), '"on" is accepted as a status');
+  QUnit.ok(Glome.Categories.setSubscriptionStatus(1, 'off'), '"off" is accepted as a status');
+  
+  var callback = function()
+  {
+    QUnit.start();
+  }
+  
+  Glome.Categories.setSubscriptionStatus(1, 'on', callback, callback);
+});
+
 /* !Glome.Categories.Category object */
 QUnit.test('Glome.Categories.Category object', function()
 {
@@ -1488,6 +1523,9 @@ QUnit.test('Glome.Categories.Category object', function()
     },
     'Category was removed successfully from the stack'
   );
+  
+  QUnit.ok(category.subscribe, 'Category subscribe method exists');
+  QUnit.ok(category.unsubscribe, 'Category unsubscribe method exists');
 });
 
 /* !Glome.Categories API */
@@ -1555,6 +1593,35 @@ QUnit.test('Glome.Categories API', function()
   
   Glome.Categories.removeListener(listener);
   QUnit.equal(Glome.Categories.listeners.length, length, 'Listener was successfully removed according to length');
+});
+
+/* !Subscription shorthands */
+QUnit.asyncTest('Subscription shorthands', function()
+{
+  Glome.Auth.login
+  (
+    Glome.id(),
+    '',
+    function()
+    {
+      var id = Object.keys(Glome.Categories.stack)[0];
+      var category = new Glome.Categories.Category(id);
+      
+      QUnit.ok(category.subscribe, 'Category subscribe method exists');
+      QUnit.ok(category.unsubscribe, 'Category unsubscribe method exists');
+      
+      category.subscribe(function()
+      {
+        QUnit.equal(category.subscribed, 1, 'Category subscription status was changed to 1 after subscribe');
+        
+        category.unsubscribe(function()
+        {
+          QUnit.equal(category.subscribed, 0, 'Category subscription status was changed to 0 after unsubscribe');
+          QUnit.start();
+        });
+      });
+    }
+  );
 });
 
 /* !Fetch categories */
@@ -1658,9 +1725,21 @@ QUnit.asyncTest('Populate template', function()
 {
   Glome.Templates.load(function()
   {
-    QUnit.ok(Glome.Templates.populate);
+    QUnit.ok(Glome.Templates.parse, 'There is a method for parsing a template');
+    QUnit.ok(Glome.Templates.populate, 'There is a shorthand method for parsing a Glome template');
     
     QUnit.equal('admin-wrapper', Glome.Templates.populate('admin-wrapper', {}).attr('data-glome-template'), 'Populate returned correct template');
+    
+    var template = jQuery('<div />')
+      .text('Hello {world}!');
+    
+    QUnit.equal(Glome.Templates.parse(template, {}).html(), 'Hello {world}!', 'No attributes were given, bracket contents should be removed');
+    
+    var template = jQuery('<div />')
+      .text('Hello {world}!');
+    
+    QUnit.equal(Glome.Templates.parse(template, {world: 'Earth'}).get(0).outerHTML, '<div>Hello Earth!</div>', 'Attribute was parsed correctly');
+    
     QUnit.start();
   });
 });

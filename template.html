@@ -59,19 +59,19 @@
                 <!-- !Category subscriptions -->
                 <div id="glomeAdminSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="admin-subscriptions">
                   <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                    <h1 data-i18n="subscribe from %s categories">Subscribe from 25 categories</h1>
+                    <h1 data-i18n="subscribe from %s categories">Subscribe from {count} categories</h1>
                     <p data-i18n="by subscribing to a category you determine which brands can reach you">
                       By subscribing to a category you determine which brands can reach you.
                     </p>
                     <hr class="glome-short" />
                     <div class="glome-selection-counter">
-                      <span class="glome-current">0</span><span class="glome-separator">/</span><span class="glome-max">0</span>
+                      <span class="glome-current">{selected}</span><span class="glome-separator">/</span><span class="glome-max">{count}</span>
                       <span class="glome-unit" data-i18n="selected">selected</span>
                     </div>
                   </div>
                   <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
                     <!-- Row -->
-                    <div class="glome-category glome-row glome-with-separator">
+                    <div class="glome-category glome-row glome-with-separator" data-glome-category="{id}">
                       <div class="glome-button-container glome-cols-1">
                         <button class="glome-subscribe glome-button glome-add glome-cols-1" data-state="off">
                           <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
@@ -80,8 +80,8 @@
                         </button>
                       </div>
                       <div class="glome-text-container">
-                        <h1 class="glome-category-title">Automotive</h1>
-                        <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                        <h1 class="glome-category-title">{name}</h1>
+                        <p class="glome-short-description">{description}</p>
                       </div>
                       <div class="glome-button-container">
                         <a class="glome-link glome-link-next"></a>
@@ -243,13 +243,13 @@
               <!-- !Startup, stage 2: category subscriptions -->
               <div id="glomePublicSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="public-subscriptions" data-page="subscriptions">
                 <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                  <h1 data-i18n="subscribe from %s categories">Subscribe from %s categories</h1>
+                  <h1 data-i18n="subscribe from %s categories">Subscribe from {count} categories</h1>
                   <p data-i18n="by subscribing to a category you determine which brands can reach you">
                     By subscribing to a category you determine which brands can reach you.
                   </p>
                   <hr class="glome-short" />
                   <div class="glome-selection-counter">
-                    <span class="glome-current">0</span><span class="glome-separator">/</span><span class="glome-max">0</span>
+                    <span class="glome-current">{selected}</span><span class="glome-separator">/</span><span class="glome-max">{count}</span>
                     <span class="glome-unit" data-i18n="selected">selected</span>
                   </div>
                   <div class="glome-pager glome-full-width">
@@ -263,7 +263,7 @@
                 </div>
                 <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix glome-categories">
                   <!-- Row -->
-                  <div class="glome-category glome-row glome-with-separator" data-glome-template="category-row">
+                  <div class="glome-category glome-row glome-with-separator" data-glome-template="category-row" data-glome-category="{id}">
                     <div class="glome-button-container glome-cols-1">
                       <button class="glome-subscribe glome-button glome-add glome-cols-1" data-state="off">
                         <span class="glome-subscribe" data-state="off" data-i18n="subscribe">Subscribe</span>
@@ -272,8 +272,8 @@
                       </button>
                     </div>
                     <div class="glome-text-container">
-                      <h1 class="glome-category-title">Automotive</h1>
-                      <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                      <h1 class="glome-category-title">{name}</h1>
+                      <p class="glome-short-description">{description}</p>
                     </div>
                   </div>
                 </div>
@@ -315,7 +315,7 @@
                   <span data-i18n="glome is now set up for you">Glome is now set up for you</span>.
                 </p>
                 <p>
-                  <button class="glome-button glome-cols-3" data-state="on" data-state-change="false">
+                  <button class="glome-button glome-cols-3" data-state="on" data-state-change="false" id="glomePublicFinishClose">
                     <span data-state="on" data-i18n="enjoy the clutter free web">Enjoy the clutter free web!</span>
                   </button>
                 </p>
@@ -337,8 +337,8 @@
                   <!-- Row -->
                   <div class="glome-category glome-row glome-with-separator">
                     <div class="glome-text-container">
-                      <h1 class="glome-category-title"><a href="#public-category">Automotive</a></h1>
-                      <p class="glome-short-description">Cars, motorcycles, repair, parts...</p>
+                      <h1 class="glome-category-title"><a href="#public-category">{name}</a></h1>
+                      <p class="glome-short-description">{description}</p>
                     </div>
                     <div class="glome-button-container">
                       <a class="glome-link glome-link-next" href="#public-category"></a>
@@ -350,9 +350,9 @@
               <!-- !Category view -->
               <div id="glomePublicCategory" class="glome-content glome-layout-cols-2" data-glome-template="public-category" data-page="category">
                 <div class="glome-cols-2 glome-fixed">
-                  <h1><a href="#public-categorylist" class="glome-link glome-link-previous"></a> Automotive</h1>
+                  <h1><a href="#public-categorylist" class="glome-link glome-link-previous"></a> {name}</h1>
                   <p>
-                    Das ist loremipsum für Automotive
+                    {description}
                   </p>
                   <hr class="glome-short" />
                 </div>
@@ -360,9 +360,9 @@
                   <!-- Row -->
                   <div class="glome-category glome-row glome-with-separator">
                     <div class="glome-text-container">
-                      <h1 class="glome-category-title"><a href="#public-ad">Audi</a></h1>
+                      <h1 class="glome-category-title"><a href="#public-ad">{tilte}</a></h1>
                       <p class="glome-short-description">
-                        <a href="#public-ad">Audi offers lorem ipsum</a>
+                        <a href="#public-ad">{description}</a>
                       </p>
                     </div>
                     <div class="glome-button-container">
@@ -375,17 +375,17 @@
               <!-- !Ad view -->
               <div id="glomePublicAd" class="glome-content glome-layout-cols-2" data-glome-template="public-ad" data-page="ad">
                 <div class="glome-cols-2 glome-fixed">
-                  <h1><a href="#public-category" class="glome-link glome-link-previous"></a> Automotive</h1>
+                  <h1><a href="#public-category" class="glome-link glome-link-previous"></a> {name}</h1>
                   <p>
-                    <a href="#public-category">See more in automotive</a>
+                    <a href="#public-category">See more in {name}</a>
                   </p>
                 </div>
                 <div class="glome-cols-4">
                   <div class="glome-layout-cols-2 glome-clearfix">
                     <div class="glome-cols-2">
-                      <h1>Audi test drive week</h1>
+                      <h1>{title}</h1>
                       <p>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse.
+                        {description}
                       </p>
                     </div>
                     <div class="glome-cols-2">
@@ -394,7 +394,7 @@
                   </div>
                   <div class="glome-layout-cols-2 glome-clearfix glome-ad-actions">
                     <div class="glome-cols-2">
-                      <h2 data-i18n="up to %s per order">Up to $13 per order</h2>
+                      <h2 data-i18n="up to %s per order">{bonus}</h2>
                     </div>
                     <div class="glome-cols-2">
                       <button class="glome-button glome-cols-1" data-state="on" data-state-change="false"><span data-state="on" data-i18n="get it">Get it</span></button>
@@ -424,7 +424,7 @@
           <a href="#public-ad" class="glome-ad-logo">
             <img src="images/icons/glome-icon-light.svg" alt="Glome" />
           </a>
-          <a href="#public-ad" class="glome-ad-title">Audi S7 Test Drive Week</a>
+          <a href="#public-ad" class="glome-ad-title">{title}</a>
           <div class="glome-ad-reward">13 $</div>
         </div>
         <div id="glomeWidgetIcon"></div>

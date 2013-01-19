@@ -712,6 +712,9 @@
   border-style: solid none none;
   border-color: #b1b1b1;
   border-width: 1px; }
+  @media screen and (max-height: 550px) {
+    #glomePublicContent .glome-pager {
+      bottom: 29px; } }
 
 #glomePublicSubscriptions .glome-pager {
   position: fixed; }

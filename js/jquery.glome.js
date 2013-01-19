@@ -410,7 +410,38 @@
       populate: function(template, data)
       {
         var tmp = this.get(template);
-        return tmp;
+        return this.parse(tmp, data);
+      },
+      
+      /**
+       * Parse a template with data
+       * 
+       * @param mixed dom          jQuery wrappable object or text
+       * @param mixed data         Template data
+       */
+      parse: function(dom, data)
+      {
+        var tmp = jQuery(dom).get(0).outerHTML;
+        var matches = {}
+        
+        while (tmp.match(/\{([A-Za-z0-9_]+)\}/))
+        {
+          var regs = tmp.match(/\{([A-Za-z0-9\_]+)\}/);
+          var regexp = new RegExp(plugin.Tools.escape(regs[0]), 'g');
+          var value = '‹«' + regs[1] + '»›';
+          var key = regs[1];
+          
+          if (typeof data[key] !== 'undefined')
+          {
+            var value = String(data[key]);
+          }
+          
+          tmp = tmp.replace(regexp, value);
+        }
+        
+        tmp = tmp.replace(/‹«([A-Za-z0-9_]+)»›/g, '{$1}');
+        
+        return jQuery(tmp);
       }
     }
     
@@ -449,6 +480,11 @@
         {
           url: 'adcategories.json',
           allowed: ['read']
+        },
+        subscriptions:
+        {
+          url: 'adcategories/{subscriptionId}/{subscriptionStatus}.json',
+          allowed: ['create']
         }
       },
       
@@ -460,19 +496,29 @@
        */
       parseURL: function(url)
       {
-        var re = new RegExp('\{([a-zA-Z0-9]+)\}');
+        var from, to, re, regs, key;
+        
+        re = new RegExp('\{([a-zA-Z0-9]+)\}');
         
         while (url.match(re))
         {
-          var regs = url.match(re);
-          var key = regs[1];
+          regs = url.match(re);
+          key = regs[1];
           
-          var from = new RegExp(plugin.Tools.escape(regs[0]), 'g');
+          from = new RegExp(plugin.Tools.escape(regs[0]), 'g');
           
           switch (key)
           {
             case 'glomeid':
-              var to = plugin.id();
+              to = plugin.id();
+              break;
+            
+            case 'subscriptionId':
+              to = plugin.Categories.subscriptionId;
+              break;
+            
+            case 'subscriptionStatus':
+              to = plugin.Categories.subscriptionStatus;
               break;
             
             default:
@@ -480,7 +526,7 @@
               {
                 throw new Error('Undefined variable "' + key + '" in URL');
               }
-              var to = plugin[key];
+              to = plugin[key];
           }
           
           url = url.replace(from, to);
@@ -1592,6 +1638,20 @@
       disableListeners: false,
       
       /**
+       * Selected category. This is for enabling parsing of the action URL
+       * 
+       * @param int
+       */
+      subscriptionId: 0,
+      
+      /**
+       * Subscription status. This is for enabling parsing of the action URL
+       * 
+       * @param int
+       */
+      subscriptionStatus: 0,
+      
+      /**
        * Create a new category or fetch an existing from stack. Constructor
        * 
        * @param mixed data
@@ -1608,12 +1668,66 @@
         Category.prototype = new plugin.Prototype();
         Category.prototype.constructor = Category;
         
-        
         Category.prototype.status = 0;
         Category.prototype.setStatus = function(statusCode)
         {
           this.status = statusCode;
           return true;
+        }
+        
+        // Subscription status
+        Category.prototype.subscribed = 0;
+        
+        // Shorthand for setting subscription status to 'on'
+        Category.prototype.subscribe = function(callback)
+        {
+          var _category = this;
+          
+          plugin.Categories.setSubscriptionStatus
+          (
+            this.id,
+            'on',
+            plugin.Tools.mergeCallbacks
+            (
+              function()
+              {
+                _category.subscribed = 1;
+                
+                // Sync also the stack if the reference got broken
+                var id = _category.id;
+                plugin.Categories.stack[id].subscribed = _category.subscribed
+                
+                plugin.Categories.onchange();
+              },
+              callback
+            )
+          );
+        }
+        
+        // Shorthand for setting subscription status to 'off'
+        Category.prototype.unsubscribe = function(callback)
+        {
+          var _category = this;
+          
+          plugin.Categories.setSubscriptionStatus
+          (
+            this.id,
+            'on',
+            plugin.Tools.mergeCallbacks
+            (
+              function()
+              {
+                _category.subscribed = 0;
+                
+                // Sync also the stack if the reference got broken
+                var id = _category.id;
+                plugin.Categories.stack[id].subscribed = _category.subscribed
+                
+                plugin.Categories.onchange();
+              },
+              callback
+            )
+          );
         }
         
         var category = new Category(data);
@@ -1635,6 +1749,56 @@
         }
         
         return Object.keys(this.stack).length;
+      },
+      
+      /**
+       * Set subscription status for a category
+       * 
+       * @param int categoryId       ID of the category
+       * @param int status           Subscription status, 1 for subscribed, 0 for unsubscribed
+       * @param mixed callback       Callback, either a function or an array of functions
+       * @param mixed onerror        Onerror, either a function or an array of functions
+       * @return jqXHR request
+       */
+      setSubscriptionStatus: function(categoryId, status, callback, onerror)
+      {
+        if (   !categoryId
+            || categoryId.toString().match(/[^0-9]/))
+        {
+          throw new Error('Only integers allowed for category ID');
+        }
+        
+        if (   typeof status === 'undefined'
+            || !status.toString().match(/^(0|1|on|off)$/i))
+        {
+          throw new Error('Status has to be either "on" or "off"');
+        }
+        
+        plugin.Categories.subscriptionId = categoryId;
+        
+        if (status.toString().match(/(0|off)/i))
+        {
+          plugin.Categories.subscriptionStatus = 'off';
+        }
+        else
+        {
+          plugin.Categories.subscriptionStatus = 'on';
+        }
+        
+        var request = plugin.API.create
+        (
+          'subscriptions',
+          {
+            user:
+            {
+              glomeid: plugin.id()
+            }
+          },
+          callback,
+          onerror
+        );
+        
+        return request;
       },
       
       /**
@@ -1753,8 +1917,8 @@
       /**
        * Load Categories from the Glome server
        * 
-       * @param function callback     Callback for successful load
-       * @param function onerror      Callback for unsuccessful load
+       * @param mixed callback     Callback for successful load
+       * @param mixed onerror      Callback for unsuccessful load
        */
       load: function(callback, onerror)
       {
@@ -2129,6 +2293,10 @@
           this.content = plugin.Templates.get('public-startup');
           
           this.content.appendTo(this.contentArea);
+        }
+        
+        mvc.prototype.controller = function()
+        {
           this.content.find('#glomePublicFirstRunProceed')
             .on('click', function()
             {
@@ -2160,7 +2328,7 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-subscriptions');
+          this.content = plugin.Templates.populate('public-subscriptions', {count: plugin.Categories.count(), selected: 0});
           this.content.appendTo(this.contentArea);
           
           for (var i in plugin.Categories.stack)
@@ -2169,16 +2337,127 @@
             
             if (!row.size())
             {
-              var row = plugin.Templates.get('category-row');
+              var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
           }
+        }
+        
+        mvc.prototype.controller = function()
+        {
+          this.contentArea.find('.glome-subscribe')
+            .on('click', function()
+            {
+              var id = jQuery(this).parents('[data-glome-category]').attr('data-glome-category');
+              console.log(id, plugin.Categories.stack[id].subscribed);
+              
+              if (plugin.Categories.stack[id].subscribed)
+              {
+                jQuery(this).attr('data-state', 'off');
+                plugin.Categories.stack[id].unsubscribe();
+              }
+              else
+              {
+                jQuery(this).attr('data-state', 'on');
+                plugin.Categories.stack[id].subscribe();
+              }
+            });
+          
+          this.contentArea.find('.glome-pager .glome-navigation-button.left')
+            .on('click', function()
+            {
+              plugin.MVC.run('FirstRunInitialize');
+            });
+          
+          this.contentArea.find('.glome-pager .glome-navigation-button.right')
+            .on('click', function()
+            {
+              plugin.MVC.run('FirstRunPassword');
+            });
         }
         
         var m = new mvc();
         
         return m;
       },
+      
+      /* !First run: initialize */
+      FirstRunPassword: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.view = function()
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-password');
+          
+          this.content.appendTo(this.contentArea);
+        }
+        
+        mvc.prototype.controller = function()
+        {
+          
+          this.contentArea.find('.glome-pager .glome-navigation-button.left')
+            .on('click', function()
+            {
+              plugin.MVC.run('FirstRunSubscriptions');
+            });
+          
+          this.contentArea.find('.glome-pager .glome-navigation-button.right')
+            .on('click', function()
+            {
+              plugin.MVC.run('FirstRunFinish');
+            });
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      /* !First run: finish */
+      FirstRunFinish: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.view = function()
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-finish');
+          
+          this.content.appendTo(this.contentArea);
+        }
+        
+        mvc.prototype.controller = function()
+        {
+          this.content.find('#glomePublicFinishClose')
+            .on('click', function()
+            {
+              plugin.MVC.run('Widget');
+            });
+            
+          this.content.find('a.glome-settings')
+            .off('click')
+            .on('click', function()
+            {
+              plugin.MVC.run('Admin');
+            });
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      /* !Public: Show an ad */
       ShowAd:
       {
         model: function()
@@ -2195,10 +2474,14 @@
           }
         }
       },
+      
+      /* !Public: Show a category */
       ShowCategory:
       {
         
       },
+      
+      /* !Public: Show all categories */
       ShowAllCategories:
       {
         
