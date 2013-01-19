@@ -2171,9 +2171,11 @@
           
           this.widget.find('a')
             .off('click')
-            .on('click', function()
+            .on('click', function(e)
             {
-              plugin.MVC.run('DisplayAd', this.widgetAd);
+              e.preventDefault();
+              plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
+              return false;
             });
         }
         
@@ -2248,27 +2250,47 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-password');
+          this.content = plugin.Templates.get('public-requirepassword');
           
           this.content.appendTo(this.contentArea);
         }
         
         mvc.prototype.controller = function()
         {
-          this.content.find('form')
+          this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
+            .off('click')
+            .on('click', function()
+            {
+              jQuery('#glomePublicRequirePasswordContainer').trigger('submit');
+              console.log('click');
+            });
+          
+          this.contentArea.find('#glomePublicRequirePasswordContainer')
+            .off('submit')
             .on('submit', function(e)
             {
-              plugin.API.login
+              var request;
+              e.preventDefault();
+              
+              if (request)
+              {
+                request.abort();
+              }
+              
+              request = plugin.Auth.login
               (
                 plugin.id(),
                 jQuery(this).find('input[type="password"]').val(),
                 function()
                 {
-                  var mvc = new plugin.MVC.run('Widget');
+                  plugin.Ads.load(function()
+                  {
+                    plugin.container.find('.glome-close').trigger('click');
+                  });
+                  plugin.Categories.load();
                 }
               );
               
-              e.preventDefault();
               return false;
             });
         }
@@ -2381,7 +2403,7 @@
         return m;
       },
       
-      /* !First run: initialize */
+      /* !First run: set optional password */
       FirstRunPassword: function()
       {
         // Return an existing ad if it is in the stack, otherwise return null
@@ -2400,7 +2422,6 @@
         
         mvc.prototype.controller = function()
         {
-          
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
             .on('click', function()
             {
@@ -2411,6 +2432,49 @@
             .on('click', function()
             {
               plugin.MVC.run('FirstRunFinish');
+            });
+          
+          // Set the password if requested for
+          jQuery('#glomePublicSetPassword')
+            .on('submit', function(e)
+            {
+              var pw1 = jQuery(this).find('input[type="password"]').eq(0).val();
+              var pw2 = jQuery(this).find('input[type="password"]').eq(1).val();
+              
+              if (pw1 !== pw2)
+              {
+                alert('Passwords do not match');
+              }
+              else if (!pw1)
+              {
+                jQuery('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
+              }
+              else if (pw1.length < 6)
+              {
+                alert('Password minimum length is 6 characters');
+              }
+              else
+              {
+                plugin.Auth.setPassword
+                (
+                  pw1,
+                  pw2,
+                  null,
+                  function()
+                  {
+                    jQuery('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
+                  }
+                );
+              }
+              
+              e.preventDefault();
+              return false;
+            });
+          
+          jQuery('#glomePublicSetPassword').find('button')
+            .on('click', function()
+            {
+              jQuery(this).parents('form').trigger('click');
             });
         }
         
@@ -2441,7 +2505,7 @@
           this.content.find('#glomePublicFinishClose')
             .on('click', function()
             {
-              plugin.MVC.run('Widget');
+              plugin.container.find('.glome-close').trigger('click');
             });
             
           this.content.find('a.glome-settings')
@@ -2458,21 +2522,53 @@
       },
       
       /* !Public: Show an ad */
-      ShowAd:
+      ShowAd: function()
       {
-        model: function()
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
         {
-          
-        },
-        view: function()
-        {
-          this.contentArea.find('.glome-row').remove();
-          
-          for (var i in plugin.Categories.stack)
-          {
-            var row = plugin.Templates.get('category-row');
-          }
         }
+        
+        mvc.prototype = new plugin.MVC.Public();
+        
+        mvc.prototype.model = function(args)
+        {
+          console.log(args);
+          if (args.adId)
+          {
+            this.ad = new plugin.Ads.Ad(args.adId);
+          }
+          else if (args.constructor.name === 'Ad')
+          {
+            this.ad = args;
+          }
+          
+          this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
+        }
+        
+        mvc.prototype.view = function(args)
+        {
+          var vars =
+          {
+            name: this.category.name,
+            title: this.ad.title,
+            description: this.ad.description,
+            bonus: this.ad.bonus
+          }
+          
+          this.viewInit();
+          this.content = plugin.Templates.populate('public-ad', vars);
+          this.content.appendTo(this.contentArea);
+          
+          this.content.find('.glome-ad-image').get(0).onload = function()
+          {
+          }
+          this.content.find('.glome-ad-image').get(0).src = this.ad.content;
+        }
+        
+        var m = new mvc();
+        
+        return m;
       },
       
       /* !Public: Show a category */
@@ -2501,15 +2597,13 @@
       plugin.Tools.validateCallback(callback);
       plugin.Tools.validateCallback(onerror);
       
-      callback = plugin.Tools.mergeCallbacks
-      (
-        callback,
-        function()
+      if (el)
+      {
+        this.Templates.load(function()
         {
-          plugin.Ads.load();
-          plugin.Categories.load();
-        }
-      );
+          plugin.container = jQuery(el);
+        });
+      }
       
       // Create a new Glome ID if previous ID does not exist
       if (!plugin.id()
@@ -2521,6 +2615,11 @@
           function()
           {
             plugin.MVC.run('FirstRunInitialize');
+          },
+          function()
+          {
+            plugin.Ads.load();
+            plugin.Categories.load();
           },
           callback
         );
@@ -2540,7 +2639,11 @@
             (
               function()
               {
-                plugin.MVC.run('Widget');
+                plugin.Ads.load(function()
+                {
+                  plugin.MVC.run('Widget');
+                });
+                plugin.Categories.load();
               },
               callback
             );
@@ -2559,14 +2662,6 @@
             plugin.Tools.triggerCallbacks(onerrors);
           }
         );
-      }
-      
-      if (el)
-      {
-        this.Templates.load(function()
-        {
-          plugin.container = jQuery(el);
-        });
       }
       
       return true;

@@ -591,11 +591,14 @@
 
 /* !Admin pages: settings */
 #glomeAdminSettingsChangePassword input, #glomePublicSetPassword input,
-#glomePublicSetPassword input {
+#glomePublicRequirePassword input,
+#glomePublicSetPassword input,
+#glomePublicRequirePassword input {
   width: 255px;
   margin-bottom: 13px; }
 
-#glomeAdminSettingsChangePassword, #glomePublicSetPassword {
+#glomeAdminSettingsChangePassword, #glomePublicSetPassword,
+#glomePublicRequirePassword {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -608,7 +611,8 @@
   border-color: #b1b1b1;
   padding-bottom: 20px; }
 
-#glomeAdminSettingsChangePassword button, #glomePublicSetPassword button {
+#glomeAdminSettingsChangePassword button, #glomePublicSetPassword button,
+#glomePublicRequirePassword button {
   float: right;
   width: 120px; }
 
@@ -771,7 +775,8 @@
   margin-top: 20px; }
 
 /* !First run, stage 3: set password */
-#glomePublicSetPassword {
+#glomePublicSetPassword,
+#glomePublicRequirePassword {
   border: none;
   padding-left: 0;
   padding-top: 40px;

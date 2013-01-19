@@ -596,7 +596,8 @@ $full_page_z_index: 10000
 
 /* !Admin pages: settings */
 #glomeAdminSettingsChangePassword input,
-#glomePublicSetPassword input
+#glomePublicSetPassword input,
+#glomePublicRequirePassword input
   width: ($col_width + $col_margin) * 2 - $col_margin
   margin-bottom: $font_size
 
@@ -756,7 +757,8 @@ $full_page_z_index: 10000
   margin-top: 20px
 
 /* !First run, stage 3: set password */
-#glomePublicSetPassword
+#glomePublicSetPassword,
+#glomePublicRequirePassword
   @extend #glomeAdminSettingsChangePassword
   border: none
   padding:
