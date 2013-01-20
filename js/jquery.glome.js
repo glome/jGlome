@@ -182,6 +182,114 @@
             arguments[i]();
           }
         }
+      },
+      
+      /**
+       * Add a listener to a context
+       * 
+       * @param function listener      Listener function
+       * @param string id              Listener id
+       * @param string context         Listener context
+       */
+      addListener: function(listener, id, context)
+      {
+        if (typeof plugin[context] === 'undefined')
+        {
+          throw new Error('Trying to add a listener to undefined context');
+        }
+        
+        if (typeof plugin[context].listeners === 'undefined')
+        {
+          throw new Error('Trying to add a listener to a restricted context');
+        }
+        
+        if (typeof listener != 'function')
+        {
+          throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
+        }
+        
+        if (!id)
+        {
+          id = 0;
+          
+          do
+          {
+            id++;
+          }
+          while (typeof plugin[context].listeners[id] !== 'undefined')
+        }
+        
+        id = id.toString();
+        
+        plugin[context].listeners[id] = listener;
+        return id;
+      },
+      
+      /**
+       * Remove a listener
+       * 
+       * @param mixed listener
+       * @param string context
+       */
+      removeListener: function(listener, context)
+      {
+        var i;
+        
+        if (typeof plugin[context] === 'undefined')
+        {
+          throw new Error('Trying to add a listener to undefined context');
+        }
+        
+        if (typeof plugin[context].listeners === 'undefined')
+        {
+          throw new Error('Trying to add a listener to a restricted context');
+        }
+        
+        if (typeof listener === 'function')
+        {
+          for (i in plugin[context].listeners)
+          {
+            if (plugin[context].listeners[i] === listener)
+            {
+              delete plugin[context].listeners[i];
+            }
+          }
+          
+          return true;
+        }
+        
+        var listener = listener.toString();
+        
+        if (typeof plugin[context].listeners[listener] !== 'undefined')
+        {
+          delete plugin[context].listeners[listener];
+        }
+        
+        return true;
+      },
+      
+      /**
+       * Trigger context listeners
+       * 
+       * @param string context
+       */
+      triggerListeners: function(context, type, t)
+      {
+        if (typeof plugin[context] === 'undefined')
+        {
+          throw new Error('Trying to add a listener to undefined context');
+        }
+        
+        if (plugin[context].disableListeners)
+        {
+          return;
+        }
+        
+        for (var i in plugin[context].listeners)
+        {
+          plugin[context].listeners[i].context = plugin.Categories;
+          plugin[context].listeners[i](type, t); 
+        }
       }
     }
     
@@ -365,6 +473,11 @@
           for (var i = 0; i < parts.size(); i++)
           {
             var part = parts.eq(i).clone();
+            
+            // Remove references to future releases that already exist
+            // on the template file
+            part.find('.glome-future-releases').remove();
+            
             var templateName = part.attr('data-glome-template');
             this.templates[templateName] = part;
           }
@@ -1056,7 +1169,7 @@
        * 
        * @param Array
        */
-      plugin.Prototype.listeners = [];
+      plugin.Prototype.listeners = {};
       
       /**
        * Default constructor. Optionally either leave blank to create a completely new and
@@ -1089,7 +1202,7 @@
           
           if (typeof plugin[container].listeners == 'undefined')
           {
-            plugin[container].listeners = [];
+            plugin[container].listeners = {};
           }
         }
         
@@ -1197,17 +1310,7 @@
        */
       Prototype.prototype.onchange = function(type)
       {
-        var container = this.container;
-        
-        if (   container
-            && plugin[container]
-            && typeof plugin[container].listeners !== 'undefined')
-        {
-          for (var i = 0; i < plugin[container].listeners.length; i++)
-          {
-            plugin[container].listeners[i](type, this);
-          }
-        }
+        plugin.Tools.triggerListeners(this.container, type, this)
       }
       
       /**
@@ -1398,11 +1501,64 @@
         
         var ads = {};
         
+        // Aliases for category
+        var cats = ['categories', 'adcategory', 'adcategories'];
+        
+        for (var i = 0; i < cats.length; i++)
+        {
+          var cat = cats[i];
+          
+          if (typeof filters[cat] !== 'undefined')
+          {
+            filters.category = filters[cat];
+            delete filters[cat];
+            break;
+          }
+        }
+        
+        if (   typeof filters.category !== 'undefined'
+            && !jQuery.isArray(filters.category))
+        {
+          if (filters.category.toString().match(/^[0-9]+$/))
+          {
+            filters.category = [Number(filters.category)];
+          }
+          else
+          {
+            throw new Error('Glome.Ads.listAds requires category filter to be an integer or an array of integers');
+          }
+        }
+        
+        if (typeof filters.subscribed !== 'undefined')
+        {
+          var tmp = Object.keys(plugin.Categories.listCategories({subscribed: filters.subscribed}));
+          
+          // There is a category filter, get array intersect
+          if (filters.category)
+          {
+            var intersect = [];
+            
+            for (var i = 0; i < filters.category.length; i++)
+            {
+              if (jQuery.inArray(filters.category[i], tmp) !== -1)
+              {
+                intersect.push(filters.category[i]);
+              }
+            }
+            
+            filters.category = intersect;
+          }
+          else
+          {
+            filters.category = tmp;
+          }
+        }
+        
         // Loop through the ads and apply filters
         for (i in plugin.Ads.stack)
         {
           var ad = plugin.Ads.stack[i];
-          found = false;
+          var found = false;
           
           for (k in filters)
           {
@@ -1418,27 +1574,28 @@
                 var filter = filters[k];
                 
                 // @TODO: support filtering by category name (String)
-                if (typeof filter == 'number')
+                var tmp = filters;
+                
+                for (n = 0; n < filter.length; n++)
                 {
-                  if (jQuery.inArray(filter, ad[filterKey]) !== -1)
+                  if (!filter[n].toString().match(/^[0-9]+$/))
                   {
-                    found = true;
+                    throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
+                  }
+                  
+                  for (var j = 0; j < ad[filterKey].length; j++)
+                  {
+                    if (ad[filterKey][j].id == filter)
+                    {
+                      found = true;
+                      break;
+                    }
+                  }
+                  
+                  if (found)
+                  {
                     break;
                   }
-                }
-                else if (jQuery.isArray(filter))
-                {
-                  var tmp = filters;
-                  
-                  for (n = 0; n < filter.length; n++)
-                  {
-                    tmp.category = filter[n];
-                    jQuery.extend(ads, this.listAds(tmp));
-                  }
-                }
-                else
-                {
-                  throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
                 }
                 break;
               
@@ -1468,6 +1625,10 @@
                 {
                   throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
                 }
+                break;
+              
+              // Matching of the categories has already been done
+              case 'subscribed':
                 break;
               
               default:
@@ -1558,17 +1719,12 @@
       /**
        * Add a listener to observe data changes
        * 
-       * @param function listener    Listerner function that should be added
+       * @param function listener   Listerner function that should be added
+       * @param string id           @optional listener ID for future referemce
        */
-      addListener: function(listener)
+      addListener: function(listener, id)
       {
-        if (typeof listener != 'function')
-        {
-          throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
-        }
-        
-        plugin.Ads.listeners.push(listener);
-        return true;
+        return plugin.Tools.addListener(listener, id, 'Ads');
       },
       
       /**
@@ -1579,23 +1735,7 @@
        */
       removeListener: function(listener)
       {
-        var i;
-        
-        if (typeof listener != 'function')
-        {
-          throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
-        }
-        
-        for (i = 0; i < plugin.Ads.listeners.length; i++)
-        {
-          if (plugin.Ads.listeners[i] == listener)
-          {
-            plugin.Ads.listeners.splice(i, 1);
-            return true;
-          }
-        }
-        
-        return true;
+        return plugin.Tools.removeListener(listener, 'Ads');
       },
       
       /**
@@ -1604,18 +1744,13 @@
        * 
        * @param function listener    Listener function
        */
-      onchange: function()
+      onchange: function(type)
       {
         if (this.disableListeners)
         {
           return;
         }
-        
-        for (var i = 0; i < plugin.Ads.listeners.length; i++)
-        {
-          plugin.Ads.listeners[i].context = plugin.Ads;
-          plugin.Ads.listeners[i]();  
-        }
+        return plugin.Tools.triggerListeners('Ads', type);
       }
     };
     
@@ -1886,7 +2021,7 @@
                 break;
               
               case 'subscribed':
-                if (category[k] === filters[i])
+                if (category[k] == filters[k])
                 {
                   found = true;
                 }
@@ -1980,17 +2115,12 @@
       /**
        * Add a listener to observe data changes
        * 
-       * @param function listener    Listerner function that should be added
+       * @param function listener   Listerner function that should be added
+       * @param string id           @optional listener ID for future referemce
        */
-      addListener: function(listener)
+      addListener: function(listener, id)
       {
-        if (typeof listener != 'function')
-        {
-          throw new Error('Glome.Categories.addListener requires a function as argument, when one is given');
-        }
-        
-        plugin.Categories.listeners.push(listener);
-        return true;
+        return plugin.Tools.addListener(listener, id, 'Categories');
       },
       
       /**
@@ -2001,23 +2131,7 @@
        */
       removeListener: function(listener)
       {
-        var i;
-        
-        if (typeof listener != 'function')
-        {
-          throw new Error('Glome.Categories.addListener requires a function as argument, when one is given');
-        }
-        
-        for (i = 0; i < plugin.Categories.listeners.length; i++)
-        {
-          if (plugin.Categories.listeners[i] == listener)
-          {
-            plugin.Categories.listeners.splice(i, 1);
-            return true;
-          }
-        }
-        
-        return true;
+        return plugin.Tools.removeListener(listener, 'Categories');
       },
       
       /**
@@ -2028,16 +2142,7 @@
        */
       onchange: function()
       {
-        if (this.disableListeners)
-        {
-          return;
-        }
-        
-        for (var i = 0; i < plugin.Categories.listeners.length; i++)
-        {
-          plugin.Categories.listeners[i].context = plugin.Categories;
-          plugin.Categories.listeners[i]();  
-        }
+        return plugin.Tools.triggerListeners('Categories');
       }
     };
     
@@ -2047,6 +2152,11 @@
      */
     plugin.MVC =
     {
+      /**
+       * Current context
+       */
+      currentContext: null,
+      
       /* !MVC Runner */
       run: function(route, args)
       {
@@ -2088,8 +2198,22 @@
             
           };
           
+          // Triggers for context changes
+          this.contextChange = function(args)
+          {
+            if (   plugin.MVC.currentContext
+                && plugin.MVC.currentContext.contextChange
+                && plugin.MVC.currentContext !== this)
+            {
+              plugin.MVC.currentContext.contextChange();
+            }
+            
+            plugin.MVC.currentContext = this;
+          };
+          
           this.run = function(args)
           {
+            this.contextChange(args);
             this.model(args);
             this.view(args);
             this.controller(args);
@@ -2103,7 +2227,6 @@
       /* !MVC: Widget */
       Widget: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2116,15 +2239,15 @@
           // If there is no widgetAd, use the last
           if (!this.widgetAd)
           {
-            var ids = Object.keys(plugin.Ads.stack);
+            var ads = Object.keys(plugin.Ads.listAds({subscribed: 1}));
             
-            if (ids.length)
+            if (ads.length)
             {
-              var last = ids.length - 1;
-              var id = ids[last];
-              
-              this.widgetAd = new plugin.Ads.Ad(id);
+              var last = ads.length - 1;
+              this.widgetAd = new plugin.Ads.Ad(ads[last]);
             }
+            
+            console.log(typeof this.widgetAd, this.widgetAd);
           }
           else if (args
               && args.adid)
@@ -2206,7 +2329,6 @@
       /* !MVC Public */
       Public: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2260,7 +2382,6 @@
       /* !MVC: Require password */
       RequirePassword: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2321,7 +2442,6 @@
       /* !First run: initialize */
       FirstRunInitialize: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2359,7 +2479,6 @@
       /* !First run: subscriptions */
       FirstRunSubscriptions: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2368,7 +2487,7 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.populate('public-subscriptions', {count: plugin.Categories.count(), selected: 0});
+          this.content = plugin.Templates.populate('public-subscriptions', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
           this.content.appendTo(this.contentArea);
           
           for (var i in plugin.Categories.stack)
@@ -2380,6 +2499,15 @@
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
+            
+            if (plugin.Categories.stack[i].subscribed)
+            {
+              row.find('button.glome-subscribe').attr('data-state', 'on');
+            }
+            else
+            {
+              row.find('button.glome-subscribe').attr('data-state', 'off');
+            }
           }
         }
         
@@ -2389,17 +2517,24 @@
             .on('click', function()
             {
               var id = jQuery(this).parents('[data-glome-category]').attr('data-glome-category');
+              var changeCount = function()
+              {
+                var count = plugin.Categories.count({subscribed: 1});
+                plugin.container.find('.glome-current').text(count);
+              }
               
               if (plugin.Categories.stack[id].subscribed)
               {
                 jQuery(this).attr('data-state', 'off');
-                plugin.Categories.stack[id].unsubscribe();
+                plugin.Categories.stack[id].unsubscribe(changeCount);
               }
               else
               {
                 jQuery(this).attr('data-state', 'on');
-                plugin.Categories.stack[id].subscribe();
+                plugin.Categories.stack[id].subscribe(changeCount);
               }
+              
+              plugin.Categories.onchange('subscriptions');
             });
           
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
@@ -2423,7 +2558,6 @@
       /* !First run: set optional password */
       FirstRunPassword: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2503,7 +2637,6 @@
       /* !First run: finish */
       FirstRunFinish: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2529,7 +2662,9 @@
             .off('click')
             .on('click', function()
             {
-              plugin.MVC.run('Admin');
+              plugin.container.find('.glome-close').trigger('click');
+              plugin.MVC.run('AdminSubscriptions');
+              return false;
             });
         }
         
@@ -2541,7 +2676,6 @@
       /* !Public: Show an ad */
       ShowAd: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
@@ -2550,6 +2684,15 @@
         
         mvc.prototype.model = function(args)
         {
+          if (!args)
+          {
+            // Display the first ad if no other was requested
+            var args =
+            {
+              adId: Object.keys(plugin.Ads.stack)[0]
+            }
+          }
+          
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);
@@ -2559,7 +2702,14 @@
             this.ad = args;
           }
           
-          this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
+          if (args.forceCategory)
+          {
+            this.category = new plugin.Categories.Category(args.forceCategory);
+          }
+          else
+          {
+            this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
+          }
         }
         
         mvc.prototype.view = function(args)
@@ -2591,6 +2741,28 @@
             });
         }
         
+        mvc.prototype.controller = function(args)
+        {
+          plugin.container.find('.glome-category-title, .glome-category-title a')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              
+              var categoryId = jQuery(this).parents('[data-category-id]').attr('data-category-id');
+              
+              if (!categoryId)
+              {
+                plugin.MVC.run('ShowAllCategories');
+              }
+              else
+              {
+                plugin.MVC.run('ShowCategory', {categoryId: categoryId});
+              }
+              
+              return false;
+            });
+        }
+        
         var m = new mvc();
         
         return m;
@@ -2599,12 +2771,66 @@
       /* !Public: Show category ads */
       ShowCategory: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
         
         mvc.prototype = new plugin.MVC.Public();
+        
+        mvc.prototype.model = function(args)
+        {
+          if (!args)
+          {
+            args = {}
+          }
+          if (!args.categoryId)
+          {
+            args.categoryId = Object.keys(plugin.Categories.stack)[0];
+          }
+          
+          this.category = new plugin.Categories.Category(args.categoryId);
+          this.ads = plugin.Ads.listAds({category: Number(args.categoryId)});
+        }
+        
+        mvc.prototype.view = function(args)
+        {
+          this.viewInit();
+          this.content = plugin.Templates.populate('public-category', this.category);
+          this.content.appendTo(this.contentArea);
+          
+          // Display ads
+          this.content.find('.glome-ad-list > .glome-ad-row').remove();
+          
+          for (var i in this.ads)
+          {
+            var ad = this.ads[i];
+            var row = plugin.Templates.populate('ad-row', ad);
+            
+            row.find('img').attr('src', ad.content);
+            
+            row.appendTo(this.content.find('.glome-ad-list'));
+          }
+        }
+        
+        mvc.prototype.controller = function(args)
+        {
+          this.content.find('.glome-link-previous')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              plugin.MVC.run('ShowAllCategories');
+              return false;
+            });
+          
+          this.content.find('.glome-ad-row').find('a')
+            .off('click')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-ad-id]').attr('data-ad-id'), forceCategory: Number(jQuery(this).parents('[data-category-id]').attr('data-category-id'))});
+              return false;
+            });
+        }
         
         var m = new mvc();
         
@@ -2614,12 +2840,41 @@
       /* !Public: Show all categories */
       ShowAllCategories: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
         function mvc()
         {
         }
         
         mvc.prototype = new plugin.MVC.Public();
+        
+        mvc.prototype.model = function(args)
+        {
+        }
+        
+        mvc.prototype.view = function(args)
+        {
+          this.viewInit();
+          this.content = plugin.Templates.get('public-categorylist');
+          this.content.appendTo(this.contentArea);
+          
+          this.content.find('.glome-category-list > .glome-category').remove();
+          
+          for (var i in plugin.Categories.listCategories({subscribed: 1}))
+          {
+            var category = plugin.Categories.stack[i];
+            var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
+          }
+        }
+        
+        mvc.prototype.controller = function(args)
+        {
+          this.content.find('.glome-category-list > .glome-category')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              plugin.MVC.run('ShowCategory', {categoryId: jQuery(this).attr('data-category-id')});
+              return false;
+            });
+        }
         
         var m = new mvc();
         return m;
@@ -2658,11 +2913,7 @@
                 Subscriptions:
                 {
                   mvc: 'AdminSubscriptions'
-                },
-                'Lorem ipsum':
-                {
-                  mvc: 'AdminSubscriptionsBrands'
-                },
+                }
               }
             },
             Statistics:
@@ -2670,7 +2921,10 @@
               mvc: 'AdminStatistics',
               children:
               {
-                
+                Statistics:
+                {
+                  mvc: 'AdminStatistics',
+                },
               }
             },
             Rewards:
@@ -2678,7 +2932,10 @@
               mvc: 'AdminRewards',
               children:
               {
-                
+                Rewards:
+                {
+                  mvc: 'AdminRewards',
+                },
               }
             },
             Settings:
@@ -2686,7 +2943,10 @@
               mvc: 'AdminSettings',
               children:
               {
-                
+                Settings:
+                {
+                  mvc: 'AdminSettings',
+                },
               }
             }
           }
@@ -2698,7 +2958,9 @@
             if (!li.size())
             {
               var li = plugin.Templates.get('navigation-item');
-              li.find('a').text(i);
+              li.find('a')
+                .attr('href', items[i].mvc)
+                .text(i);
               li
                 .attr('data-mvc', items[i].mvc)
                 .appendTo(nav);
@@ -2721,7 +2983,9 @@
                     .appendTo(subnav);
                   
                 }
-                subli.find('> a').text(n);
+                subli.find('> a')
+                  .attr('href', '#' + child.mvc)
+                  .text(n);
               }
             }
           }
@@ -2741,10 +3005,10 @@
                 console.warn('Navigation failed due to ' + e.toString());
               }
               
+              
               return false;
             });
           
-          console.log(args);
           if (args.selected)
           {
             var sel = nav.find('[data-mvc="' + args.selected + '"]');
@@ -2767,7 +3031,7 @@
       /* !MVC Admin */
       Admin: function()
       {
-        // Return an existing ad if it is in the stack, otherwise return null
+        // 
         function mvc()
         {
         }
@@ -2785,7 +3049,8 @@
               .appendTo(plugin.container);
           }
           
-          if (!wrapper.find('[data-glome-template="admin-header"]').size())
+          var header = wrapper.find('[data-glome-template="admin-header"]');
+          if (!header.size())
           {
             var header = plugin.Templates.get('admin-header');
             header.find('.glome-close')
@@ -2796,11 +3061,11 @@
                 plugin.MVC.run('Widget');
               });
             
-            var selected = args.selected || '';
-            
             header.appendTo(wrapper);
-            plugin.MVC.run('Navigation', {header: header, selected: selected});
           }
+          
+          var selected = args.selected || '';
+          plugin.MVC.run('Navigation', {header: header, selected: selected});
           
           if (!wrapper.find('[data-glome-template="admin-footer"]').size())
           {
@@ -2833,6 +3098,7 @@
         
         mvc.prototype = new plugin.MVC.FirstRunSubscriptions();
         mvc.prototype.viewInit = admin.viewInit;
+        
         mvc.prototype.view = function(args)
         {
           if (!args)
@@ -2843,7 +3109,7 @@
           args.selected = 'AdminSubscriptions';
           
           this.viewInit(args);
-          this.content = plugin.Templates.populate('admin-subscriptions', {count: plugin.Categories.count(), selected: 0});
+          this.content = plugin.Templates.populate('admin-subscriptions', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
           this.content.appendTo(this.contentArea);
           
           this.content.find('.glome-category').remove();
@@ -2857,7 +3123,100 @@
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
+            
+            if (plugin.Categories.stack[i].subscribed)
+            {
+              row.find('button.glome-subscribe').attr('data-state', 'on');
+            }
+            else
+            {
+              row.find('button.glome-subscribe').attr('data-state', 'off');
+            }
           }
+        }
+        
+        var m = new mvc();
+        return m;
+      },
+      
+      /* !MVC: Admin statistics */
+      AdminStatistics: function()
+      {
+        function mvc()
+        {
+          
+        }
+        
+        mvc.prototype = new plugin.MVC.Admin();
+        
+        mvc.prototype.view = function(args)
+        {
+          if (!args)
+          {
+            args = {}
+          }
+          
+          args.selected = 'AdminStatistics';
+          
+          this.viewInit(args);
+          this.content = plugin.Templates.populate('admin-statistics', {});
+          this.content.appendTo(this.contentArea);
+        }
+        
+        var m = new mvc();
+        return m;
+      },
+      
+      /* !MVC: Admin statistics */
+      AdminRewards: function()
+      {
+        function mvc()
+        {
+          
+        }
+        
+        mvc.prototype = new plugin.MVC.Admin();
+        
+        mvc.prototype.view = function(args)
+        {
+          if (!args)
+          {
+            args = {}
+          }
+          
+          args.selected = 'AdminRewards';
+          
+          this.viewInit(args);
+          this.content = plugin.Templates.populate('admin-rewards', {});
+          this.content.appendTo(this.contentArea);
+        }
+        
+        var m = new mvc();
+        return m;
+      },
+      
+      /* !MVC: Admin statistics */
+      AdminSettings: function()
+      {
+        function mvc()
+        {
+          
+        }
+        
+        mvc.prototype = new plugin.MVC.Admin();
+        
+        mvc.prototype.view = function(args)
+        {
+          if (!args)
+          {
+            args = {}
+          }
+          
+          args.selected = 'AdminSettings';
+          
+          this.viewInit(args);
+          this.content = plugin.Templates.populate('admin-settings', {});
+          this.content.appendTo(this.contentArea);
         }
         
         var m = new mvc();

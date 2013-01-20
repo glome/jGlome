@@ -158,9 +158,9 @@
                     </div>
                   </div>
                   <hr class="glome-short" />
-                  <div class="glome-layout-cols-2 glome-clearfix">
+                  <div class="glome-layout-cols-2 glome-clearfix glome-future-releases">
                     <div class="glome-cols-2">
-                      <h1 data-i18n="create or change your password">Create or Change your password</h1>
+                      <h1 data-i18n="pair your devices">Pair your devices</h1>
                       <p>
                         <span data-i18n="if you already use glome on one device you can pair all of your devices to use the same account">
                           If you already use Glome on one device you can pair all of your devices to use the same account
@@ -333,9 +333,9 @@
                   </p>
                   <hr class="glome-short" />
                 </div>
-                <div class="glome-cols-4 glome-clearfix">
+                <div class="glome-cols-4 glome-clearfix glome-category-list">
                   <!-- Row -->
-                  <div class="glome-category glome-row glome-with-separator">
+                  <div class="glome-category glome-row glome-with-separator" data-glome-template="category-list-row" data-category-id="{id}">
                     <div class="glome-text-container">
                       <h1 class="glome-category-title"><a href="#public-category">{name}</a></h1>
                       <p class="glome-short-description">{description}</p>
@@ -348,19 +348,24 @@
               </div>
               
               <!-- !Category view -->
-              <div id="glomePublicCategory" class="glome-content glome-layout-cols-2" data-glome-template="public-category" data-page="category">
+              <div id="glomePublicCategory" class="glome-content glome-layout-cols-2" data-glome-template="public-category" data-page="category" data-category-id="{id}">
                 <div class="glome-cols-2 glome-fixed">
-                  <h1><a href="#public-categorylist" class="glome-link glome-link-previous"></a> {name}</h1>
+                  <h1>
+                    <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
+                    <!-- <span data-i18n="all categories" class="glome-all-categories">All categories</span> « -->
+                    {name}
+                  </h1>
                   <p>
                     {description}
                   </p>
                   <hr class="glome-short" />
                 </div>
-                <div class="glome-cols-4 glome-clearfix">
+                <div class="glome-cols-4 glome-clearfix glome-ad-list">
                   <!-- Row -->
-                  <div class="glome-category glome-row glome-with-separator">
+                  <div class="glome-ad glome-ad-row glome-row glome-with-separator" data-glome-template="ad-row" data-ad-id="{id}">
+                    <div class="glome-image-container"><a href="#public-ad"><img src="images/template/audi-splash.jpg" alt="" /></a></div>
                     <div class="glome-text-container">
-                      <h1 class="glome-category-title"><a href="#public-ad">{tilte}</a></h1>
+                      <h1 class="glome-ad-title"><a href="#public-ad">{title}</a></h1>
                       <p class="glome-short-description">
                         <a href="#public-ad">{description}</a>
                       </p>
@@ -373,11 +378,11 @@
               </div>
               
               <!-- !Ad view -->
-              <div id="glomePublicAd" class="glome-content glome-layout-cols-2" data-glome-template="public-ad" data-page="ad" data-ad-id="{adId}" data-ad-action="{adAction}">
+              <div id="glomePublicAd" class="glome-content glome-layout-cols-2" data-glome-template="public-ad" data-page="ad" data-ad-id="{adId}" data-category-id="{categoryId}" data-ad-action="{adAction}">
                 <div class="glome-cols-2 glome-fixed">
-                  <h1><a href="#public-category" class="glome-link glome-link-previous"></a> {name}</h1>
+                  <h1 class="glome-category-title"><a href="#public-category" class="glome-link glome-link-previous"></a> {name}</h1>
                   <p>
-                    <a href="#public-category">See more in {name}</a>
+                    <a class="glome-category-title" href="#public-category">See more in {name}</a>
                   </p>
                 </div>
                 <div class="glome-cols-4">
@@ -393,7 +398,7 @@
                     </div>
                   </div>
                   <div class="glome-layout-cols-2 glome-clearfix glome-ad-actions">
-                    <div class="glome-cols-ad-description">
+                    <div class="glome-cols-ad-description glome-ad-bonus">
                       <h2 data-i18n="up to %s per order">{bonus}</h2>
                     </div>
                     <div class="glome-cols-ad-image">

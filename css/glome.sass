@@ -681,6 +681,7 @@ $full_page_z_index: 10000
     bottom: $footer_height / 2
 
 #glomePublicContent .glome-content-wrapper
+  min-height: 300px
   padding:
     top: 25px
     left: 15px
@@ -786,11 +787,25 @@ $full_page_z_index: 10000
 #glomePublicAd .glome-cols-ad-description
   width: ($col_width * 4 - $col_margin) - $ad_image_width
 
+#glomePublicAd .glome-ad-bonus h2
+  margin-top: 0 !important
+
 #glomePublicAd .glome-cols-ad-image
   width: $ad_image_width
   img
     min-width: $ad_image_width
     max-width: $ad_image_width
+
+#glomePublicCategory .glome-ad-row
+  .glome-text-container h1,
+  .glome-text-container p
+    height: 1em
+    overflow: hidden
+  .glome-image-container
+    width: 100px
+    img
+      max-width: 100px
+      max-height: 50px
 
 /* !Glome widget */
 #glomeWidget

@@ -198,6 +198,47 @@ QUnit.test('Glome methods', function()
   QUnit.ok(Glome.Tools.escape, 'Regular expressions escaping is available');
   QUnit.equal('foo', Glome.Tools.escape('foo'), 'Plain string does not change');
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
+  
+  // Add listener exists
+  QUnit.ok(Glome.Tools.addListener, 'Tools.addListener method exists');
+  QUnit.ok(Glome.Tools.addListener(function(){}, null, 'Ads'), 'Function listener was accepted');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.addListener('foobar');
+    },
+    'Add listener requires a function, error successfully thrown on type "string"'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.addListener([]);
+    },
+    'Add listener requires a function, error successfully thrown on type "string"'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Tools.addListener(function(){}, 'foobar', 'foobar');
+    },
+    'Undefined listener context error caught successfully'
+  );
+  
+  var listener = function(){}
+  var listenerId = 'foobar';
+  
+  QUnit.strictEqual(Glome.Tools.addListener(function(){}, listenerId, 'Ads'), listenerId, 'Listener returned the id it was given');
+  console.log(listener, Glome.Ads.listeners[listenerId]);
+  QUnit.ok(Glome.Ads.listeners[listenerId], 'There is now a new listener with id "' + listenerId + '"');
+  
+  // Reset the listeners
+  Glome.Ads.listeners = {};
 });
 
 /* !Browser rules */
@@ -489,6 +530,35 @@ QUnit.test('Listeners', function()
   var container = o.container;
   QUnit.ok(Glome[container].listeners, 'There is a placeholder for Prototype listeners');
   QUnit.ok(o.onchange, 'There is an event trigger method for changes');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.Ads.addListener('foo');
+    },
+    'Glome.Ads.addListener requires a function as argument, when one is given'
+  );
+  
+  var listenerType = 'click';
+  var listener = function(type)
+  {
+    jQuery('#qunit-fixture').attr('data-listener', 'true');
+    QUnit.equal(type, listenerType, 'Listener type was passed on correctly');
+  }
+  
+  var length = Object.keys(Glome.Ads.listeners).length;
+  
+  var listenerId = Glome.Ads.addListener(listener, 'listenerId');
+  QUnit.strictEqual(listenerId, 'listenerId', 'Listener returned a listener ID and it was exactly what was given');
+  QUnit.equal(Object.keys(Glome.Ads.listeners).length, length + 1, 'Listener was successfully registered according to length');
+  QUnit.strictEqual(Glome.Ads.listeners[listenerId], listener, 'Listener was successfully registered to stored data');
+  
+  Glome.Ads.onchange(listenerType);
+  QUnit.equal(jQuery('#qunit-fixture').attr('data-listener'), 'true', 'Listener was successfully triggered');
+  
+  Glome.Ads.removeListener(listener);
+  QUnit.equal(Object.keys(Glome.Ads.listeners).length, length, 'Listener was successfully removed according to length');
 });
 
 /* !Listeners triggered on create */
@@ -496,17 +566,17 @@ QUnit.test('Listeners triggered on create', function()
 {
   QUnit.stop();
   
-  // Reset the array
-  Glome.Ads.listeners = [];
-  Glome.Ads.listeners.push(function()
+  // Reset listeners
+  Glome.Ads.listeners = {};
+  Glome.Ads.listeners.testListener = function()
   {
     // Reset the array
-    Glome.Ads.listeners = [];
+    Glome.Ads.listeners = {};
     
     QUnit.start();
     QUnit.ok(typeof Glome.Ads.stack[objectId], 'Onchange event was successfully triggered after create');
     QUnit.expect(1);
-  });
+  };
   
   var objectId = 1;
   var dataset =
@@ -532,17 +602,17 @@ QUnit.test('Listeners triggered on update', function()
   
   QUnit.stop();
   
-  // Reset the array
-  Glome.Ads.listeners = [];
-  Glome.Ads.listeners.push(function()
+  // Reset the listeners object
+  Glome.Ads.listeners = {};
+  Glome.Ads.listeners.onUpdate = function()
   {
     // Reset the array
-    Glome.Ads.listeners = [];
+    Glome.Ads.listeners = {};
     
     QUnit.start();
     QUnit.equal(typeof Glome.Ads.stack[objectId], 'undefined', 'Onchange event was successfully triggered after ID change');
     QUnit.expect(1);
-  });
+  }
   
   o.id = 2;
 });
@@ -561,15 +631,15 @@ QUnit.test('Listeners triggered on delete', function()
   QUnit.stop();
   
   var container = o.container;
-  Glome[container].listeners.push(function()
+  Glome[container].listeners.onDelete = function()
   {
     // Reset the array
-    Glome[container].listeners = [];
+    Glome[container].listeners = {};
     
     QUnit.start();
     QUnit.equal(typeof Glome[container].stack[objectId], 'undefined', 'Onchange event was successfully triggered after delete');
     QUnit.expect(1);
-  });
+  };
   
   o.delete();
 });
@@ -588,15 +658,15 @@ QUnit.test('Change type is passed on correctly', function()
   QUnit.stop();
   
   var container = o.container;
-  Glome[container].listeners.push(function(type, object)
+  Glome[container].listeners.typeChange = function(type, object)
   {
     // Reset the array
-    Glome[container].listeners = [];
+    Glome[container].listeners = {};
     
     QUnit.start();
     QUnit.equal(type, 'delete', 'Onchange event passes correctly the argument "type"');
     QUnit.equal(object.id, objectId, 'Onchange event passes correctly the argument "object"');
-  });
+  }
   
   o.delete();
 });
@@ -1170,6 +1240,8 @@ QUnit.module('Glome Ads class');
 /* !Glome.Ads.Ad object */
 QUnit.test('Glome.Ads.Ad object', function()
 {
+  Glome.Ads.stack = {};
+  
   QUnit.equal(typeof Glome.Ads.Ad, 'function', 'There is a method for creating a new Ad prototype object');
   
   QUnit.throws
@@ -1239,6 +1311,12 @@ QUnit.test('Glome.Ads.Ad object', function()
     },
     'Ad was removed successfully from the stack'
   );
+  
+  var id = gad.id;
+  
+  QUnit.ok(Glome.Ads.removeAd(id), 'Removing an ad was successful');
+  QUnit.equal(typeof Glome.Ads.stack[id], 'undefined', 'Ad was removed successfully from the stack');
+  
 });
 
 /* !Glome.Ads API */
@@ -1251,20 +1329,25 @@ QUnit.test('Glome.Ads API', function()
   
   Glome.Ads.stack = {};
   
-  var categoryid = 1000000;
+  var categoryId = 1000000;
   
   var ad =
   {
     id: 1,
     title: 'Test',
-    adcategories: [categoryid]
+    adcategories:
+    [
+      {
+        id: categoryId
+      }
+    ]
   }
   
   var id = ad.id;
   
   var filters =
   {
-    category: categoryid
+    category: categoryId
   }
   
   var gad = Glome.Ads.Ad(ad);
@@ -1278,36 +1361,9 @@ QUnit.test('Glome.Ads API', function()
   );
   
   QUnit.equal(Glome.Ads.count(), Object.keys(Glome.Ads.stack).length, 'Glome.Ads.count gives the same as stack length');
+  console.log('start', filters);
   QUnit.equal(Glome.Ads.count(filters), Object.keys(Glome.Ads.listAds(filters)).length, 'Glome.Ads.count gives the same as stack length');
-  
-  QUnit.ok(Glome.Ads.removeAd(id), 'Removing an ad was successful');
-  QUnit.equal(typeof Glome.Ads.stack[id], 'undefined', 'Ad was removed successfully from the stack');
-  
-  QUnit.throws
-  (
-    function()
-    {
-      Glome.Ads.addListener('foo');
-    },
-    'Glome.Ads.addListener requires a function as argument, when one is given'
-  );
-  
-  var listener = function()
-  {
-    jQuery('#qunit-fixture').attr('data-listener', 'true');
-  }
-  
-  var length = Glome.Ads.listeners.length;
-  
-  Glome.Ads.addListener(listener);
-  QUnit.equal(Glome.Ads.listeners.length, length + 1, 'Listener was successfully registered according to length');
-  QUnit.strictEqual(Glome.Ads.listeners[length], listener, 'Listener was successfully registered to stored data');
-  
-  Glome.Ads.onchange();
-  QUnit.equal(jQuery('#qunit-fixture').attr('data-listener'), 'true', 'Listener was successfully triggered');
-  
-  Glome.Ads.removeListener(listener);
-  QUnit.equal(Glome.Ads.listeners.length, length, 'Listener was successfully removed according to length');
+  console.log('end');
 });
 
 /* !Ads list filters */
@@ -1326,8 +1382,17 @@ QUnit.test('Ads list filters', function()
   var statusCode = 2;
   
   var gad = Glome.Ads.Ad(ad);
-  gad.adcategories.push(categoryId);
+  gad.adcategories.push({id: categoryId, subscribed: 1});
   gad.setStatus(statusCode);
+  
+  var gcategory = new Glome.Categories.Category
+  (
+    {
+      id: categoryId,
+      name: 'foobar',
+      subscribed: 1
+    }
+  );
   
   // List ads
   QUnit.ok(Glome.Ads.listAds, 'Ad listing method is available');
@@ -1374,6 +1439,16 @@ QUnit.test('Ads list filters', function()
   var ads = Glome.Ads.listAds({category: categoryId});
   QUnit.ok(ads[id], 'Freshly entered ad was found after filtering by category ' + categoryId);
   QUnit.equal(Object.keys(ads).length, 1, 'There should be exactly one match');
+  
+  var ads = Glome.Ads.listAds({subscribed: 1});
+  QUnit.ok(ads[id], 'Freshly entered ad was found after filtering by subscriptions');
+  QUnit.equal(Object.keys(ads).length, 1, 'There should be exactly one match');
+  
+  var ads = Glome.Ads.listAds({subscribed: 0});
+  QUnit.equal(Object.keys(ads).length, 0, 'There should be no matches for subscribed: 0');
+  
+  var ads = Glome.Ads.listAds({subscribed: 0, category: categoryId});
+  QUnit.equal(Object.keys(ads).length, 0, 'There should be no matches for intersection of subscribed: 0 and category ID ' + categoryId);
   
   var ads = Glome.Ads.listAds({status: statusCode});
   QUnit.ok(ads[id], 'Freshly entered ad was found after filtering by status code ' + statusCode);
@@ -1546,6 +1621,7 @@ QUnit.test('Glome.Categories API', function()
   QUnit.ok(Glome.Categories.count, 'There is a count method');
   
   Glome.Categories.stack = {};
+  Glome.Categories.listeners = {};
   
   var categoryid = 1000000;
   
@@ -1591,17 +1667,17 @@ QUnit.test('Glome.Categories API', function()
     jQuery('#qunit-fixture').attr('data-listener', 'true');
   }
   
-  var length = Glome.Categories.listeners.length;
+  var length = Object.keys(Glome.Categories.listeners).length;
   
-  Glome.Categories.addListener(listener);
-  QUnit.equal(Glome.Categories.listeners.length, length + 1, 'Listener was successfully registered according to length');
-  QUnit.strictEqual(Glome.Categories.listeners[length], listener, 'Listener was successfully registered to stored data');
+  var listenerId = Glome.Categories.addListener(listener);
+  QUnit.equal(Object.keys(Glome.Categories.listeners).length, length + 1, 'Listener was successfully registered according to length');
+  QUnit.strictEqual(Glome.Categories.listeners[listenerId], listener, 'Listener was successfully registered to stored data');
   
   Glome.Categories.onchange();
   QUnit.equal(jQuery('#qunit-fixture').attr('data-listener'), 'true', 'Listener was successfully triggered');
   
   Glome.Categories.removeListener(listener);
-  QUnit.equal(Glome.Categories.listeners.length, length, 'Listener was successfully removed according to length');
+  QUnit.equal(Object.keys(Glome.Categories.listeners).length, length, 'Listener was successfully removed according to length');
 });
 
 /* !Subscription shorthands */
@@ -1872,6 +1948,14 @@ QUnit.test('MVC runner', function()
   
   var runner = Glome.MVC.run('Prototype', args);
   QUnit.equal(typeof runner, 'object', 'Runner returned an object');
+  
+  runner.contextChange = function()
+  {
+    Glome.MVC.contextChangeSuccess = true;
+  }
+  
+  var runner = Glome.MVC.run('Prototype');
+  QUnit.ok(Glome.MVC.contextChangeSuccess, 'Context change was executed successfully');
 });
 
 /* !MVC: Require password */
@@ -1995,6 +2079,13 @@ QUnit.asyncTest('All MVCs', function()
     for (var i = 0; i <  items.length; i++)
     {
       var item = items[i];
+      
+      if (typeof Glome.MVC[item] !== 'function')
+      {
+        QUnit.ok(false, 'Glome.MVC.' + item + ' is not a function');
+        continue;
+      }
+      
       var mvc = new Glome.MVC[item]();
       QUnit.ok(Glome.MVC[item], 'MVC ' + item + ' exists');
       QUnit.ok(mvc.model, 'MVC ' + item + ' has "model" method');
@@ -2002,5 +2093,7 @@ QUnit.asyncTest('All MVCs', function()
       QUnit.ok(mvc.controller, 'MVC ' + item + ' has "controller" method');
       QUnit.ok(mvc.run, 'MVC ' + item + ' has "run" method');
     }
+    
+    QUnit.start();
   });
 });

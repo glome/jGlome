@@ -689,6 +689,7 @@
       bottom: 29px; } }
 
 #glomePublicContent .glome-content-wrapper {
+  min-height: 300px;
   padding-top: 25px;
   padding-left: 15px;
   padding-bottom: 25px;
@@ -799,11 +800,24 @@
 #glomePublicAd .glome-cols-ad-description {
   width: 165px; }
 
+#glomePublicAd .glome-ad-bonus h2 {
+  margin-top: 0 !important; }
+
 #glomePublicAd .glome-cols-ad-image {
   width: 300px; }
   #glomePublicAd .glome-cols-ad-image img {
     min-width: 300px;
     max-width: 300px; }
+
+#glomePublicCategory .glome-ad-row .glome-text-container h1,
+#glomePublicCategory .glome-ad-row .glome-text-container p {
+  height: 1em;
+  overflow: hidden; }
+#glomePublicCategory .glome-ad-row .glome-image-container {
+  width: 100px; }
+  #glomePublicCategory .glome-ad-row .glome-image-container img {
+    max-width: 100px;
+    max-height: 50px; }
 
 /* !Glome widget */
 #glomeWidget {
