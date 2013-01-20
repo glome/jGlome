@@ -199,6 +199,13 @@ QUnit.test('Glome methods', function()
   QUnit.equal('foo\/', Glome.Tools.escape('foo/'), 'Plain string does not change');
 });
 
+/* !Browser rules */
+QUnit.test('Browser rules', function()
+{
+  QUnit.ok(Glome.Browser, 'Browser rules container is set');
+  QUnit.ok(Glome.Browser.openUrl, 'There is a rule on how a URL is opened');
+});
+
 /* !Validate callbacks */
 QUnit.test('Validate callbacks', function()
 {

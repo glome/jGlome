@@ -185,6 +185,19 @@
       }
     }
     
+    /* !Browser */
+    /**
+     * Browser rules. In extensions this is where local storage shall be overridden
+     * and link opening rules and such shall be defined
+     */
+    plugin.Browser =
+    {
+      openUrl: function(url, newTab)
+      {
+        window.open(url);
+      }
+    }
+    
     /* !Data */
     /**
      * Data access
@@ -2553,17 +2566,25 @@
             name: this.category.name,
             title: this.ad.title,
             description: this.ad.description,
-            bonus: this.ad.bonus
+            bonus: this.ad.bonus,
+            adAction: this.ad.action,
+            adId: this.ad.id,
+            categoryId: this.category.id
           }
           
           this.viewInit();
           this.content = plugin.Templates.populate('public-ad', vars);
           this.content.appendTo(this.contentArea);
           
-          this.content.find('.glome-ad-image').get(0).onload = function()
-          {
-          }
           this.content.find('.glome-ad-image').get(0).src = this.ad.content;
+          
+          this.content.find('.glome-ad-image, .glome-goto-ad')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
+              return false;
+            });
         }
         
         var m = new mvc();
