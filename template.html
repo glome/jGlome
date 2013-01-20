@@ -22,38 +22,38 @@
               <ul class="glome-navigation" data-glome-template="navigation-container">
                 <li class="glome-cols-1" data-glome-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
                   <a href="#admin-subscriptions">Subscriptions</a>
-                  <ul>
-                    <li class="selected"><a>Subscriptions</a></li>
-                    <li><a>Lorem ipsum</a></li>
+                  <ul data-glome-template="subnavigation-container">
+                    <li data-glome-template="subnavigation-item"><a>Subscriptions</a></li>
+                    <li data-glome-template="null"><a>Lorem ipsum</a></li>
                   </ul>
                 </li>
-                <li class="glome-cols-1" data-glome-template="navigation-item" data-page="statistics" data-i18n="statistics">
+                <li class="glome-cols-1" data-glome-template="null" data-page="statistics" data-i18n="statistics">
                   <a href="#admin-statistics">Statistics</a>
-                  <ul>
-                    <li class="selected"><a>History</a></li>
+                  <ul data-glome-template="null">
+                    <li><a>History</a></li>
                     <li><a>Downloads</a></li>
                     <li><a>Footprint</a></li>
                     <li><a>Social stream</a></li>
                   </ul>
                 </li>
-                <li class="glome-cols-1" data-glome-template="navigation-item" data-page="rewards" data-i18n="rewards">
+                <li class="glome-cols-1" data-glome-template="null" data-page="rewards" data-i18n="rewards">
                   <a href="#admin-rewards">Rewards</a>
-                  <ul>
-                    <li class="selected"><a>Rewards</a></li>
+                  <ul data-glome-template="null">
+                    <li><a>Rewards</a></li>
                     <li><a>Lorem ipsum</a></li>
                   </ul>
                 </li>
-                <li class="glome-cols-1" data-glome-template="navigation-item" data-page="settings" data-i18n="settings">
+                <li class="glome-cols-1" data-glome-template="null" data-page="settings" data-i18n="settings">
                   <a href="#admin-settings">Settings</a>
-                  <ul>
-                    <li class="selected"><a>Settings</a></li>
+                  <ul data-glome-template="null">
+                    <li><a>Settings</a></li>
                     <li><a>Lorem ipsum</a></li>
                   </ul>
                 </li>
               </ul>
             </div>
           </div>
-          <div id="glomeAdminContent">
+          <div id="glomeAdminContent" class="glome-clearfix" data-glome-template="admin-content">
             <div class="glome-content-wrapper">
               <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
                 <!-- !Category subscriptions -->
@@ -69,7 +69,7 @@
                       <span class="glome-unit" data-i18n="selected">selected</span>
                     </div>
                   </div>
-                  <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
+                  <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix glome-categories">
                     <!-- Row -->
                     <div class="glome-category glome-row glome-with-separator" data-glome-category="{id}">
                       <div class="glome-button-container glome-cols-1">

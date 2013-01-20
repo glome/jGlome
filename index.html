@@ -10,6 +10,28 @@
       var glome = new jQuery.Glome();
       glome.pref('server', window.location.protocol + '//' + window.location.hostname + '/');
       glome.initialize('body');
+      
+      jQuery(function()
+      {
+        jQuery(window)
+          .on('hashchange', function()
+          {
+            try
+            {
+              var mvc = glome.MVC.run(window.location.hash.replace(/#/, ''));
+            }
+            catch (e)
+            {
+              // Do nothing, but output the thrown error to console
+              console.warn(e.toString());
+            }
+          });
+      });
+      
+      jQuery(window).oneTime(500, function()
+      {
+        jQuery(window).trigger('hashchange');
+      });
     </script>
   </head>
   <body>

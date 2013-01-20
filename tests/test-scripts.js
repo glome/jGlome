@@ -5,6 +5,7 @@ var previousId = null;
 var testServer = '/';
 var testGlomeId = null;
 var testPassword = 'loremipsum';
+var setPassword = '';
 
 /* !Module: Preliminary tests module */
 QUnit.module('Preliminary checks');
@@ -1144,6 +1145,7 @@ QUnit.test('Login with password', function()
             testPassword,
             function()
             {
+              setPassword = testPassword;
               QUnit.start();
               QUnit.equal(testGlomeId, Glome.id(), 'Logging with a password was successful');
             },
@@ -1608,7 +1610,7 @@ QUnit.asyncTest('Subscription shorthands', function()
   Glome.Auth.login
   (
     Glome.id(),
-    '',
+    setPassword,
     function()
     {
       var id = Object.keys(Glome.Categories.stack)[0];
@@ -1620,7 +1622,6 @@ QUnit.asyncTest('Subscription shorthands', function()
       category.subscribe(function()
       {
         QUnit.equal(category.subscribed, 1, 'Category subscription status was changed to 1 after subscribe');
-        
         category.unsubscribe(function()
         {
           QUnit.equal(category.subscribed, 0, 'Category subscription status was changed to 0 after unsubscribe');
@@ -1642,7 +1643,6 @@ QUnit.test('Fetch categories', function()
     function()
     {
       QUnit.notEqual(0, Object.keys(Glome.Categories.stack).length, 'Glome categories were loaded');
-      QUnit.start();
       
       for (i in Glome.Categories.stack)
       {
@@ -1650,6 +1650,11 @@ QUnit.test('Fetch categories', function()
         QUnit.deepEqual(category, Glome.Categories.stack[i], 'Constructor gives the same object as was stored to stack')
         break;
       }
+      
+      var l = Object.keys(Glome.Categories.stack).length;
+      QUnit.equal(l, Glome.Categories.count(), 'Category count returned the stack length: ' + l);
+      
+      QUnit.start();
     },
     function()
     {
@@ -1740,7 +1745,8 @@ QUnit.asyncTest('Populate template', function()
     var template = jQuery('<div />')
       .text('Hello {world}!');
     
-    QUnit.equal(Glome.Templates.parse(template, {}).html(), 'Hello {world}!', 'No attributes were given, bracket contents should be removed');
+    QUnit.equal(Glome.Templates.parse(template, {}).html(), 'Hello {world}!', 'No attributes were given, bracket contents should remain');
+    QUnit.equal(Glome.Templates.parse(template, {world: ''}).html(), 'Hello !', 'An empty attribute was given, bracket contents should be removed');
     
     var template = jQuery('<div />')
       .text('Hello {world}!');
@@ -1877,10 +1883,6 @@ QUnit.asyncTest('Require password', function()
     Glome.container = jQuery('#qunit-fixture');
     
     var pw = new Glome.MVC.RequirePassword();
-    QUnit.ok(pw.model, 'Require password returned an object with model');
-    QUnit.ok(pw.view, 'Require password returned an object with view');
-    QUnit.ok(pw.controller, 'Require password returned an object with controller');
-    QUnit.ok(pw.run, 'Require password returned a runner');
     
     QUnit.ok(pw.run(), 'Require password was successfully run');
     QUnit.start();
@@ -1899,10 +1901,6 @@ QUnit.asyncTest('First Run: Initialize', function()
     QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
     
     var firstrun = new Glome.MVC.FirstRunInitialize();
-    QUnit.ok(firstrun.model, 'Firstrun returned an object with model');
-    QUnit.ok(firstrun.view, 'Firstrun returned an object with view');
-    QUnit.ok(firstrun.controller, 'Firstrun returned an object with controller');
-    QUnit.ok(firstrun.run, 'Firstrun returned a runner');
     
     QUnit.ok(firstrun.run(), 'Firstrun was successfully run');
     QUnit.start();
@@ -1923,10 +1921,6 @@ QUnit.asyncTest('First Run: Subscriptions', function()
       QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
       
       var subscriptions = new Glome.MVC.FirstRunSubscriptions();
-      QUnit.ok(subscriptions.model, 'Subscriptions returned an object with model');
-      QUnit.ok(subscriptions.view, 'Subscriptions returned an object with view');
-      QUnit.ok(subscriptions.controller, 'Subscriptions returned an object with controller');
-      QUnit.ok(subscriptions.run, 'Subscriptions returned a runner');
       
       QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
       
@@ -1945,10 +1939,6 @@ QUnit.asyncTest('Widget', function()
     Glome.container = jQuery('#qunit-fixture');
     
     var widget = new Glome.MVC.Widget();
-    QUnit.ok(widget.model, 'Widget returned an object with model');
-    QUnit.ok(widget.view, 'Widget returned an object with view');
-    QUnit.ok(widget.controller, 'Widget returned an object with controller');
-    QUnit.ok(widget.run, 'Widget returned a runner');
     
     var ad =
     {
@@ -1974,5 +1964,43 @@ QUnit.asyncTest('Widget', function()
     QUnit.notEqual(widget.widget.attr('data-state'), 'open', 'Widget is closed on startup');
     
     QUnit.start();
+  });
+});
+
+
+QUnit.asyncTest('All MVCs', function()
+{
+  Glome.Templates.load(function()
+  {
+    var items =
+    [
+      'Navigation',
+      'Widget',
+      'Public',
+      'RequirePassword',
+      'FirstRunInitialize',
+      'FirstRunSubscriptions',
+      'FirstRunPassword',
+      'FirstRunFinish',
+      'ShowAd',
+      'ShowCategory',
+      'ShowAllCategories',
+      'Admin',
+      'AdminSubscriptions',
+      'AdminStatistics',
+      'AdminRewards',
+      'AdminSettings',
+    ];
+    
+    for (var i = 0; i <  items.length; i++)
+    {
+      var item = items[i];
+      var mvc = new Glome.MVC[item]();
+      QUnit.ok(Glome.MVC[item], 'MVC ' + item + ' exists');
+      QUnit.ok(mvc.model, 'MVC ' + item + ' has "model" method');
+      QUnit.ok(mvc.view, 'MVC ' + item + ' has "view" method');
+      QUnit.ok(mvc.controller, 'MVC ' + item + ' has "controller" method');
+      QUnit.ok(mvc.run, 'MVC ' + item + ' has "run" method');
+    }
   });
 });

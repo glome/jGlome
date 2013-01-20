@@ -1691,6 +1691,12 @@
         // Subscription status
         Category.prototype.subscribed = 0;
         
+        // Category name
+        Category.prototype.name = '';
+        
+        // Description
+        Category.prototype.description = '';
+        
         // Shorthand for setting subscription status to 'on'
         Category.prototype.subscribe = function(callback)
         {
@@ -1725,7 +1731,7 @@
           plugin.Categories.setSubscriptionStatus
           (
             this.id,
-            'on',
+            'off',
             plugin.Tools.mergeCallbacks
             (
               function()
@@ -2275,7 +2281,6 @@
             .on('click', function()
             {
               jQuery('#glomePublicRequirePasswordContainer').trigger('submit');
-              console.log('click');
             });
           
           this.contentArea.find('#glomePublicRequirePasswordContainer')
@@ -2384,7 +2389,6 @@
             .on('click', function()
             {
               var id = jQuery(this).parents('[data-glome-category]').attr('data-glome-category');
-              console.log(id, plugin.Categories.stack[id].subscribed);
               
               if (plugin.Categories.stack[id].subscribed)
               {
@@ -2546,7 +2550,6 @@
         
         mvc.prototype.model = function(args)
         {
-          console.log(args);
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);
@@ -2593,16 +2596,272 @@
         return m;
       },
       
-      /* !Public: Show a category */
-      ShowCategory:
+      /* !Public: Show category ads */
+      ShowCategory: function()
       {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
         
+        mvc.prototype = new plugin.MVC.Public();
+        
+        var m = new mvc();
+        
+        return m;
       },
       
       /* !Public: Show all categories */
-      ShowAllCategories:
+      ShowAllCategories: function()
       {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
         
+        mvc.prototype = new plugin.MVC.Public();
+        
+        var m = new mvc();
+        return m;
+      },
+      
+      Navigation: function()
+      {
+        function mvc()
+        {
+          
+        }
+        
+        mvc.prototype = new plugin.MVC.Prototype();
+        mvc.prototype.view = function(args)
+        {
+          if (   !args.header
+              || !args.header.size())
+          {
+            return;
+          }
+          
+          var nav = args.header.find('.glome-navigation');
+          if (!nav.size())
+          {
+            var nav = plugin.Templates.get('navigation-container');
+            nav.insertAfter(args.header.find('.glome-icon'));
+          }
+          
+          var items =
+          {
+            Subscriptions:
+            {
+              mvc: 'AdminSubscriptions',
+              children:
+              {
+                Subscriptions:
+                {
+                  mvc: 'AdminSubscriptions'
+                },
+                'Lorem ipsum':
+                {
+                  mvc: 'AdminSubscriptionsBrands'
+                },
+              }
+            },
+            Statistics:
+            {
+              mvc: 'AdminStatistics',
+              children:
+              {
+                
+              }
+            },
+            Rewards:
+            {
+              mvc: 'AdminRewards',
+              children:
+              {
+                
+              }
+            },
+            Settings:
+            {
+              mvc: 'AdminSettings',
+              children:
+              {
+                
+              }
+            }
+          }
+          
+          for (var i in items)
+          {
+            var li = nav.find('> [data-mvc="' + items[i].mvc + '"]');
+            
+            if (!li.size())
+            {
+              var li = plugin.Templates.get('navigation-item');
+              li.find('a').text(i);
+              li
+                .attr('data-mvc', items[i].mvc)
+                .appendTo(nav);
+            }
+            
+            if (items[i].children)
+            {
+              var subnav = plugin.Templates.get('subnavigation-container').appendTo(li);
+              
+              for (var n in items[i].children)
+              {
+                var child = items[i].children[n];
+                
+                var subli = subnav.find('> [data-mvc="' + child.mvc + '"]');
+                
+                if (!subli.size())
+                {
+                  var subli = plugin.Templates.get('subnavigation-item')
+                    .attr('data-mvc', child.mvc)
+                    .appendTo(subnav);
+                  
+                }
+                subli.find('> a').text(n);
+              }
+            }
+          }
+          
+          nav.find('a')
+            .off('click')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              
+              try
+              {
+                plugin.MVC.run(jQuery(this).parent().attr('data-mvc'));
+              }
+              catch (e)
+              {
+                console.warn('Navigation failed due to ' + e.toString());
+              }
+              
+              return false;
+            });
+          
+          console.log(args);
+          if (args.selected)
+          {
+            var sel = nav.find('[data-mvc="' + args.selected + '"]');
+            
+            sel.each(function()
+            {
+              sel.addClass('selected');
+              sel.siblings().removeClass('selected');
+              
+              sel.parents('li').addClass('selected');
+              sel.parents('li').siblings().removeClass('selected');
+            });
+          }
+        }
+        
+        var m = new mvc();
+        return m;
+      },
+      
+      /* !MVC Admin */
+      Admin: function()
+      {
+        // Return an existing ad if it is in the stack, otherwise return null
+        function mvc()
+        {
+        }
+        
+        mvc.prototype = new plugin.MVC.Prototype();
+        
+        // Prototype for initializing a view
+        mvc.prototype.viewInit = function(args)
+        {
+          var wrapper = jQuery('[data-glome-template="admin-wrapper"]');
+          
+          if (!wrapper.size())
+          {
+            var wrapper = plugin.Templates.get('admin-wrapper')
+              .appendTo(plugin.container);
+          }
+          
+          if (!wrapper.find('[data-glome-template="admin-header"]').size())
+          {
+            var header = plugin.Templates.get('admin-header');
+            header.find('.glome-close')
+              .off('click')
+              .on('click', function()
+              {
+                plugin.container.find('[data-glome-template="admin-wrapper"]').remove();
+                plugin.MVC.run('Widget');
+              });
+            
+            var selected = args.selected || '';
+            
+            header.appendTo(wrapper);
+            plugin.MVC.run('Navigation', {header: header, selected: selected});
+          }
+          
+          if (!wrapper.find('[data-glome-template="admin-footer"]').size())
+          {
+            plugin.Templates.get('admin-footer').appendTo(wrapper);
+          }
+          
+          if (!wrapper.find('[data-glome-template="admin-content"]').size())
+          {
+            plugin.Templates.get('admin-content').insertAfter(wrapper.find('[data-glome-template="admin-header"]'));
+          }
+          
+          this.contentArea = wrapper.find('[data-glome-template="admin-content"]').find('[data-context="glome-content-area"]');
+          this.contentArea.find('> *').remove();
+        }
+        
+        var m = new mvc();
+        
+        return m;
+      },
+      
+      /* !MVC: Admin subscriptions */
+      AdminSubscriptions: function()
+      {
+        function mvc()
+        {
+          
+        }
+        
+        var admin = new plugin.MVC.Admin();
+        
+        mvc.prototype = new plugin.MVC.FirstRunSubscriptions();
+        mvc.prototype.viewInit = admin.viewInit;
+        mvc.prototype.view = function(args)
+        {
+          if (!args)
+          {
+            args = {}
+          }
+          
+          args.selected = 'AdminSubscriptions';
+          
+          this.viewInit(args);
+          this.content = plugin.Templates.populate('admin-subscriptions', {count: plugin.Categories.count(), selected: 0});
+          this.content.appendTo(this.contentArea);
+          
+          this.content.find('.glome-category').remove();
+          
+          for (var i in plugin.Categories.stack)
+          {
+            var row = this.contentArea.find('.glome-category[data-category="' + plugin.Categories.stack[i].id + '"]');
+            
+            if (!row.size())
+            {
+              var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
+              row.appendTo(this.contentArea.find('.glome-categories'));
+            }
+          }
+        }
+        
+        var m = new mvc();
+        return m;
       }
     };
     
