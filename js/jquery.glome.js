@@ -2583,6 +2583,7 @@
             {
               e.preventDefault();
               plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
+              plugin.container.find('.glome-close').trigger('click');
               return false;
             });
         }
