@@ -764,16 +764,6 @@
   font-weight: 100;
   bottom: 132px; }
 
-/* !View ad */
-#glomePublicAd button {
-  font-size: 138% !important; }
-
-#glomePublicAd button + button {
-  float: right; }
-
-#glomePublicAd .glome-ad-actions {
-  margin-top: 20px; }
-
 /* !First run, stage 3: set password */
 #glomePublicSetPassword,
 #glomePublicRequirePassword {
@@ -795,6 +785,25 @@
   opacity: 0.7; }
   #glomePublicFinish .glome-settings:hover {
     opacity: 1; }
+
+/* !View ad */
+#glomePublicAd button {
+  font-size: 138% !important; }
+
+#glomePublicAd button + button {
+  float: right; }
+
+#glomePublicAd .glome-ad-actions {
+  margin-top: 20px; }
+
+#glomePublicAd .glome-cols-ad-description {
+  width: 165px; }
+
+#glomePublicAd .glome-cols-ad-image {
+  width: 300px; }
+  #glomePublicAd .glome-cols-ad-image img {
+    min-width: 300px;
+    max-width: 300px; }
 
 /* !Glome widget */
 #glomeWidget {

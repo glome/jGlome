@@ -19,6 +19,7 @@ $button_red_dark: darken($button_red_medium, 25)
 $col_width: 120px
 $col_margin: 15px
 $full_width: ($col_width + $col_margin) * 7 - $col_margin
+$ad_image_width: 300px
 
 $navigation_height: 42px
 $header_height: 177px
@@ -746,16 +747,6 @@ $full_page_z_index: 10000
   @include selection-counter
   bottom: $footer_height + $pager_height + 10
 
-/* !View ad */
-#glomePublicAd button
-  font-size: 138% !important
-
-#glomePublicAd button + button
-  float: right
-
-#glomePublicAd .glome-ad-actions
-  margin-top: 20px
-
 /* !First run, stage 3: set password */
 #glomePublicSetPassword,
 #glomePublicRequirePassword
@@ -781,6 +772,25 @@ $full_page_z_index: 10000
   opacity: 0.7
   &:hover
     opacity: 1
+
+/* !View ad */
+#glomePublicAd button
+  font-size: 138% !important
+
+#glomePublicAd button + button
+  float: right
+
+#glomePublicAd .glome-ad-actions
+  margin-top: 20px
+
+#glomePublicAd .glome-cols-ad-description
+  width: ($col_width * 4 - $col_margin) - $ad_image_width
+
+#glomePublicAd .glome-cols-ad-image
+  width: $ad_image_width
+  img
+    min-width: $ad_image_width
+    max-width: $ad_image_width
 
 /* !Glome widget */
 #glomeWidget
