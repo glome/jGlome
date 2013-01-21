@@ -444,11 +444,12 @@
       {
         // Get preference
         case 1:
+          console.log('read jGlome pref: ' + key);
           return plugin.Data.get(key);
 
         // Set preference
         case 2:
-          alert('set: ' + key + ': ' + value);
+          console.log('set jGlome pref: ' + key + ' = ' + value);
           return plugin.Data.set(key, value);
 
         default:
@@ -2313,7 +2314,7 @@
               this.widgetAd = new plugin.Ads.Ad(ads[last]);
             }
 
-            console.log(typeof this.widgetAd, this.widgetAd);
+            //console.log(typeof this.widgetAd, this.widgetAd);
           }
           else if (args
               && args.adid)
