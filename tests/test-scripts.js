@@ -2019,35 +2019,47 @@ QUnit.asyncTest('Widget', function()
 {
   Glome.Templates.load(function()
   {
-    // Bind Glome to QUnit fixture
-    Glome.container = jQuery('#qunit-fixture');
-    
-    var widget = new Glome.MVC.Widget();
-    
-    var ad =
+    Glome.Ads.load(function()
     {
-      id: 999999999,
-      title: 'This is a test ad',
-      logo: 'images/icons/glome-icon.svg',
-    }
-    var gad = new Glome.Ads.Ad(ad);
-    
-    QUnit.ok(widget.run(), 'Widget was successfully run');
-    QUnit.ok(widget.widgetAd, 'Widget ad was selected');
-    QUnit.equal(ad.id, widget.widgetAd.id, 'Last ad was selected');
-    
-    QUnit.equal(widget.widget.find('.glome-ad-title').text(), ad.title, 'Knocking ad title was changed');
-    QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
-    QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
-    
-    QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
-    QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
-    QUnit.equal(widget.widget.attr('data-knocking-ad'), '', 'Empty knocking ad id was passed to widget DOM');
-    QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), '', 'Knocking ad logo was hidden');
-    
-    QUnit.notEqual(widget.widget.attr('data-state'), 'open', 'Widget is closed on startup');
-    
-    QUnit.start();
+      // Bind Glome to QUnit fixture
+      Glome.container = jQuery('#qunit-fixture');
+      
+      var widget = new Glome.MVC.Widget();
+      var categoryId = 100000;
+      
+      var ad =
+      {
+        id: 999999999,
+        title: 'This is a test ad',
+        logo: 'images/icons/glome-icon.svg',
+        adcategories:
+        [
+          {
+            id: categoryId
+          }
+        ]
+      }
+      
+      var gad = new Glome.Ads.Ad(ad);
+      var gcategory = new Glome.Categories.Category({id: categoryId, subscribed: 1});
+      
+      QUnit.ok(widget.run(), 'Widget was successfully run');
+      QUnit.ok(widget.widgetAd, 'Widget ad was selected');
+      QUnit.equal(ad.id, widget.widgetAd.id, 'Last ad was selected');
+      
+      QUnit.equal(widget.widget.find('.glome-ad-title').text(), ad.title, 'Knocking ad title was changed');
+      QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
+      QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
+      
+      QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
+      QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
+      QUnit.equal(widget.widget.attr('data-knocking-ad'), '', 'Empty knocking ad id was passed to widget DOM');
+      QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), '', 'Knocking ad logo was hidden');
+      
+      QUnit.notEqual(widget.widget.attr('data-state'), 'open', 'Widget is closed on startup');
+      
+      QUnit.start();
+    });
   });
 });
 

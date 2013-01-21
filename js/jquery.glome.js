@@ -17,6 +17,7 @@
     
     this.version = version;
     this.glomeid = null;
+    this.idPrefix = '';
     this.ads = {};
     this.container = null;
     this.sessionCookie = null;
@@ -3263,7 +3264,7 @@
           },
           callback
         );
-        this.Auth.createGlomeId(date.getTime(), callbacks, onerror);
+        this.Auth.createGlomeId(plugin.idPrefix + String(date.getTime()), callbacks, onerror);
       }
       else
       {
