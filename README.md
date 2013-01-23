@@ -1,4 +1,11 @@
 jGlome
 ======
+Glome UI plugin for jQuery.
 
-jQuery Glome
+More details to come.
+
+Copyright and License
+=====================
+Please see MIT-LICENSE.txt.
+
+
