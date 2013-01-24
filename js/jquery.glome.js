@@ -3299,7 +3299,7 @@
       plugin.Tools.validateCallback(options.callback);
       plugin.Tools.validateCallback(options.onerror);
       
-      if (options.DataBackend)
+      if (options.dataBackend)
       {
         plugin.setDataBackend(options.dataBackend);
       }
@@ -3385,7 +3385,6 @@
       }
       
       options = jQuery.extend(defaults, options);
-      
       return plugin.initialize(options);
     }
   };
