@@ -393,6 +393,25 @@
         return true;
       }
     }
+    
+    /**
+     * Data storage backend when not using localStorage
+     */
+    plugin.setDataBackend = function(backend)
+    {
+        if (typeof backend.get !== 'function')
+        {
+          throw new Error('Method "get" is a requirement for data storage backend');
+        }
+        
+        if (typeof backend.set !== 'function')
+        {
+          throw new Error('Method "set" is a requirement for data storage backend');
+        }
+        
+        plugin.Data = backend;
+    }
+    
     /**
      * Set or get preferences
      * 
@@ -3280,15 +3299,9 @@
       plugin.Tools.validateCallback(options.callback);
       plugin.Tools.validateCallback(options.onerror);
       
-      if (options.storageBackend)
+      if (options.DataBackend)
       {
-        if (   typeof options.storageBackend.get !== 'function'
-            || typeof options.storageBackend.set !== 'function')
-        {
-          throw new Error('Both "get" and "set" are required for storage backend');
-        }
-        
-        plugin.Data = options.storageBackend;
+        plugin.setDataBackend(options.dataBackend);
       }
       
       if (options.container)
@@ -3368,7 +3381,7 @@
         container: null,
         callback: null,
         onerror: null,
-        storageBackend: null
+        dataBackend: null
       }
       
       options = jQuery.extend(defaults, options);

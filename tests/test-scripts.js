@@ -246,6 +246,37 @@ QUnit.test('Browser rules', function()
 {
   QUnit.ok(Glome.Browser, 'Browser rules container is set');
   QUnit.ok(Glome.Browser.openUrl, 'There is a rule on how a URL is opened');
+  
+  QUnit.ok(Glome.setDataBackend, 'There is a data backend method');
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.setDataBackend
+      (
+        {
+          get: null,
+          set: function() {}
+        }
+      );
+    },
+    'Data backend got rightfully upset when it did not get a "get" method'
+  );
+  
+  QUnit.throws
+  (
+    function()
+    {
+      Glome.setDataBackend
+      (
+        {
+          get: function() {}
+        }
+      );
+    },
+    'Data backend got rightfully upset when it did not get a "set" method'
+  );
 });
 
 /* !Validate callbacks */
