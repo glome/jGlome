@@ -42,6 +42,7 @@
     this.container = null;
     this.sessionCookie = null;
     this.sessionToken = null;
+    this.contentPrefix = '';
     this.templateLocation = 'template.html';
     this.userData = null;
     
@@ -410,6 +411,17 @@
         }
         
         plugin.Data = backend;
+        
+        // Run initialization if applicable
+        if (plugin.Data.init)
+        {
+          plugin.Data.init();
+        }
+    }
+    
+    if (options.dataBackend)
+    {
+      plugin.setDataBackend(options.dataBackend);
     }
     
     /**
@@ -547,6 +559,13 @@
               continue;
             }
             
+            var href = element.attr('href');
+            
+            if (href.substr(0, plugin.contentPrefix.length) !== plugin.contentPrefix)
+            {
+              element.attr('href', plugin.contentPrefix + href);
+            }
+            
             if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
             {
               jQuery('head').append(element);
@@ -559,7 +578,7 @@
         jQuery.ajax
         (
           {
-            url: plugin.templateLocation,
+            url: plugin.contentPrefix + plugin.templateLocation,
             context: this,
             dataType: 'html',
             isLocal: true,
@@ -1001,24 +1020,33 @@
             plugin.userData = data;
             
             var token = jqXHR.getResponseHeader('X-CSRF-Token');
+            var cookie = jqXHR.getResponseHeader('Set-Cookie');
             
             if (token)
             {
               plugin.sessionToken = token;
-              jQuery.ajaxSetup
-              (
-                {
-                  xhrFields:
-                  {
-                    withCredentials: true
-                  },
-                  headers:
-                  {
-                    'X-CSRF-Token': plugin.sessionToken
-                  }
-                }
-              );
             }
+            
+            if (cookie)
+            {
+              plugin.cookie = cookie;
+            }
+            
+            jQuery.ajaxSetup
+            (
+              {
+                xhrFields:
+                {
+                  withCredentials: true
+                },
+                beforeSend: function(jqxhr)
+                {
+                  alert(plugin.sessionToken);
+                  jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+                  jqxhr.setRequestHeader('Cookie', plugin.cookie);
+                }
+              }
+            );
           },
           callback
         );
@@ -3376,11 +3404,6 @@
         container: null,
         callback: null,
         onerror: null
-      }
-      
-      if (options.dataBackend)
-      {
-        plugin.setDataBackend(options.dataBackend);
       }
       
       options = jQuery.extend(defaults, options);
