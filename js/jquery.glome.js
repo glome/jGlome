@@ -42,8 +42,9 @@
     this.container = null;
     this.sessionCookie = null;
     this.sessionToken = null;
-    this.templateLocation = 'assets/jGlome/template.html';
-
+    this.templateLocation = 'template.html';
+    this.context = 'javascript';
+    
     /**
      * Switch to determine if first run should be the starting point
      */
@@ -434,7 +435,7 @@
 
         try
         {
-          localStore = window.localStorage
+          localStore = window.localStorage;
         }
         catch (e)
         {
@@ -469,7 +470,7 @@
       {
         // Get preference
         case 1:
-          console.log('read jGlome pref: ' + key);
+          console.log('read jGlome pref: ' + key + ' - ' + plugin.Data.get(key));
           return plugin.Data.get(key);
 
         // Set preference
@@ -601,11 +602,20 @@
         }
 
         var callbacks = plugin.Tools.mergeCallbacks(default_callback, callback);
+        
+        if (plugin.context === 'firefox')
+        {
+          var url = 'http://localhost:3000/assets/jGlome/' + plugin.templateLocation;
+        }
+        else
+        {
+          var url = plugin.templateLocation;
+        }
 
         jQuery.ajax
         (
           {
-            url: 'http://localhost:3000/' + plugin.templateLocation,
+            url: url,
             context: this,
             dataType: 'html',
             isLocal: true,
@@ -2330,8 +2340,6 @@
           if (!this.widgetAd)
           {
             var ads = Object.keys(plugin.Ads.listAds({subscribed: 1}));
-
-console.log(ads);
 
             if (ads.length)
             {
