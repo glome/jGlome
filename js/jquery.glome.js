@@ -3299,11 +3299,6 @@
       plugin.Tools.validateCallback(options.callback);
       plugin.Tools.validateCallback(options.onerror);
       
-      if (options.dataBackend)
-      {
-        plugin.setDataBackend(options.dataBackend);
-      }
-      
       if (options.container)
       {
         this.Templates.load(function()
@@ -3380,12 +3375,20 @@
       {
         container: null,
         callback: null,
-        onerror: null,
-        dataBackend: null
+        onerror: null
+      }
+      
+      if (options.dataBackend)
+      {
+        plugin.setDataBackend(options.dataBackend);
       }
       
       options = jQuery.extend(defaults, options);
-      return plugin.initialize(options);
+      
+      if (options.container)
+      {
+        return plugin.initialize(options);
+      }
     }
   };
 }(jQuery)
