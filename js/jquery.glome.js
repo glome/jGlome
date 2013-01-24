@@ -37,6 +37,7 @@
 
     this.version = version;
     this.glomeid = null;
+    this.userData = null;
     this.idPrefix = '';
     this.ads = {};
     this.container = null;
@@ -1044,6 +1045,7 @@
           {
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
+            plugin.userData = data;
 
             var token = jqXHR.getResponseHeader('X-CSRF-Token');
             var cookie = jqXHR.getResponseHeader('Set-Cookie');
@@ -1914,7 +1916,7 @@
         }
 
         // Subscription status
-        Category.prototype.subscribed = 0;
+        Category.prototype.subscribed = 1;
 
         // Category name
         Category.prototype.name = '';
@@ -1923,7 +1925,7 @@
         Category.prototype.description = '';
 
         // Shorthand for setting subscription status to 'on'
-        Category.prototype.subscribe = function(callback)
+        Category.prototype.subscribe = function(callback, onerror)
         {
           var _category = this;
 
@@ -1943,13 +1945,14 @@
 
                 plugin.Categories.onchange();
               },
-              callback
+              callback,
+              onerror
             )
           );
         }
 
         // Shorthand for setting subscription status to 'off'
-        Category.prototype.unsubscribe = function(callback)
+        Category.prototype.unsubscribe = function(callback, onerror)
         {
           var _category = this;
 
@@ -1969,12 +1972,19 @@
 
                 plugin.Categories.onchange();
               },
-              callback
+              callback,
+              onerror
             )
           );
         }
 
         var category = new Category(data);
+        
+        if (   plugin.userData
+            && jQuery.inArray(category.id, plugin.userData.disabled_adcategories) !== -1)
+        {
+          category.subscribed = 0;
+        }
 
         return category;
       },

@@ -807,6 +807,7 @@ QUnit.test('Glome API basics', function()
 /* !Glome API requests */
 QUnit.test('Glome API requests', function()
 {
+  QUnit.equal(Glome.userData, null, 'User data should be null before it has been loaded');
   var request = Glome.API.get('login', null);
   
   // Abort the mission immediately, these do not need to be fired
@@ -1113,9 +1114,9 @@ QUnit.test('Login', function()
     '',
     function(data, status, jqXHR)
     {
-      QUnit.start();
       QUnit.ok(Glome.sessionToken, 'CSRF token is set');
       QUnit.equal(Glome.sessionToken, jqXHR.getResponseHeader('X-CSRF-Token'), 'CSRF token is the same as the one of AJAX request');
+      QUnit.start();
     },
     function(jqXHR)
     {
@@ -1165,6 +1166,7 @@ QUnit.asyncTest('Login failure', function()
     
     Glome.Auth.login(Glome.id(), '', function()
     {
+      QUnit.ok(Glome.userData, 'User data was populated');
       QUnit.start();
     });
   });
@@ -1680,6 +1682,63 @@ QUnit.test('Glome.Categories API', function()
   QUnit.equal(Object.keys(Glome.Categories.listeners).length, length, 'Listener was successfully removed according to length');
 });
 
+var preloadedCategories = null;
+
+/* !Fetch categories */
+QUnit.test('Fetch categories', function()
+{
+  QUnit.stop();
+  
+  // List categories for this Glome user
+  // Get Categories
+  Glome.Auth.login
+  (
+    Glome.id(),
+    setPassword,
+    function()
+    {
+      Glome.Api.get
+      (
+        'categories',
+        null,
+        function(data)
+        {
+          // Set the first category as unsubscribed
+          var categoryId = data[0].id;
+          Glome.userData.disabled_adcategories.push(categoryId);
+          
+          Glome.Categories.load
+          (
+            function()
+            {
+              QUnit.equal(Glome.Categories.stack[categoryId].subscribed, 0, 'First loaded category has status "unsubscribed"');
+              
+              QUnit.notEqual(0, Object.keys(Glome.Categories.stack).length, 'Glome categories were loaded');
+              
+              for (i in Glome.Categories.stack)
+              {
+                var category = new Glome.Categories.Category(Glome.Categories.stack[i].id);
+                QUnit.deepEqual(category, Glome.Categories.stack[i], 'Constructor gives the same object as was stored to stack')
+                break;
+              }
+              
+              var l = Object.keys(Glome.Categories.stack).length;
+              QUnit.equal(l, Glome.Categories.count(), 'Category count returned the stack length: ' + l);
+              
+              QUnit.start();
+            },
+            function()
+            {
+              QUnit.start();
+              QUnit.ok(false, 'Glome categories were loaded (caught on error)');
+            }
+          );
+        }
+      );
+    }
+  );
+});
+  
 /* !Subscription shorthands */
 QUnit.asyncTest('Subscription shorthands', function()
 {
@@ -1695,51 +1754,40 @@ QUnit.asyncTest('Subscription shorthands', function()
       QUnit.ok(category.subscribe, 'Category subscribe method exists');
       QUnit.ok(category.unsubscribe, 'Category unsubscribe method exists');
       
-      category.subscribe(function()
-      {
-        QUnit.equal(category.subscribed, 1, 'Category subscription status was changed to 1 after subscribe');
-        category.unsubscribe(function()
+      category.subscribe
+      (
+        function()
         {
-          QUnit.equal(category.subscribed, 0, 'Category subscription status was changed to 0 after unsubscribe');
+          QUnit.equal(category.subscribed, 1, 'Category subscription status was changed to 1 after subscribe');
+          category.unsubscribe
+          (
+            function()
+            {
+              QUnit.equal(category.subscribed, 0, 'Category subscription status was changed to 0 after unsubscribe');
+              QUnit.start();
+            },
+            function()
+            {
+              QUnit.equal(true, false, 'Subscribe request returned an error');
+              QUnit.start();
+            }
+          );
+        },
+        function()
+        {
+          QUnit.equal(true, false, 'Subscribe request returned an error');
           QUnit.start();
-        });
-      });
+        }
+      );
+    },
+    function()
+    {
+      QUnit.equal(true, false, 'Subscribe request returned an error');
+      QUnit.start();
     }
   );
 });
 
-/* !Fetch categories */
-QUnit.test('Fetch categories', function()
-{
-  QUnit.stop();
-  
-  // List categories for this Glome user
-  Glome.Categories.load
-  (
-    function()
-    {
-      QUnit.notEqual(0, Object.keys(Glome.Categories.stack).length, 'Glome categories were loaded');
-      
-      for (i in Glome.Categories.stack)
-      {
-        var category = new Glome.Categories.Category(Glome.Categories.stack[i].id);
-        QUnit.deepEqual(category, Glome.Categories.stack[i], 'Constructor gives the same object as was stored to stack')
-        break;
-      }
-      
-      var l = Object.keys(Glome.Categories.stack).length;
-      QUnit.equal(l, Glome.Categories.count(), 'Category count returned the stack length: ' + l);
-      
-      QUnit.start();
-    },
-    function()
-    {
-      QUnit.start();
-      QUnit.ok(false, 'Glome categories were loaded (caught on error)');
-    }
-  );
-});
-  
 /* !Module: Glome user interface  */
 QUnit.module('Glome user interface');
 
