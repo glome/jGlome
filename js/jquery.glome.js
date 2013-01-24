@@ -61,12 +61,17 @@
     /**
      * hack: Preferences manager if localStorage is not available
      */
-    this.PreferencesManager = new PreferencesManager("extensions.glome.",
-      function(branch, name)
-      {
-        console.log('************ ' + name + ' preference changed');
-      }
-    );
+    this.PreferencesManager = null;
+    
+    if (typeof PreferencesManager !== 'undefined')
+    {
+      this.PreferencesManager = new PreferencesManager("extensions.glome.",
+        function(branch, name)
+        {
+          console.log('************ ' + name + ' preference changed');
+        }
+      );
+    }
 
     /**
      * Return the current Glome ID
