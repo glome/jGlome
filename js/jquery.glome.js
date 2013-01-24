@@ -43,7 +43,6 @@
     this.sessionCookie = null;
     this.sessionToken = null;
     this.templateLocation = 'template.html';
-    this.context = 'javascript';
     
     /**
      * Switch to determine if first run should be the starting point
@@ -603,19 +602,10 @@
 
         var callbacks = plugin.Tools.mergeCallbacks(default_callback, callback);
         
-        if (plugin.context === 'firefox')
-        {
-          var url = 'http://localhost:3000/assets/jGlome/' + plugin.templateLocation;
-        }
-        else
-        {
-          var url = plugin.templateLocation;
-        }
-
         jQuery.ajax
         (
           {
-            url: url,
+            url: plugin.templateLocation,
             context: this,
             dataType: 'html',
             isLocal: true,
