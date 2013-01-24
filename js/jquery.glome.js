@@ -2749,7 +2749,7 @@
           if (!args)
           {
             // Display the first ad if no other was requested
-            var args =
+            args =
             {
               adId: Object.keys(plugin.Ads.stack)[0]
             }
