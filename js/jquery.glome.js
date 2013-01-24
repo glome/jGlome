@@ -28,12 +28,12 @@
   /**
    * Glome master class, which is responsible for all of the non-DOM interactions
    */
-  jQuery.Glome = function(el, callback, onerror)
+  jQuery.Glome = function(options)
   {
     'use strict';
     
     var plugin = this;
-    var context = jQuery(el);
+    var context = null;
     
     this.version = version;
     this.glomeid = null;
@@ -3275,21 +3275,21 @@
      * @param function callback  @optional @see Callback, triggered after initialization is complete
      * @param function onerror   @optional @see Onerror, triggered in the initialization fails
      */
-    plugin.initialize = function(el, callback, onerror)
+    plugin.initialize = function(options)
     {
-      plugin.Tools.validateCallback(callback);
-      plugin.Tools.validateCallback(onerror);
+      plugin.Tools.validateCallback(options.callback);
+      plugin.Tools.validateCallback(options.onerror);
       
-      if (el)
+      if (options.container)
       {
         this.Templates.load(function()
         {
-          plugin.container = jQuery(el);
+          plugin.container = jQuery(options.container);
         });
       }
       
       // Create a new Glome ID if previous ID does not exist
-      if (!plugin.id()
+      if (   !plugin.id()
           || window.location.hash == '#debug')
       {
         var date = new Date();
@@ -3304,9 +3304,9 @@
             plugin.Ads.load();
             plugin.Categories.load();
           },
-          callback
+          options.callback
         );
-        this.Auth.createGlomeId(plugin.idPrefix + String(date.getTime()), callbacks, onerror);
+        this.Auth.createGlomeId(plugin.idPrefix + String(date.getTime()), callbacks, options.onerror);
       }
       else
       {
@@ -3328,7 +3328,7 @@
                 });
                 plugin.Categories.load();
               },
-              callback
+              options.callback
             );
           },
           function()
@@ -3339,7 +3339,7 @@
               {
                 plugin.MVC.run('RequirePassword');
               },
-              onerror
+              options.onerror
             );
             
             plugin.Tools.triggerCallbacks(onerrors);
@@ -3350,9 +3350,18 @@
       return true;
     };
     
-    if (el)
+    if (options)
     {
-      return plugin.initialize(el, callback, onerror);
+      var defaults =
+      {
+        container: null,
+        callback: null,
+        onerror: null
+      }
+      
+      options = jQuery.extend(defaults, options);
+      
+      return plugin.initialize(options);
     }
   };
 }(jQuery)
