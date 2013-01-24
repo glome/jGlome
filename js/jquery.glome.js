@@ -3280,6 +3280,17 @@
       plugin.Tools.validateCallback(options.callback);
       plugin.Tools.validateCallback(options.onerror);
       
+      if (options.storageBackend)
+      {
+        if (   typeof options.storageBackend.get !== 'function'
+            || typeof options.storageBackend.set !== 'function')
+        {
+          throw new Error('Both "get" and "set" are required for storage backend');
+        }
+        
+        plugin.Data = options.storageBackend;
+      }
+      
       if (options.container)
       {
         this.Templates.load(function()
@@ -3356,7 +3367,8 @@
       {
         container: null,
         callback: null,
-        onerror: null
+        onerror: null,
+        storageBackend: null
       }
       
       options = jQuery.extend(defaults, options);
