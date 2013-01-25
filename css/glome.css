@@ -60,7 +60,7 @@
 
 [data-glome-container="true"] .glome-clearfix:after {
   display: block;
-  content: "";
+  content: '';
   width: 0;
   height: 0;
   visibility: hidden;
@@ -233,7 +233,7 @@
 [data-glome-container="true"] .glome-button.glome-add[data-state="on"]:hover [data-state="on"]:before {
   background-repeat: no-repeat;
   background-position: center center;
-  content: "";
+  content: '';
   width: 20px;
   height: 20px;
   margin-right: 5px;
@@ -882,4 +882,4 @@
   background-repeat: no-repeat; }
 
 #glomeWidget[data-state="knock"] #glomeWidgetIcon {
-  background-image: url(../images/icons/glome-symbol-light-green.svg); }
+  background-image: url("../images/icons/glome-symbol-light-green.svg"); }

@@ -1,0 +1,1256 @@
+$separator: #b1b1b1;
+$text_color: #4d4d4d;
+$text_color_medium: #cccccc;
+$text_color_light: #e8e8e8;
+
+$small_screen_height: 550px;
+
+$button_height: 35px;
+$button_gray_light: #f3f3f3;
+$button_gray_medium: #dfdfdf;
+$button_gray_dark: darken($button_gray_medium, 15);
+$button_green_light: #71fa44;
+$button_green_medium: #37d004;
+$button_green_dark: darken($button_green_medium, 15);
+$button_red_light: #ff5d86;
+$button_red_medium: #e11548;
+$button_red_dark: darken($button_red_medium, 25);
+
+$col_width: 120px;
+$col_margin: 15px;
+$full_width: ($col_width + $col_margin) * 7 - $col_margin;
+$ad_image_width: 300px;
+
+$navigation_height: 42px;
+$header_height: 177px;
+$footer_height: 58px;
+$pager_height: 64px;
+$font_size: 13px;
+
+$widget_height: 50px;
+$widget_gray_dark: #2a2a2a;
+$widget_gray_medium: #404040;
+$widget_gray_light: #b4b4b4;
+
+$full_page_z_index: 10000;
+
+/* !Mixins */
+@mixin vendor-specific($property, $value)
+{
+  -webkit-#{$property}: $value;
+  -moz-#{$property}: $value;
+  -ms-#{$property}: $value;
+  -o-#{$property}: $value;
+  #{$property}: $value;
+}
+
+@mixin container
+{
+  @include vendor-specific(box-sizing, border-box);
+}
+
+@mixin appearance-none
+{
+  @include vendor-specific(appearance, none);
+}
+
+@mixin reset
+{
+  @include container;
+  @include appearance-none;
+  border:
+  {
+    style: none;
+    width: 0;
+    color: transparent;
+  }
+}
+
+@mixin button
+{
+  background:
+  {
+    color: $button_gray_medium;
+    image: -webkit-linear-gradient(top, $button_gray_light 0%, $button_gray_medium 100%);
+    image: -moz-linear-gradient(top, $button_gray_light 0%, $button_gray_medium 100%);
+    image: -ms-linear-gradient(top, $button_gray_light 0%, $button_gray_medium 100%);
+    image: -o-linear-gradient(top, $button_gray_light 0%, $button_gray_medium 100%);
+    image: linear-gradient(top, $button_gray_light 0%, $button_gray_medium 100%);
+  }
+  color: darken($button_gray_medium, 15%);
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+}
+
+@mixin button-enable-hover
+{
+  background:
+  {
+    color: $button_green_medium;
+    image: -webkit-linear-gradient(top, $button_green_light 0%, $button_green_medium 100%);
+    image: -moz-linear-gradient(top, $button_green_light 0%, $button_green_medium 100%);
+    image: -ms-linear-gradient(top, $button_green_light 0%, $button_green_medium 100%);
+    image: -o-linear-gradient(top, $button_green_light 0%, $button_green_medium 100%);
+    image: linear-gradient(top, $button_green_light 0%, $button_green_medium 100%);
+  }
+  color: darken($button_green_medium, 15%);
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+}
+
+@mixin button-disable-hover
+{
+  background:
+  {
+    color: $button_red_medium;
+    image: -webkit-linear-gradient(top, $button_red_light 0%, $button_red_medium 100%);
+    image: -moz-linear-gradient(top, $button_red_light 0%, $button_red_medium 100%);
+    image: -ms-linear-gradient(top, $button_red_light 0%, $button_red_medium 100%);
+    image: -o-linear-gradient(top, $button_red_light 0%, $button_red_medium 100%);
+    image: linear-gradient(top, $button_red_light 0%, $button_red_medium 100%);
+  }
+  color: darken($button_red_medium, 25%);
+  text-shadow: 0 1px rgba(255, 255, 255, 0.4);
+}
+
+@mixin selection-counter
+{
+  position: fixed;
+  font-size: 215%;
+  vertical-align: bottom;
+  font-weight: 100;
+}
+
+@mixin close
+{
+  background:
+  {
+    image: url(../images/icons/icon-x.svg);
+    size: 30px 30px;
+    position: center center;
+    repeat: no-repeat;
+  }
+  width: 30px;
+  height: 30px;
+  opacity: 0.8;
+  &:hover
+  {
+    opacity: 1;
+  }
+}
+
+/* !Main containers */
+.glome-fullscreen-container
+{
+  display: block !important;
+  position: fixed;
+  z-index: $full_page_z_index;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  color: $text_color !important;
+  a
+  {
+    color: $text_color;
+  }
+  font-weight: 100 !important;
+}
+
+/* Reveals all boxes */
+//[data-glome-container="true"] *
+//{
+//  @include container;
+//  border: solid 1px red;
+//}
+  
+/* !Resets */
+[data-glome-container="true"],
+[data-glome-container="true"] input,
+[data-glome-container="true"] button,
+[data-glome-container="true"] textarea,
+[data-glome-container="true"] select
+{
+  font:
+  {
+    family: Helvetica, Arial, sans-serif !important;
+    size: $font_size !important;
+  }
+}
+
+[data-glome-container="true"] input[type=text],
+[data-glome-container="true"] input[type=email],
+[data-glome-container="true"] input[type=tel],
+[data-glome-container="true"] input[type=password]
+{
+  @include reset;
+  background:
+  {
+    color: $text_color;
+  }
+  color: $text_color_light;
+  border: none;
+  display: block;
+  height: $button_height;
+  padding-left: 10px;
+}
+
+[data-glome-container="true"] .glome-content
+{
+  @include container;
+}
+
+[data-glome-container="true"].hidden,
+[data-glome-container="true"] .hidden
+{
+  display: none !important;
+}
+
+[data-glome-container="true"] .glome-clearfix:after
+{
+  display: block;
+  content: '';
+  width: 0;
+  height: 0;
+  visibility: hidden;
+  clear: both;
+}
+
+[data-glome-container="true"] .glome-layout-cols-2 > *
+{
+  float: left;
+}
+
+[data-glome-container="true"] .glome-layout-cols-2 > * + *
+{
+  float: right;
+  margin-left: 0;
+}
+
+[data-glome-container="true"] .glome-fixed
+{
+  position: fixed;
+}
+
+/* !General rules */
+[data-glome-container="true"] a:link,
+[data-glome-container="true"] a:visited
+{
+  text-decoration: none;
+  &:hover
+  {
+    text-decoration: underline;
+  }
+}
+
+[data-glome-container="true"] :not(:hover) > [data-mouseover="true"],
+[data-glome-container="true"] :hover > [data-mouseover="false"]
+{
+  display: none !important;
+}
+  
+[data-glome-container="true"] .glome-close
+{
+  right: 0;
+  top: 0;
+  padding: 10px;
+  cursor: pointer;
+  position: fixed;
+}
+
+[data-glome-container="true"] h1
+{
+  font:
+  {
+    size: 185%;
+    weight: 600;
+  }
+}
+
+[data-glome-container="true"] p
+{
+  line-height: 115%;
+}
+
+[data-glome-container="true"] * > h1:first-child
+{
+  margin-top: 0;
+}
+
+[data-glome-container="true"] hr,
+[data-glome-container="true"] .glome-with-separator + .glome-with-separator
+{
+  border:
+  {
+    style: solid none none;
+    color: $separator;
+    width: 1px;
+  }
+}
+
+[data-glome-container="true"] hr.glome-short
+{
+  width: 20px;
+  margin: 0;
+}
+
+/* !Navigation button */
+[data-glome-container="true"] .glome-navigation-button
+{
+  @include container;
+  @include appearance-none;
+  background:
+  {
+    image: url(../images/icons/arrow-button-gradient-gray.svg);
+    repeat: no-repeat;
+    color: transparent;
+  }
+  display: inline-block;
+  overflow: hidden;
+  width: $col_width;
+  text-align: center;
+  vertical-align: middle;
+  height: 36px;
+  border: none;
+  
+  &:hover,
+  &[data-state=on]
+  {
+    background-image: url(../images/icons/arrow-button-gradient-green.svg);
+  }
+  
+  &:after
+  {
+    content: "";
+  }
+  
+  &.left
+  {
+    background-position: left center;
+    border-right: solid 1px rgba(0, 0, 0, 0.1);
+    padding-left: 10px;
+  }
+  
+  &.right
+  {
+    background-position: right center;
+    border-left: solid 1px rgba(255, 255, 255, 0.8);
+    float: right;
+    padding-right: 10px;
+  }
+}
+
+/* !Button */
+[data-glome-container="true"] .glome-button
+{
+  @include container;
+  @include appearance-none;
+  @include button;
+  color: $text_color;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4), 1px 1px 1px rgba(0, 0, 0, 0.4);
+  border: none;
+  height: $button_height;
+  line-height: $button_height;
+  display: inline-block;
+  text-align: center;
+  font-weight: bold;
+  text-decoration: none !important;
+  cursor: pointer;
+  padding: 1px 0.5em 0;
+  white-space: nowrap;
+}
+
+[data-glome-container="true"] .glome-mouseout,
+[data-glome-container="true"] *:hover > .glome-mouseover + .glome-mouseout,
+[data-glome-container="true"] .glome-mouseover:hover + .glome-mouseout
+{
+  display: none;
+}
+
+[data-glome-container="true"] *:hover .glome-mouseover,
+[data-glome-container="true"] .glome-mouseover:hover
+{
+  display: auto;
+}
+
+[data-glome-container="true"] .glome-button:hover
+{
+  text-shadow: 0 0 4px rgba(255, 255, 255, 1);
+}
+
+[data-glome-container="true"] .glome-button[data-state="on"],
+[data-glome-container="true"] .glome-button[data-state="off"]:not([data-state-change="false"]):hover
+{
+  @include button-enable-hover;
+}
+
+[data-glome-container="true"] .glome-button[data-state="on"]:not([data-state-change="false"]):hover
+{
+  @include button-disable-hover;
+}
+
+[data-glome-container="true"] .glome-button[data-state="on"]:hover [data-state="on"]:before
+{
+  background:
+  {
+    image: url(../images/icons/icon-minus.svg);
+    size: 20px 20px;
+  }
+}
+
+[data-glome-container="true"] .glome-button[data-state="off"] [data-state="on"],
+[data-glome-container="true"] .glome-button[data-state="on"] [data-state="off"]
+{
+  display: none;
+}
+
+[data-glome-container="true"] .glome-button.glome-add[data-state="off"] [data-state="off"]:before
+{
+  background:
+  {
+    image: url(../images/icons/icon-plus.svg);
+    size: 20px 20px;
+  }
+}
+
+[data-glome-container="true"] .glome-button.glome-add[data-state="off"] [data-state="off"]:before,
+[data-glome-container="true"] .glome-button.glome-add[data-state="on"]:hover [data-state="on"]:before
+{
+  background:
+  {
+    repeat: no-repeat;
+    position: center center;
+  }
+  content: '';
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+  display: inline-block;
+  vertical-align: -5px;
+}
+
+/* !Next button */
+[data-glome-container="true"] .glome-link
+{
+  @include container;
+  background:
+  {
+    size: 24px 17px;
+  }
+  &.glome-link-next
+  {
+    background-image: url(../images/icons/arrow-right.svg);
+  }
+  &.glome-link-prev,
+  &.glome-link-previous
+  {
+    opacity: 1 - 64/255;
+    background-image: url(../images/icons/arrow-left.svg);
+  }
+  width: 24px;
+  height: 17px;
+  display: inline-block;
+  opacity: 1 - 180/255;
+  &:hover
+  {
+    opacity: 1 - 64/255;
+  }
+}
+
+/* !Table data */
+[data-glome-container="true"] .glome-row
+{
+  clear: both;
+  padding: 10px 0;
+}
+
+[data-glome-container="true"] .glome-row:first-child
+{
+  padding-top: 0;
+}
+
+[data-glome-container="true"] .glome-row > *
+{
+  display: table-cell;
+  vertical-align: middle;
+  width: 100%;
+}
+
+[data-glome-container="true"] .glome-row > * + *
+{
+  padding-left: 15px;
+}
+
+[data-glome-container="true"] .glome-row > .glome-button-container
+{
+  padding-left: 0;
+}
+
+[data-glome-container="true"] .glome-row > .glome-price-container
+{
+  white-space: nowrap;
+}
+
+[data-glome-container="true"] .glome-row h1,
+[data-glome-container="true"] .glome-row p
+{
+  margin: 0;
+}
+
+/* !Column widths */
+@for $i from 1 through 7
+{
+  [data-glome-container="true"] .glome-cols-#{$i}
+  {
+    width: ($col_width + $col_margin) * $i - $col_margin;
+  }
+}
+
+[data-glome-container="true"] .glome-full-width
+{
+  width: ($col_width + $col_margin) * 7 - $col_margin;
+  margin: 0 auto;
+}
+
+/* !Admin view */
+#glomeAdmin
+{
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#glomeAdmin .glome-header,
+#glomeAdmin .glome-footer
+{
+  @include container;
+  background:
+  {
+    color: #ebebeb;
+  }
+}
+
+#glomeAdmin .glome-footer
+{
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+#glomeAdmin .glome-header
+{
+  box-shadow: 0 $navigation_height 0 rgba(77, 77, 77, 1);
+  @media screen and (max-height: $small_screen_height)
+  {
+    height: $header_height / 2;
+  }
+  
+  img.glome-icon
+  {
+    width: 76px;
+    height: 106px;
+    @media screen and (max-height: $small_screen_height)
+    {
+      width: (76px / 2);
+      height: (106px / 2);
+    }
+  }
+}
+
+/* !Admin header */
+#glomeAdminHeader
+{
+  height: $header_height;
+  padding-top: 35px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $full_page_z_index + 1;
+  @media screen and (max-height: $small_screen_height)
+  {
+    padding-top: 20px;
+    height: $header_height / 2;
+  }
+}
+
+#glomeAdmin .glome-close
+{
+  @include close;
+}
+
+/* !Admin navigation */
+#glomeAdmin .glome-navigation
+{
+  display: block;
+  float: right;
+  margin: 45px 0 0;
+  padding: 0;
+  @media screen and (max-height: $small_screen_height)
+  {
+    margin-top: 0;
+  }
+}
+
+#glomeAdmin .glome-navigation > li
+{
+  height: 80px;
+  overflow: visible;
+}
+
+#glomeAdmin .glome-navigation > li + li
+{
+  margin-left: $col_margin;
+}
+
+#glomeAdmin .glome-navigation > li,
+#glomeAdmin .glome-navigation > li > a
+{
+  display: block;
+  float: left;
+}
+
+#glomeAdmin .glome-navigation > li > a
+{
+  @include container;
+  text-align: center;
+  color: #cfcdcd;
+  height: 55px;
+  line-height: 25px;
+  clear: both;
+  font-size: 108%;
+  @media screen and (max-height: $small_screen_height)
+  {
+    height: 35px;
+  }
+}
+
+#glomeAdmin .glome-navigation > li.selected > a,
+#glomeAdmin .glome-navigation > li:hover > a
+{
+  text:
+  {
+    decoration: none !important;
+  }
+  color: #33cc00;
+}
+
+#glomeAdmin .glome-navigation > li > a:before
+{
+  background:
+  {
+    repeat: no-repeat;
+    position: center top;
+    size: 35px 35px;
+  }
+  display: block;
+  clear: both;
+  margin: 0 auto;
+  width: 60px;
+  height: 40px;
+  content: "";
+  opacity: (255 - 205) / 255;
+  @media screen and (max-height: $small_screen_height)
+  {
+    height: 30px;
+    background-size: 25px 25px;
+  }
+}
+
+@each $type in subscriptions, statistics, rewards, settings
+{
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"] > a:before
+  {
+    background-image: url(../images/icons/icon-#{$type}.svg);
+  }
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"].selected > a:before,
+  #glomeAdmin .glome-navigation > li[data-page="#{$type}"]:hover > a:before
+  {
+    background-image: url(../images/icons/icon-#{$type}-gradient.svg);
+    opacity: 1;
+  }
+}
+
+#glomeAdmin .glome-navigation > li.selected > a:before
+{
+  background-position-y: 0 !important;
+}
+
+#glomeAdmin .glome-navigation > li.selected > a:after
+{
+  background:
+  {
+    image: url(../images/textures/selected-triangle.svg);
+    size: 32px 16px;
+    position: center bottom;
+    repeat: no-repeat;
+  }
+  content: "";
+  display: block;
+  margin-top: 16px;
+  height: 20px;
+  @media screen and (max-height: $small_screen_height)
+  {
+    margin-top: 0;
+  }
+}
+
+/* !Admin navigation, second level */
+#glomeAdmin .glome-navigation > li > ul
+{
+  display: none;
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul
+{
+  display: block;
+  position: fixed;
+  top: $header_height;
+  left: 50%;
+  margin:
+  {
+    left: -1 * (($col_width + $col_margin) - $col_margin) / 2;
+    top: 0;
+    right: 0;
+    bottom: 0;
+  }
+  padding: 0;
+  width: ($col_width + $col_margin) * 4 - $col_margin;
+  height: $navigation_height;
+  line-height: $navigation_height;
+  @media screen and (max-height: $small_screen_height)
+  {
+    top: $header_height / 2;
+  }
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul li
+{
+  display: block;
+  float: left;
+  width: $col_width;
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul li + li
+{
+  margin-left: $col_margin;
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul li,
+#glomeAdmin .glome-navigation > li.selected > ul li a
+{
+  color: $text_color_light;
+  text-decoration: none !important;
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul a:hover,
+#glomeAdmin .glome-navigation > li.selected > ul li.selected a
+{
+  color: #54ec01;
+}
+
+#glomeAdmin .glome-navigation > li.selected > ul li.selected a
+{
+  font-weight: 700;
+}
+
+/* !Admin content */
+#glomeAdminContent
+{
+  @include container;
+  background:
+  {
+    image: url(../images/textures/admin-background-texture.gif);
+    attachment: fixed;
+    color: $button_gray_medium;
+  }
+  overflow-y: scroll;
+  left: 0;
+  top: $header_height + $navigation_height;
+  right: 0;
+  bottom: $footer_height;
+  padding:
+  {
+    top: 25px;
+    left: 15px;
+    bottom: 25px;
+  }
+  position: fixed;
+  z-index: $full_page_z_index;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  @media screen and (max-height: $small_screen_height)
+  {
+    top: $header_height / 2 + $navigation_height;
+    bottom: $footer_height / 2;
+  }
+}
+
+#glomeAdminContent > .glome-full-width
+{
+  padding-bottom: 25px;
+}
+
+/* !Admin footer */
+#glomeAdminFooter
+{
+  height: $footer_height;
+  line-height: $footer_height;
+  position: fixed;
+  z-index: $full_page_z_index + 1;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  @media screen and (max-height: $small_screen_height)
+  {
+    height: $footer_height / 2;
+    line-height: $footer_height / 2;
+  }
+}
+
+/* !Admin pages: subscriptions */
+#glomeAdminSubscriptions .glome-selection-counter
+{
+  @include selection-counter;
+  bottom: $footer_height + 10;
+}
+
+#glomeAdminSubscriptions .glome-selection-counter .glome-unit,
+#glomePublicSubscriptions .glome-selection-counter .glome-unit
+{
+  font:
+  {
+    size: $font_size;
+    weight: 500;
+  }
+}
+
+/* !Admin pages: rewards */
+#glomeAdmin .glome-total-rewards
+{
+  display: table-cell;
+  vertical-align: bottom;
+  padding: 0.5em 0;
+}
+
+#glomeAdmin .glome-total-rewards [data-type="currency"],
+#glomeAdmin .glome-total-rewards [data-type="full"],
+#glomeAdmin .glome-total-rewards [data-type="decimal-separator"]
+{
+  font:
+  {
+    size: 300%;
+    weight: bold;
+  }
+}
+
+#glomeAdmin .glome-total-rewards [data-type="cents"]
+{
+  font-size: 175%;
+}
+
+/* !Admin pages: settings */
+#glomeAdminSettingsChangePassword input,
+#glomePublicSetPassword input,
+#glomePublicRequirePassword input
+{
+  width: ($col_width + $col_margin) * 2 - $col_margin;
+  margin-bottom: $font_size;
+}
+
+#glomeAdminSettingsChangePassword
+{
+  @include container;
+  padding-left: $col_margin + $col_width;
+  padding-right: $col_margin + $col_width;
+  border:
+  {
+    style: none none solid;
+    width: 1px;
+    color: $separator;
+  }
+  padding-bottom: 20px;
+}
+
+#glomeAdminSettingsChangePassword button
+{
+  float: right;
+  width: $col_width;
+}
+
+#glomeAdminSettings hr
+{
+  margin-bottom: 20px;
+}
+
+#glomeAdminSettingsPairDevices input
+{
+  width: $col_width;
+  display: inline-block;
+  margin-left: $col_margin - 0.5px; // Some odd layout issue prevents full columns from fitting
+  font:
+  {
+    size: 20px !important;
+    weight: 600;
+  }
+}
+
+/* !Public views */
+#glomePublic
+{
+  z-index: $full_page_z_index;
+  background:
+  {
+    color: rgba(0, 0, 0, 0.95);
+  }
+}
+
+#glomePublicHeader
+{
+  @include container;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 40px 0;
+  height: $header_height;
+  img.glome-icon
+  {
+    @include container;
+    width: 76px;
+    height: 106px;
+  }
+  @media screen and (max-height: $small_screen_height)
+  {
+    height: $header_height / 2;
+    padding: 20px 0;
+    img.glome-icon
+    {
+      width: (76px / 2);
+      height: (106px / 2);
+    }
+  }
+}
+
+#glomePublicFooter
+{
+  @extend #glomeAdminFooter;
+  letter-spacing: 0.5pt;
+  &,
+  a
+  {
+    color: $text_color_medium;
+  }
+}
+
+#glomePublicFooter .glome-text-separator:before
+{
+  content: " | ";
+  margin: 0 1em;
+}
+
+#glomePublicContent
+{
+  @extend #glomeAdminContent;
+  @include container;
+  overflow-y: auto;
+  top: $header_height;
+  bottom: $footer_height;
+  padding: 0 0 $pager_height;
+  background:
+  {
+    image: none;
+    color: transparent;
+  }
+  position: fixed;
+  z-index: $full_page_z_index;
+  @media screen and (max-height: $small_screen_height)
+  {
+    top: $header_height / 2;
+    bottom: $footer_height / 2;
+  }
+}
+
+#glomePublicContent .glome-content-wrapper
+{
+  min-height: 300px;
+  padding:
+  {
+    top: 25px;
+    left: 15px;
+    bottom: 25px;
+  }
+  position: absolute;
+  left: 0;
+  right: 0;
+  background:
+  {
+    image: url(../images/textures/admin-background-texture.gif);
+    color: $button_gray_medium;
+    attachment: fixed;
+  }
+}
+
+#glomePublicContent .glome-pager
+{
+  @include container;
+  $padding: 14px;
+  background:
+  {
+    image: url(../images/textures/admin-background-texture.gif);
+    attachment: fixed;
+    color: $button_gray_medium;
+  }
+  bottom: $footer_height;
+  height: $pager_height;
+  padding: $padding 0;
+  line-height: 35px;
+  z-index: $full_page_z_index + 2;
+  border:
+  {
+    style: solid none none;
+    color: $separator;
+    width: 1px;
+  }
+  @media screen and (max-height: $small_screen_height)
+  {
+    bottom: $footer_height / 2;
+  }
+}
+
+#glomePublicSubscriptions .glome-pager
+{
+  position: fixed;
+}
+
+/* !First run, stage 1: initialize Glome */
+#glomePublicStartup
+{
+  height: 100%;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  width: $full_width;
+  padding-top: 50px;
+  a
+  {
+    color: $button_gray_dark;
+    font-weight: 600;
+  }
+  @media screen and (max-height: $small_screen_height)
+  {
+    padding-top: 0;
+  }
+}
+
+#glomePublicStartup .glome-button
+{
+  height: 70px;
+  line-height: 70px;
+  margin: 1em 0;
+  font:
+  {
+    size: 185% !important;
+  }
+}
+
+#glomePublic .glome-close
+{
+  @include close;
+  background:
+  {
+    image: url('../images/icons/icon-x-white.svg');
+  }
+}
+
+/* !First run, stage 2: set subscriptions */
+#glomePublicSubscriptions .glome-selection-counter
+{
+  @include selection-counter;
+  bottom: $footer_height + $pager_height + 10;
+}
+
+/* !First run, stage 3: set password */
+#glomePublicSetPassword,
+#glomePublicRequirePassword
+{
+  @extend #glomeAdminSettingsChangePassword;
+  border: none;
+  padding:
+  {
+    left: 0;
+    top: 40px;
+    bottom: 80px;
+  }
+}
+
+/* !First run, stage 4: finish */
+#glomePublicFinish
+{
+  @extend #glomePublicStartup;
+  padding-top: 50px;
+}
+
+#glomePublicFinish .glome-settings
+{
+  background:
+  {
+    image: url(../images/icons/icon-settings.svg);
+    size: 30px 30px;
+  }
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  opacity: 0.7;
+  &:hover
+  {
+    opacity: 1;
+  }
+}
+
+/* !View ad */
+#glomePublicAd button
+{
+  font-size: 138% !important;
+}
+
+#glomePublicAd button + button
+{
+  float: right;
+}
+
+#glomePublicAd .glome-ad-actions
+{
+  margin-top: 20px;
+}
+
+#glomePublicAd .glome-cols-ad-description
+{
+  width: ($col_width * 4 - $col_margin) - $ad_image_width;
+}
+
+#glomePublicAd .glome-ad-bonus h2
+{
+  margin-top: 0 !important;
+}
+
+#glomePublicAd .glome-cols-ad-image
+{
+  width: $ad_image_width;
+  img
+  {
+    min-width: $ad_image_width;
+    max-width: $ad_image_width;
+  }
+}
+
+#glomePublicCategory .glome-ad-row
+{
+  .glome-text-container h1,
+  .glome-text-container p
+  {
+    height: 1em;
+    overflow: hidden;
+  }
+  .glome-image-container
+  {
+    width: 100px;
+    img
+    {
+      max-width: 100px;
+      max-height: 50px;
+    }
+  }
+}
+
+/* !Glome widget */
+#glomeWidget
+{
+  position: fixed;
+  left: auto;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  min-width: $widget_height;
+  height: $widget_height;
+  line-height: $widget_height;
+  z-index: $full_page_z_index - 10;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  background:
+  {
+    color: $widget_gray_dark;
+    image: -webkit-linear-gradient(bottom, $widget_gray_dark 0%, $widget_gray_medium 100%);
+    image: -moz-linear-gradient(bottom, $widget_gray_dark 0%, $widget_gray_medium 100%);
+    image: -ms-linear-gradient(bottom, $widget_gray_dark 0%, $widget_gray_medium 100%);
+    image: -o-linear-gradient(bottom, $widget_gray_dark 0%, $widget_gray_medium 100%);
+    image: linear-gradient(bottom, $widget_gray_dark 0%, $widget_gray_medium 100%);
+  }
+}
+
+#glomeWidget #glomeWidgetContent
+{
+  display: none;
+}
+
+#glomeWidget #glomeWidgetContent,
+#glomeWidget #glomeWidgetContent a
+{
+  color: $widget_gray_light;
+}
+
+#glomeWidget[data-state="open"] #glomeWidgetContent
+{
+  float: left;
+  display: block;
+  height: $widget_height;
+  .glome-ad-logo img
+  {
+    display: inline-block;
+    max-height: $widget_height - 10;
+    max-width: 150px;
+    vertical-align: middle;
+  }
+}
+
+#glomeWidget[data-state="open"] #glomeWidgetContent > *
+{
+  display: table-cell;
+  vertical-align: middle;
+  font-weight: 600;
+  padding:
+  {
+    left: 1em;
+    right: 1em;
+  }
+}
+
+#glomeWidget[data-state="open"] #glomeWidgetContent .glome-ad-reward
+{
+  color: $widget_gray_dark;
+  background:
+  {
+    color: $button_green_medium;
+    image: -webkit-linear-gradient(bottom, $button_green_medium 0%, $button_green_light 100%);
+    image: -moz-linear-gradient(bottom, $button_green_medium 0%, $button_green_light 100%);
+    image: -ms-linear-gradient(bottom, $button_green_medium 0%, $button_green_light 100%);
+    image: -o-linear-gradient(bottom, $button_green_medium 0%, $button_green_light 100%);
+    image: linear-gradient(bottom, $button_green_medium 0%, $button_green_light 100%);
+  }
+}
+
+#glomeWidgetIcon
+{
+  width: $widget_height;
+  height: $widget_height;
+  display: block;
+  float: left;
+  background:
+  {
+    image: url(../images/icons/glome-symbol-light-grayscale.svg);
+    position: center center;
+    size: 30px 30px;
+    repeat: no-repeat;
+  }
+}
+
+#glomeWidget[data-state="knock"] #glomeWidgetIcon
+{
+  background-image: url("../images/icons/glome-symbol-light-green.svg");
+}
