@@ -24,17 +24,17 @@
 ;(jQuery)
 {
   var version = '0.1a';
-  
+
   /**
    * Glome master class, which is responsible for all of the non-DOM interactions
    */
   jQuery.Glome = function(options)
   {
     'use strict';
-    
+
     var plugin = this;
     var context = null;
-    
+
     this.version = version;
     this.glomeid = null;
     this.idPrefix = '';
@@ -45,12 +45,12 @@
     this.contentPrefix = '';
     this.templateLocation = 'template.html';
     this.userData = null;
-    
+
     /**
      * Switch to determine if first run should be the starting point
      */
     this.firstrun = true;
-    
+
     /**
      * Online status and respective event listener
      */
@@ -59,10 +59,10 @@
     {
       plugin.online = window.navigator.onLine;
     });
-    
+
     /**
      * Return the current Glome ID
-     * 
+     *
      * return Glome ID
      */
     plugin.id = function()
@@ -73,7 +73,7 @@
       }
       return this.glomeid;
     }
-    
+
     /* !Tools */
     /**
      * Generic tools
@@ -84,10 +84,10 @@
       {
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
       },
-      
+
       /**
        * Validate callbacks
-       * 
+       *
        * @param mixed callback       Callback to validate
        * @param boolean allowArrays  Should (flat) arrays be allowed for callbacks
        * @return true                True if the callback is valid, throw an error if not
@@ -98,7 +98,7 @@
         {
           allowArrays = true;
         }
-        
+
         if (!callback)
         {
           return true;
@@ -125,25 +125,25 @@
         {
           throw new Error('Callback has to be a function or an array of functions');
         }
-        
+
         return true;
       },
-      
+
       /**
        * Merge callbacks
-       * 
+       *
        * @param mixed     Free number of arrays and functions as arguments
        */
       mergeCallbacks: function()
       {
         var callbacks = [];
-        
+
         for (var i = 0; i < arguments.length; i++)
         {
           try
           {
             this.validateCallback(arguments[i]);
-            
+
             if (!arguments[i])
             {
               continue;
@@ -166,13 +166,13 @@
             throw e;
           }
         }
-        
+
         return callbacks;
       },
-      
+
       /**
        * Trigger callbacks
-       * 
+       *
        * @param mixed     Free number of arrays and functions as arguments
        */
       triggerCallbacks: function()
@@ -187,12 +187,12 @@
           {
             throw e;
           }
-          
+
           if (!arguments[i])
           {
             continue;
           }
-          
+
           if (jQuery.isArray(arguments[i]))
           {
             for (var n = 0; n < arguments[i].length; n++)
@@ -206,10 +206,10 @@
           }
         }
       },
-      
+
       /**
        * Add a listener to a context
-       * 
+       *
        * @param function listener      Listener function
        * @param string id              Listener id
        * @param string context         Listener context
@@ -220,54 +220,54 @@
         {
           throw new Error('Trying to add a listener to undefined context');
         }
-        
+
         if (typeof plugin[context].listeners === 'undefined')
         {
           throw new Error('Trying to add a listener to a restricted context');
         }
-        
+
         if (typeof listener != 'function')
         {
           throw new Error('Glome.Ads.addListener requires a function as argument, when one is given');
         }
-        
+
         if (!id)
         {
           id = 0;
-          
+
           do
           {
             id++;
           }
           while (typeof plugin[context].listeners[id] !== 'undefined')
         }
-        
+
         id = id.toString();
-        
+
         plugin[context].listeners[id] = listener;
         return id;
       },
-      
+
       /**
        * Remove a listener
-       * 
+       *
        * @param mixed listener
        * @param string context
        */
       removeListener: function(listener, context)
       {
         var i;
-        
+
         if (typeof plugin[context] === 'undefined')
         {
           throw new Error('Trying to add a listener to undefined context');
         }
-        
+
         if (typeof plugin[context].listeners === 'undefined')
         {
           throw new Error('Trying to add a listener to a restricted context');
         }
-        
+
         if (typeof listener === 'function')
         {
           for (i in plugin[context].listeners)
@@ -277,23 +277,23 @@
               delete plugin[context].listeners[i];
             }
           }
-          
+
           return true;
         }
-        
+
         listener = listener.toString();
-        
+
         if (typeof plugin[context].listeners[listener] !== 'undefined')
         {
           delete plugin[context].listeners[listener];
         }
-        
+
         return true;
       },
-      
+
       /**
        * Trigger context listeners
-       * 
+       *
        * @param string context
        */
       triggerListeners: function(context, type, t)
@@ -302,20 +302,20 @@
         {
           throw new Error('Trying to add a listener to undefined context');
         }
-        
+
         if (plugin[context].disableListeners)
         {
           return;
         }
-        
+
         for (var i in plugin[context].listeners)
         {
           plugin[context].listeners[i].context = plugin.Categories;
-          plugin[context].listeners[i](type, t); 
+          plugin[context].listeners[i](type, t);
         }
       }
     }
-    
+
     /* !Browser */
     /**
      * Browser rules. In extensions this is where local storage shall be overridden
@@ -328,7 +328,7 @@
         window.open(url);
       }
     }
-    
+
     /* !Data */
     /**
      * Data access
@@ -337,7 +337,7 @@
     {
       /**
        * Get a locally stored value
-       * 
+       *
        * @param string key
        * @return mixed        Returns the typecasted value
        */
@@ -347,31 +347,31 @@
         {
           throw new Error('Glome.get expects exactly one argument');
         }
-        
+
         // @TODO: support extensions and store the information on their local storage or preferences
         // via their own interfaces
-        
+
         var storage = JSON.parse(window.localStorage.getItem(key));
-        
+
         // If there is nothing in the storage, return null
         if (   !storage
             || typeof storage.val == 'undefined')
         {
           return null;
         }
-        
+
         // Check the type
         if (typeof storage.val !== storage.type)
         {
           throw new Error('Type mismatch error: ' + storage.type + ' is not ' + typeof storage.val);
         }
-        
+
         return storage.val;
       },
-      
+
       /**
        * Set a value for the local storage
-       * 
+       *
        * @param String key    Storage identifier
        * @param mixed value   Storage value
        * @return mixed        True on successful storage
@@ -382,19 +382,19 @@
         {
           throw new Error('Glome.set expects exactly two arguments');
         }
-        
+
         // Store typecasted object
         var storage =
         {
           type: typeof value,
           val: value
         }
-        
+
         window.localStorage.setItem(key, JSON.stringify(storage));
         return true;
       }
     }
-    
+
     /**
      * Data storage backend when not using localStorage
      */
@@ -404,29 +404,29 @@
         {
           throw new Error('Method "get" is a requirement for data storage backend');
         }
-        
+
         if (typeof backend.set !== 'function')
         {
           throw new Error('Method "set" is a requirement for data storage backend');
         }
-        
+
         plugin.Data = backend;
-        
+
         // Run initialization if applicable
         if (plugin.Data.init)
         {
           plugin.Data.init();
         }
     }
-    
+
     if (options.dataBackend)
     {
       plugin.setDataBackend(options.dataBackend);
     }
-    
+
     /**
      * Set or get preferences
-     * 
+     *
      * @param String key    Storage identifier
      * @param mixed value   Storage value
      * @return mixed        Stored value or null on get, true on successful storage attempt on set
@@ -438,16 +438,16 @@
         // Get preference
         case 1:
           return plugin.Data.get(key);
-          
+
         // Set preference
         case 2:
           return plugin.Data.set(key, value);
-        
+
         default:
           throw new Error('Glome.pref excepts either one argument for get or two arguments for set');
       }
     };
-    
+
     /* !Templates */
     plugin.Templates =
     {
@@ -456,16 +456,16 @@
        * are stored as jQuery DOM objects
        */
       templates: {},
-      
+
       /**
        * Master template stored after loading the template file, stored as a jQuery DOM object
        */
       masterTemplate: null,
-      
+
       /**
        * Get a template. This effectively creates a clone of the template or throws an error
        * if requested template is not available
-       * 
+       *
        * @param String name     Template name
        * @return jQuery DOM object
        */
@@ -475,33 +475,33 @@
         {
           throw new Error('Glome.loadTemplate expects exactly one parameter');
         }
-        
+
         if (   typeof this.templates == 'null'
             || typeof this.templates !== 'object')
         {
           throw new Error('Glome template failed to load');
         }
-        
+
         if (!this.templates[name])
         {
           throw new Error('No template with name "' + name + '" found');
         }
-        
+
         var tmp = this.templates[name].clone();
-        
+
         if (!tmp.size())
         {
           throw new Error('Unexpected error: failed to clone a new template');
         }
-        
+
         tmp.find('*[data-glome-template]').remove();
-        
+
         return tmp;
       },
-      
+
       /**
        * Load the main set of templates
-       * 
+       *
        * @param function callback    Callback executed on successful load
        */
       load: function(callback)
@@ -511,70 +511,70 @@
           plugin.Tools.triggerCallbacks(callback);
           return;
         }
-        
+
         var default_callback = function(data)
         {
           var regs, tmp, elements, index;
-          
+
           this.masterTemplate = jQuery(data);
           tmp = data;
           elements = [];
           index = 0;
-          
+
           var parts = this.masterTemplate.find('[data-glome-template]');
-          
+
           for (var i = 0; i < parts.size(); i++)
           {
             var part = parts.eq(i).clone();
-            
+
             // Remove references to future releases that already exist
             // on the template file
             part.find('.glome-future-releases').remove();
-            
+
             var templateName = part.attr('data-glome-template');
             this.templates[templateName] = part;
           }
-          
+
           i = 0;
-          
+
           // Get all links directly from the raw text source
           while (regs = tmp.match(/(<link.+?>)/))
           {
             var str = plugin.Tools.escape(regs[1]);
             var regexp = new RegExp(str, 'g');
             tmp = tmp.replace(regexp, '');
-            
+
             elements.push(jQuery(regs[1]));
-            
+
             i++;
           }
-          
+
           for (var i = 0; i < elements.length; i++)
           {
             var element = elements[i];
-            
+
             // Not related to Glome, no need to add
             if (!element.attr('data-glome-include'))
             {
               continue;
             }
-            
+
             var href = element.attr('href');
-            
+
             if (href.substr(0, plugin.contentPrefix.length) !== plugin.contentPrefix)
             {
               element.attr('href', plugin.contentPrefix + href);
             }
-            
+
             if (!jQuery('head').find('link[href="' + element.attr('href') + '"]').size())
             {
               jQuery('head').append(element);
             }
           }
         }
-        
+
         var callbacks = plugin.Tools.mergeCallbacks(default_callback, callback);
-        
+
         jQuery.ajax
         (
           {
@@ -586,10 +586,10 @@
           }
         );
       },
-      
+
       /**
        * Populate a template with data
-       * 
+       *
        * @param string template    Template name
        * @param mixed data         Template data
        */
@@ -598,10 +598,10 @@
         var tmp = this.get(template);
         return this.parse(tmp, data);
       },
-      
+
       /**
        * Parse a template with data
-       * 
+       *
        * @param mixed dom          jQuery wrappable object or text
        * @param mixed data         Template data
        */
@@ -609,36 +609,36 @@
       {
         var tmp = jQuery(dom).get(0).outerHTML;
         var matches = {}
-        
+
         while (tmp.match(/\{([A-Za-z0-9_]+)\}/))
         {
           var regs = tmp.match(/\{([A-Za-z0-9\_]+)\}/);
           var regexp = new RegExp(plugin.Tools.escape(regs[0]), 'g');
           var value = '‹«' + regs[1] + '»›';
           var key = regs[1];
-          
+
           if (typeof data[key] !== 'undefined')
           {
             var value = String(data[key]);
           }
-          
+
           tmp = tmp.replace(regexp, value);
         }
-        
+
         tmp = tmp.replace(/‹«([A-Za-z0-9_]+)»›/g, '{$1}');
-        
+
         return jQuery(tmp);
       }
     }
-    
+
     /* !API */
     /**
      * Data access API
      */
     plugin.Api =
     {
-      server: plugin.pref('server') || 'https://api.glome.me/',
-      
+      server: plugin.pref('api.server') || 'https://api.glome.me/',
+
       // Store the handles here
       types:
       {
@@ -673,40 +673,40 @@
           allowed: ['create']
         }
       },
-      
+
       /**
        * Parse URL
-       * 
+       *
        * @param string url    URL to be parsed
        * @return string       Parsed URL where some variables are parsed
        */
       parseURL: function(url)
       {
         var from, to, re, regs, key;
-        
+
         re = new RegExp('\{([a-zA-Z0-9]+)\}');
-        
+
         while (url.match(re))
         {
           regs = url.match(re);
           key = regs[1];
-          
+
           from = new RegExp(plugin.Tools.escape(regs[0]), 'g');
-          
+
           switch (key)
           {
             case 'glomeid':
               to = plugin.id();
               break;
-            
+
             case 'subscriptionId':
               to = plugin.Categories.subscriptionId;
               break;
-            
+
             case 'subscriptionStatus':
               to = plugin.Categories.subscriptionStatus;
               break;
-            
+
             default:
               if (!plugin[key])
               {
@@ -714,16 +714,16 @@
               }
               to = plugin[key];
           }
-          
+
           url = url.replace(from, to);
         }
-        
+
         return url;
       },
-      
+
       /**
        * Camel case shorthand for parseURL method
-       * 
+       *
        * @param string url    URL to be parsed
        * @return string       Parsed URL where some variables are parsed
        */
@@ -731,10 +731,10 @@
       {
         return this.parseURL(url);
       },
-        
+
       /**
        * Set data on Glome server
-       * 
+       *
        * @param string type
        * @param Object data
        * @param function callback   @optional Callback function
@@ -748,51 +748,51 @@
         {
           throw new Error('Glome.API.request expects at least two arguments');
         }
-        
+
         if (typeof this.types[type] == 'undefined')
         {
           throw new Error('Glome.Api.request does not support request ' + type);
         }
-        
+
         // Type check for data
         if (   data
             && !jQuery.isPlainObject(data))
         {
           throw new Error('When passing data to Glome.Api.request, it has to be an object. Now received typeof ' + typeof data);
         }
-        
+
         // Type check for callback
         plugin.Tools.validateCallback(callback);
-        
+
         if (!onerror)
         {
           onerror = null;
         }
-        
+
         // Type check for onerror
         plugin.Tools.validateCallback(onerror);
-        
+
         if (!method)
         {
           method = 'POST';
         }
-        
+
         if (!method.toString().match(/^(GET|POST|PUT|DELETE)$/))
         {
           throw new Error('"' + method.toString() + '" is not a valid method');
         }
-        
+
         if (   method.toString() === 'POST'
             && !jQuery.isPlainObject(data))
         {
           throw new Error('Glome.API.request does not allow function as second argument for method "' + method + '"');
         }
-        
+
         // Check for connection
         if (!plugin.online)
         {
           console.warn('No Internet connection, impossible to do API calls');
-          
+
           if (jQuery.isArray(onerror))
           {
             for (var i = 0; i < onerror.length(); i++)
@@ -804,14 +804,14 @@
           {
             onerror();
           }
-          
+
           throw new Error('No Internet connection');
         }
-        
+
         var request = jQuery.ajax
         (
           {
-            url: plugin.API.parseURL(this.server + this.types[type].url),
+            url: plugin.API.parseURL(plugin.pref('api.server') + this.types[type].url),
             data: data,
             type: method.toString(),
             dataType: 'json',
@@ -829,10 +829,10 @@
         );
         return request;
       },
-      
+
       /**
        * Get request. Shorthand and backwards compatibility for API.read
-       * 
+       *
        * @access public
        * @param string type         Purpose of the request i.e. API identifier
        * @param object data         Data used for the GET request, @optional
@@ -844,10 +844,10 @@
       {
         return this.read(type, data, callback, onerror);
       },
-      
+
       /**
        * Set request. Shorthand and backwards compatibility for API.create
-       * 
+       *
        * @access public
        * @param string type         Purpose of the request i.e. API identifier
        * @param object data         Data used for the GET request, @optional
@@ -859,10 +859,10 @@
       {
         return this.create(type, data, callback, onerror);
       },
-      
+
       /**
        * Create data on Glome server. This is a shorthand for calling API.request with POST as method
-       * 
+       *
        * @param string type
        * @param Object data
        * @param function callback   @optional Callback function
@@ -876,13 +876,13 @@
         {
           throw new Error('Creating this type "' + type + '" is not allowed');
         }
-        
+
         return this.request(type, data, callback, onerror, 'POST');
       },
-      
+
       /**
        * Read request. This is effectively an alias to API.get
-       * 
+       *
        * @access public
        * @param string type         Purpose of the request i.e. API identifier
        * @param object data         Data used for the GET request, @optional
@@ -898,7 +898,7 @@
         {
           throw new Error('Creating this type "' + type + '" is not allowed');
         }
-        
+
         if (   typeof data == 'undefined'
             || typeof data == 'function'
             || jQuery.isArray(data))
@@ -907,18 +907,18 @@
           callback = data;
           data = {};
         }
-        
+
         if (!data)
         {
           data = {};
         }
-        
+
         return this.request(type, data, callback, onerror, 'GET');
       },
-      
+
       /**
        * Update data on Glome server. This is a shorthand for calling API.request with PUT as method
-       * 
+       *
        * @param string type
        * @param Object data
        * @param function callback   @optional Callback function
@@ -932,13 +932,13 @@
         {
           throw new Error('Updating this type "' + type + '" is not allowed');
         }
-        
+
         return this.request(type, data, callback, onerror, 'PUT');
       },
-      
+
       /**
        * Update data on Glome server. This is a shorthand for calling API.request with PUT as method
-       * 
+       *
        * @param string type
        * @param Object data
        * @param function callback   @optional Callback function
@@ -952,23 +952,23 @@
         {
           throw new Error('Deleting this type "' + type + '" is not allowed');
         }
-        
+
         if (typeof data == 'function')
         {
           onerror = callback;
           callback = data;
           data = {};
         }
-        
+
         return this.request(type, data, callback, onerror, 'DELETE');
       }
     };
-    
+
     /**
      * Alias for the sake of typing errors
      */
     plugin.API = plugin.Api;
-    
+
     /* !Auth */
     /**
      * Authentication
@@ -977,7 +977,7 @@
     {
       /**
        * Login a user
-       * 
+       *
        * @param string id, Glome ID
        * @param string password, Glome ID password, optional; by default an empty password is used
        * @param function callback, optional login callback
@@ -989,18 +989,18 @@
         {
           id = plugin.id();
         }
-        
+
         if (!id)
         {
           throw new Error('Glome ID not available');
         }
-        
+
         if (   !id
             || !id.toString().match(/^[a-z0-9]+$/))
         {
           throw new Error('Glome ID not available');
         }
-        
+
         // Typecast password to be a string
         if (!passwd)
         {
@@ -1010,7 +1010,7 @@
         {
           throw new Error('Password has to be a string');
         }
-        
+
         var callbacks = plugin.Tools.mergeCallbacks
         (
           function(data, status, jqXHR)
@@ -1018,20 +1018,22 @@
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
             plugin.userData = data;
-            
+
             var token = jqXHR.getResponseHeader('X-CSRF-Token');
             var cookie = jqXHR.getResponseHeader('Set-Cookie');
-            
+
             if (token)
             {
               plugin.sessionToken = token;
+              plugin.pref('session.token', token);
             }
-            
+
             if (cookie)
             {
               plugin.cookie = cookie;
+              plugin.pref('session.cookie', cookie);
             }
-            
+
             jQuery.ajaxSetup
             (
               {
@@ -1041,7 +1043,15 @@
                 },
                 beforeSend: function(jqxhr)
                 {
-                  alert(plugin.sessionToken);
+                  // revert the token and cookie from prefs if available
+                  if (typeof plugin.pref('session.token') != 'undefined')
+                  {
+                    plugin.sessionToken = plugin.pref('session.token');
+                  }
+                  if (typeof plugin.pref('session.cookie') != 'undefined')
+                  {
+                    plugin.cookie = plugin.pref('session.cookie');
+                  }
                   jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
                   jqxhr.setRequestHeader('Cookie', plugin.cookie);
                 }
@@ -1050,7 +1060,7 @@
           },
           callback
         );
-        
+
         var onerrors = plugin.Tools.mergeCallbacks
         (
           function()
@@ -1064,7 +1074,7 @@
           },
           onerror
         );
-        
+
         // Default error handling
         plugin.API.request
         (
@@ -1080,28 +1090,28 @@
           onerrors,
           'POST'
         );
-        
+
         return true;
       },
-      
+
       /**
        * How many times has the user attampted to login
        */
       loginAttempts: 0,
-      
+
       /**
        * Logout a user
-       * 
+       *
        * @param int Glome ID, optional; by default the current user ID is used, if available
        */
       logout: function(id)
       {
-        
+
       },
-      
+
       /**
        * Initialize Glome
-       * 
+       *
        * @param string ID
        * @param int counter Recursive call counter
        */
@@ -1111,36 +1121,36 @@
         {
           counter = 1;
         }
-        
+
         if (counter >= 10)
         {
           throw new Error('Exceeded maximum number of times to create a Glome ID');
         }
-        
+
         if (!id)
         {
           throw new Error('Glome ID creation requires a parameter');
         }
-        
+
         if (!id.toString().match(/^[0-9a-z]+$/i))
         {
           throw new Error('Glome ID has to be alphanumeric in lowercase');
         }
-        
+
         var glomeId = String(id);
-        
+
         if (counter > 1)
         {
           glomeId += counter;
         }
-        
+
         var callbacks = plugin.Tools.mergeCallbacks
         (
           function(data)
           {
             plugin.pref('glomeid', data.glomeid);
             plugin.glomeid = data.glomeid;
-            
+
             // Login immediately
             plugin.Auth.login(data.glomeid, '', callback, onerror);
           },
@@ -1154,7 +1164,7 @@
           },
           onerror
         );
-        
+
         plugin.API.request
         (
           'user',
@@ -1169,10 +1179,10 @@
           'POST'
         );
       },
-      
+
       /**
        * Update password
-       * 
+       *
        * @param string pw1         Password
        * @param string pw2         Password confirmation
        * @param string oldpass     Existing password - this is a placeholder at the moment as sessioning takes care of it already
@@ -1185,13 +1195,13 @@
         {
           throw new Error('Glome ID is not available');
         }
-        
+
         if (   typeof pw1 !== 'string'
             || typeof pw2 !== 'string')
         {
           throw new Error('Passwords have to be strings');
         }
-        
+
         if (pw1 !== pw2)
         {
           if (onerror)
@@ -1203,7 +1213,7 @@
             throw new Error('Password mismatch error');
           }
         }
-        
+
         var request = plugin.API.update
         (
           'me',
@@ -1219,7 +1229,7 @@
         );
       }
     }
-    
+
     /* !Prototype */
     /**
      * Prototype object for data
@@ -1231,19 +1241,19 @@
         this.container = 'Prototype';
         this._constructor(data);
       }
-      
+
       plugin.Prototype.stack = {};
-      
+
       /**
        * Registered listener functions that will be called on change event
-       * 
+       *
        * @param Array
        */
       plugin.Prototype.listeners = {};
-      
+
       /**
        * Default constructor. Optionally either leave blank to create a completely new and
-       * unbound object, otherwise 
+       * unbound object, otherwise
        *
        * @param mixed data    Integer or a plain object with key-value pairs @optional
        */
@@ -1253,12 +1263,12 @@
         if (this.container)
         {
           var container = this.container;
-          
+
           if (typeof plugin[container] == 'undefined')
           {
             plugin[container] = {};
           }
-          
+
           if (typeof plugin[container].stack == 'undefined')
           {
             plugin[container].stack = {};
@@ -1269,45 +1279,45 @@
             });
 */
           }
-          
+
           if (typeof plugin[container].listeners == 'undefined')
           {
             plugin[container].listeners = {};
           }
         }
-        
+
         // Data is set
         if (!data)
         {
           data = {};
         }
-        
+
         this.getById = function(id)
         {
           var container = this.container;
-          
+
           if (   plugin[container]
               && plugin[container].stack
               && plugin[container].stack[id])
           {
             var o = plugin[container].stack[id];
-            
+
             for (i in o)
             {
               if (i === 'id')
               {
                 i = '_id';
               }
-              
+
               this[i] = o[i];
             }
-            
+
             return this;
           }
-          
+
           throw new Error('No ' + container + ' object with id ' + id + ' available');
         }
-        
+
         // If the constructor was given anything else than integer (caught earlier) or
         // a plain object with data, refuse to accept.
         if (!jQuery.isPlainObject(data))
@@ -1316,10 +1326,10 @@
           {
             throw new Error('Non-object constructor has to be an integer');
           }
-          
+
           return this.getById(data);
         }
-        
+
         // Copy all of the properties
         for (var i in data)
         {
@@ -1333,17 +1343,17 @@
           }
         }
       }
-      
+
       /**
        * See that there is always an ID
-       * 
+       *
        * @var integer
        */
       Prototype.prototype.id = null;
-      
+
       /**
        * Delete an object
-       * 
+       *
        * @return boolean True if object was deleted successfully, false on failure
        */
       Prototype.prototype.delete = function()
@@ -1353,10 +1363,10 @@
         {
           return true;
         }
-        
+
         var container = this.container;
         var rVal = true;
-        
+
         if (   container
             && plugin[container]
             && typeof plugin[container].stack !== 'undefined'
@@ -1364,25 +1374,25 @@
         {
           rVal = delete plugin[container].stack[this.id];
         }
-        
+
         if (typeof this.onchange === 'function')
         {
           this.onchange('delete');
         }
-        
+
         return rVal;
       }
-      
+
       /**
        * Change listener
-       * 
+       *
        * @param string type    Change type
        */
       Prototype.prototype.onchange = function(type)
       {
         plugin.Tools.triggerListeners(this.container, type, this)
       }
-      
+
       /**
        * Default setter for property id. Validates the input.
        */
@@ -1390,19 +1400,19 @@
       {
         this.setId(v);
       });
-      
+
       Prototype.prototype.setId = function(v)
       {
         if (!v)
         {
           return;
         }
-        
+
         if (!v.toString().match(/^[1-9][0-9]*$/))
         {
           throw new Error('ID has to be an integer');
         }
-        
+
         if (this._id)
         {
           var prevId = this._id;
@@ -1411,24 +1421,24 @@
         {
           var prevId = null;
         }
-        
+
         this._id = v;
-        
+
         var container = this.container;
-        
+
         if (   container
             && plugin[container]
             && typeof plugin[container].stack !== 'undefined')
         {
           plugin[container].stack[v] = this;
-          
+
           if (   prevId
               && plugin[container].stack[prevId])
           {
             delete plugin[container].stack[prevId];
           }
         }
-        
+
         if (typeof this.onchange == 'function')
         {
           if (prevId)
@@ -1439,11 +1449,11 @@
           {
             var type = 'create';
           }
-          
+
           this.onchange(type);
         }
       }
-      
+
       /**
        * Default getter for property id. Validates the input.
        */
@@ -1451,7 +1461,7 @@
       {
         return this._id;
       });
-      
+
       Prototype.prototype.Extends = function(newClass)
       {
         for (var i in newClass)
@@ -1459,51 +1469,51 @@
           this[i] = newClass[i];
         }
       }
-      
+
       return new Prototype(data);
     };
-      
+
     /* !Ads */
     /**
      * Ads interface object
-     * 
+     *
      * Methods:
-     * 
+     *
      * GLome.Ads.load
      */
     plugin.Ads =
     {
       /**
        * Ad stack for storing the ads
-       * 
+       *
        * @param object
        */
       stack: {},
-      
+
       /**
        * Ad view history as retrieved from Glome server
-       * 
+       *
        * @param Array
        */
       history: [],
-      
+
       /**
        * Registered listener functions that will be called on change event
-       * 
+       *
        * @param Array
        */
       listeners: [],
-      
+
       /**
        * Is ads updating in progress right now? This is to prevent flooding of onchange events
-       * 
+       *
        * @param boolean
        */
       disableListeners: false,
-      
+
       /**
        * Create a new ad or fetch an existing from stack. Constructor
-       * 
+       *
        * @param mixed data
        */
       Ad: function(data)
@@ -1514,11 +1524,11 @@
           this.container = 'Ads';
           this._constructor(data);
         }
-        
+
         Ad.prototype = new plugin.Prototype();
         Ad.prototype.constructor = Ad;
-        
-        
+
+
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
         Ad.prototype.setStatus = function(statusCode)
@@ -1526,15 +1536,15 @@
           this.status = statusCode;
           return true;
         }
-        
+
         var ad = new Ad(data);
-        
+
         return ad;
       },
-      
+
       /**
        * Count ads
-       * 
+       *
        * @param Object filters    Optional filters. @see listAds for more details
        * @return integer          Number of ads matching the filters
        */
@@ -1544,40 +1554,40 @@
         {
           return Object.keys(this.listAds(filters)).length;
         }
-        
+
         return Object.keys(this.stack).length;
       },
-      
+
       /**
        * List ads
-       * 
+       *
        * @param Object filters  Optional filters
        * @return Array of ads
        */
       listAds: function(filters)
       {
         var found, i, k, n;
-        
+
         if (   filters
             && !jQuery.isPlainObject(filters))
         {
           throw new Error('Optional filters parameter has to be an object');
         }
-        
+
         if (!filters)
         {
           return plugin.Ads.stack;
         }
-        
+
         var ads = {};
-        
+
         // Aliases for category
         var cats = ['categories', 'adcategory', 'adcategories'];
-        
+
         for (var i = 0; i < cats.length; i++)
         {
           var cat = cats[i];
-          
+
           if (typeof filters[cat] !== 'undefined')
           {
             filters.category = filters[cat];
@@ -1585,7 +1595,7 @@
             break;
           }
         }
-        
+
         if (   typeof filters.category !== 'undefined'
             && !jQuery.isArray(filters.category))
         {
@@ -1598,16 +1608,16 @@
             throw new Error('Glome.Ads.listAds requires category filter to be an integer or an array of integers');
           }
         }
-        
+
         if (typeof filters.subscribed !== 'undefined')
         {
           var tmp = Object.keys(plugin.Categories.listCategories({subscribed: filters.subscribed}));
-          
+
           // There is a category filter, get array intersect
           if (filters.category)
           {
             var intersect = [];
-            
+
             for (var i = 0; i < filters.category.length; i++)
             {
               if (jQuery.inArray(filters.category[i], tmp) !== -1)
@@ -1615,7 +1625,7 @@
                 intersect.push(filters.category[i]);
               }
             }
-            
+
             filters.category = intersect;
           }
           else
@@ -1623,18 +1633,18 @@
             filters.category = tmp;
           }
         }
-        
+
         // Loop through the ads and apply filters
         for (i in plugin.Ads.stack)
         {
           var ad = plugin.Ads.stack[i];
           var found = false;
-          
+
           for (k in filters)
           {
             // Which object key should be used
             var filterKey = k;
-            
+
             // Filter rules
             switch (k)
             {
@@ -1642,17 +1652,17 @@
               case 'category':
                 filterKey = 'adcategories';
                 var filter = filters[k];
-                
+
                 // @TODO: support filtering by category name (String)
                 var tmp = filters;
-                
+
                 for (n = 0; n < filter.length; n++)
                 {
                   if (!filter[n].toString().match(/^[0-9]+$/))
                   {
                     throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
                   }
-                  
+
                   for (var j = 0; j < ad[filterKey].length; j++)
                   {
                     if (ad[filterKey][j].id == filter)
@@ -1661,18 +1671,18 @@
                       break;
                     }
                   }
-                  
+
                   if (found)
                   {
                     break;
                   }
                 }
                 break;
-              
+
               // Add here the cases where search is from a string or a number
               case 'status':
                 var filter = filters[k];
-                
+
                 if (typeof filter == 'number')
                 {
                   if (ad[filterKey] === filter)
@@ -1684,7 +1694,7 @@
                 else if (jQuery.isArray(filter))
                 {
                   var tmp = filters;
-                  
+
                   for (n = 0; n < filter.length; n++)
                   {
                     tmp.category = filter[n];
@@ -1696,27 +1706,27 @@
                   throw new Error('Glome.Ads.listAds requires ' + k + ' filter to be an integer or an array of integers');
                 }
                 break;
-              
+
               // Matching of the categories has already been done
               case 'subscribed':
                 break;
-              
+
               default:
                 throw new Error('Glome.Ads.listAds does not have a filter ' + k);
             }
           }
-          
+
           if (found)
           {
             var id = ad._id;
             ads[id] = ad;
           }
         }
-        
+
         return ads;
       },
-      
-      /** 
+
+      /**
        * Removes an ad from the stack
        *
        * @param id
@@ -1727,11 +1737,11 @@
         {
           return true;
         }
-        
+
         delete this.stack[id];
         plugin.Ads.onchange();
-        
-        
+
+
         if (typeof this.stack[id] == 'undefined')
         {
           return true;
@@ -1741,41 +1751,41 @@
           return false;
         }
       },
-      
+
       /**
        * Load ads from the Glome server
-       * 
+       *
        * @param function callback     Callback for successful load
        * @param function onerror      Callback for unsuccessful load
        */
       load: function(callback, onerror)
       {
         plugin.Tools.validateCallback(onerror);
-        
+
         var callbacks = plugin.Tools.mergeCallbacks
         (
           function(data)
           {
             var i, id, ad;
-            
+
             // Reset the ad stack
             plugin.Ads.stack = {};
-            
+
             // Temporarily store the listeners
             plugin.Ads.disableListeners = true;
-            
+
             for (i = 0; i < data.length; i++)
             {
               id = data[i].id;
               ad = new plugin.Ads.Ad(data[i]);
             }
-            
+
             plugin.Ads.disableListeners = false;
             plugin.Ads.onchange();
           },
           callback
         );
-        
+
         // Get ads
         plugin.Api.get
         (
@@ -1785,10 +1795,10 @@
           onerror
         );
       },
-      
+
       /**
        * Add a listener to observe data changes
-       * 
+       *
        * @param function listener   Listerner function that should be added
        * @param string id           @optional listener ID for future referemce
        */
@@ -1796,10 +1806,10 @@
       {
         return plugin.Tools.addListener(listener, id, 'Ads');
       },
-      
+
       /**
        * Remove a listener
-       * 
+       *
        * @param function listener    Listerner function that should be removed
        * @return boolean
        */
@@ -1807,11 +1817,11 @@
       {
         return plugin.Tools.removeListener(listener, 'Ads');
       },
-      
+
       /**
        * When stack changes, this method is triggered or when present, a function will be
        * registered to listeners list
-       * 
+       *
        * @param function listener    Listener function
        */
       onchange: function(type)
@@ -1823,55 +1833,55 @@
         return plugin.Tools.triggerListeners('Ads', type);
       }
     };
-    
+
     /* !Categories */
     /**
      * Categories interface object
-     * 
+     *
      * Methods:
-     * 
+     *
      * GLome.Categories.load
      */
     plugin.Categories =
     {
       /**
        * Category stack for storing the categories
-       * 
+       *
        * @param object
        */
       stack: {},
-      
+
       /**
        * Registered listener functions that will be called on change event
-       * 
+       *
        * @param Array
        */
       listeners: [],
-      
+
       /**
        * Is categories updating in progress right now? This is to prevent flooding of onchange events
-       * 
+       *
        * @param boolean
        */
       disableListeners: false,
-      
+
       /**
        * Selected category. This is for enabling parsing of the action URL
-       * 
+       *
        * @param int
        */
       subscriptionId: 0,
-      
+
       /**
        * Subscription status. This is for enabling parsing of the action URL
-       * 
+       *
        * @param int
        */
       subscriptionStatus: 0,
-      
+
       /**
        * Create a new category or fetch an existing from stack. Constructor
-       * 
+       *
        * @param mixed data
        */
       Category: function(data)
@@ -1882,31 +1892,31 @@
           this.container = 'Categories';
           this._constructor(data);
         }
-        
+
         Category.prototype = new plugin.Prototype();
         Category.prototype.constructor = Category;
-        
+
         Category.prototype.status = 0;
         Category.prototype.setStatus = function(statusCode)
         {
           this.status = statusCode;
           return true;
         }
-        
+
         // Subscription status
         Category.prototype.subscribed = 1;
-        
+
         // Category name
         Category.prototype.name = '';
-        
+
         // Description
         Category.prototype.description = '';
-        
+
         // Shorthand for setting subscription status to 'on'
         Category.prototype.subscribe = function(callback)
         {
           var _category = this;
-          
+
           plugin.Categories.setSubscriptionStatus
           (
             this.id,
@@ -1916,23 +1926,23 @@
               function()
               {
                 _category.subscribed = 1;
-                
+
                 // Sync also the stack if the reference got broken
                 var id = _category.id;
                 plugin.Categories.stack[id].subscribed = _category.subscribed
-                
+
                 plugin.Categories.onchange();
               },
               callback
             )
           );
         }
-        
+
         // Shorthand for setting subscription status to 'off'
         Category.prototype.unsubscribe = function(callback)
         {
           var _category = this;
-          
+
           plugin.Categories.setSubscriptionStatus
           (
             this.id,
@@ -1942,42 +1952,42 @@
               function()
               {
                 _category.subscribed = 0;
-                
+
                 // Sync also the stack if the reference got broken
                 var id = _category.id;
                 plugin.Categories.stack[id].subscribed = _category.subscribed
-                
+
                 plugin.Categories.onchange();
               },
               callback
             )
           );
         }
-        
+
         var category = new Category(data);
-        
+
         if (   category.id
             && plugin.userData)
         {
           var categoryList = [];
-          
+
           for (var i = 0; i < plugin.userData.disabled_adcategories.length; i++)
           {
             categoryList.push(plugin.userData.disabled_adcategories[i].id);
           }
-          
+
           if (jQuery.inArray(category.id, categoryList) !== -1)
           {
             category.subscribed = 0;
           }
         }
-        
+
         return category;
       },
-      
+
       /**
        * Count categories
-       * 
+       *
        * @param Object filters    Optional filters. @see listAds for more details
        * @return integer          Number of ads matching the filters
        */
@@ -1987,13 +1997,13 @@
         {
           return Object.keys(this.listCategories(filters)).length;
         }
-        
+
         return Object.keys(this.stack).length;
       },
-      
+
       /**
        * Set subscription status for a category
-       * 
+       *
        * @param int categoryId       ID of the category
        * @param int status           Subscription status, 1 for subscribed, 0 for unsubscribed
        * @param mixed callback       Callback, either a function or an array of functions
@@ -2007,15 +2017,15 @@
         {
           throw new Error('Only integers allowed for category ID');
         }
-        
+
         if (   typeof status === 'undefined'
             || !status.toString().match(/^(0|1|on|off)$/i))
         {
           throw new Error('Status has to be either "on" or "off"');
         }
-        
+
         plugin.Categories.subscriptionId = categoryId;
-        
+
         if (status.toString().match(/(0|off)/i))
         {
           plugin.Categories.subscriptionStatus = 'off';
@@ -2024,7 +2034,7 @@
         {
           plugin.Categories.subscriptionStatus = 'on';
         }
-        
+
         var request = plugin.API.create
         (
           'subscriptions',
@@ -2037,51 +2047,51 @@
           callback,
           onerror
         );
-        
+
         return request;
       },
-      
+
       /**
        * List categories
-       * 
+       *
        * @param Object filters  Optional filters
        * @return Array of categories
        */
       listCategories: function(filters)
       {
         var found, i, k, n;
-        
+
         if (   filters
             && !jQuery.isPlainObject(filters))
         {
           throw new Error('Optional filters parameter has to be an object');
         }
-        
+
         if (!filters)
         {
           return plugin.Categories.stack;
         }
-        
+
         var categories = {};
-        
+
         // Loop through the categories and apply filters
         for (i in plugin.Categories.stack)
         {
           var category = plugin.Categories.stack[i];
           found = false;
-          
+
           for (k in filters)
           {
             // Which object key should be used
             var filterKey = k;
-            
+
             // Filter rules
             switch (k)
             {
               // Add here the cases where search is from a string or a number
               case 'status':
                 var filter = filters[k];
-                
+
                 if (typeof filter == 'number')
                 {
                   if (category[filterKey] === filter)
@@ -2093,7 +2103,7 @@
                 else if (jQuery.isArray(filter))
                 {
                   var tmp = filters;
-                  
+
                   for (n = 0; n < filter.length; n++)
                   {
                     tmp.category = filter[n];
@@ -2105,30 +2115,30 @@
                   throw new Error('Glome.Categories.listCategories requires ' + k + ' filter to be an integer or an array of integers');
                 }
                 break;
-              
+
               case 'subscribed':
                 if (category[k] == filters[k])
                 {
                   found = true;
                 }
                 break;
-              
+
               default:
                 throw new Error('Glome.Categories.listCategories does not have a filter ' + k);
             }
           }
-          
+
           if (found)
           {
             var id = category._id;
             categories[id] = category;
           }
         }
-        
+
         return categories;
       },
-      
-      /** 
+
+      /**
        * Removes a category from the stack
        *
        * @param id
@@ -2139,11 +2149,11 @@
         {
           return true;
         }
-        
+
         delete this.stack[id];
         plugin.Categories.onchange();
-        
-        
+
+
         if (typeof this.stack[id] == 'undefined')
         {
           return true;
@@ -2153,41 +2163,41 @@
           return false;
         }
       },
-      
+
       /**
        * Load Categories from the Glome server
-       * 
+       *
        * @param mixed callback     Callback for successful load
        * @param mixed onerror      Callback for unsuccessful load
        */
       load: function(callback, onerror)
       {
         plugin.Tools.validateCallback(onerror);
-        
+
         var callbacks = plugin.Tools.mergeCallbacks
         (
           function(data)
           {
             var i, id, category;
-            
+
             // Reset the category stack
             plugin.Categories.stack = {};
-            
+
             // Temporarily store the listeners
             plugin.Categories.disableListeners = true;
-            
+
             for (i = 0; i < data.length; i++)
             {
               id = data[i].id;
               category = new plugin.Categories.Category(data[i]);
             }
-            
+
             plugin.Categories.disableListeners = false;
             plugin.Categories.onchange();
           },
           callback
         );
-        
+
         // Get Categories
         plugin.Api.get
         (
@@ -2197,10 +2207,10 @@
           onerror
         );
       },
-      
+
       /**
        * Add a listener to observe data changes
-       * 
+       *
        * @param function listener   Listerner function that should be added
        * @param string id           @optional listener ID for future referemce
        */
@@ -2208,10 +2218,10 @@
       {
         return plugin.Tools.addListener(listener, id, 'Categories');
       },
-      
+
       /**
        * Remove a listener
-       * 
+       *
        * @param function listener    Listerner function that should be removed
        * @return boolean
        */
@@ -2219,11 +2229,11 @@
       {
         return plugin.Tools.removeListener(listener, 'Categories');
       },
-      
+
       /**
        * When stack changes, this method is triggered or when present, a function will be
        * registered to listeners list
-       * 
+       *
        * @param function listener    Listener function
        */
       onchange: function()
@@ -2231,7 +2241,7 @@
         return plugin.Tools.triggerListeners('Categories');
       }
     };
-    
+
     /* !MVC */
     /**
      * Sketch of MVC. @TODO: use backbone.js or something similar in the near future
@@ -2242,7 +2252,7 @@
        * Current context
        */
       currentContext: null,
-      
+
       /* !MVC Runner */
       run: function(route, args)
       {
@@ -2250,17 +2260,17 @@
         {
           throw new Error('No route called "' + route.toString() + '"');
         }
-        
+
         var mvc = new plugin.MVC[route];
-        
+
         if (typeof mvc.run !== 'undefined')
         {
           mvc.run(args);
         }
-        
+
         return mvc;
       },
-      
+
       /* !MVC Prototype */
       Prototype: function()
       {
@@ -2269,21 +2279,21 @@
           // Model
           this.model = function(args)
           {
-            
+
           };
-          
+
           // View
           this.view = function(args)
           {
-            
+
           };
-          
+
           // Controller
           this.controller = function(args)
           {
-            
+
           };
-          
+
           // Triggers for context changes
           this.contextChange = function(args)
           {
@@ -2293,37 +2303,37 @@
             {
               plugin.MVC.currentContext.contextChange();
             }
-            
+
             plugin.MVC.currentContext = this;
           };
-          
+
           this.run = function(args)
           {
             this.contextChange(args);
             this.model(args);
             this.view(args);
             this.controller(args);
-            
+
             return true;
           }
         }
         return new MVC();
       },
-      
+
       /* !MVC: Widget */
       Widget: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Prototype();
         mvc.prototype.widgetAd = null;
-        
+
         mvc.prototype.model = function(args)
         {
           this.widgetAd = null;
-          
+
           // If there is no widgetAd, use the last
           if (   args
               && args.adid)
@@ -2340,7 +2350,7 @@
           else if (!this.widgetAd)
           {
             var ads = Object.keys(plugin.Ads.listAds({subscribed: 1}));
-            
+
             if (ads.length)
             {
               var last = ads.length - 1;
@@ -2352,17 +2362,17 @@
             }
           }
         }
-        
+
         mvc.prototype.view = function(args)
         {
           this.widget = plugin.container.find('[data-glome-template="widget"]');
-          
+
           // Reuse the old widget or create new
           if (!this.widget.size())
           {
             this.widget = plugin.Templates.get('widget').appendTo(plugin.container);
           }
-          
+
           if (this.widgetAd)
           {
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
@@ -2375,7 +2385,7 @@
             this.widget.find('.glome-ad-logo img').attr('src', '');
           }
         }
-        
+
         mvc.prototype.controller = function(args)
         {
           // Open and close the widget. Closing widget hides always the knocking
@@ -2390,17 +2400,17 @@
               }
               else if (jQuery(this).parent().attr('data-knocking-ad'))
               {
-               jQuery(this).parent().attr('data-state', 'open'); 
+               jQuery(this).parent().attr('data-state', 'open');
               }
             });
-          
+
           // Start with the widget closed if no arguments were passed
           if (!args)
           {
             this.widget
               .attr('data-state', 'closed');
           }
-          
+
           this.widget.find('a')
             .off('click')
             .on('click', function(e)
@@ -2410,32 +2420,32 @@
               return false;
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !MVC Public */
       Public: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Prototype();
-        
+
         // Prototype for initializing a view
         mvc.prototype.viewInit = function()
         {
           var wrapper = jQuery('[data-glome-template="public-wrapper"]');
-          
+
           if (!wrapper.size())
           {
             var wrapper = plugin.Templates.get('public-wrapper')
               .appendTo(plugin.container);
           }
-          
+
           if (!wrapper.find('[data-glome-template="public-header"]').size())
           {
             var header = plugin.Templates.get('public-header');
@@ -2446,45 +2456,45 @@
                 plugin.container.find('[data-glome-template="public-wrapper"]').remove();
                 plugin.MVC.run('Widget');
               });
-            
+
             header.appendTo(wrapper);
           }
-          
+
           if (!wrapper.find('[data-glome-template="public-footer"]').size())
           {
             plugin.Templates.get('public-footer').appendTo(wrapper);
           }
-          
+
           if (!wrapper.find('[data-glome-template="public-content"]').size())
           {
             plugin.Templates.get('public-content').insertAfter(wrapper.find('[data-glome-template="public-header"]'));
           }
-          
+
           this.contentArea = wrapper.find('[data-glome-template="public-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !MVC: Require password */
       RequirePassword: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
         mvc.prototype.view = function()
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-requirepassword');
-          
+
           this.content.appendTo(this.contentArea);
         }
-        
+
         mvc.prototype.controller = function()
         {
           this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
@@ -2493,19 +2503,19 @@
             {
               jQuery('#glomePublicRequirePasswordContainer').trigger('submit');
             });
-          
+
           this.contentArea.find('#glomePublicRequirePasswordContainer')
             .off('submit')
             .on('submit', function(e)
             {
               var request;
               e.preventDefault();
-              
+
               if (request)
               {
                 request.abort();
               }
-              
+
               request = plugin.Auth.login
               (
                 plugin.id(),
@@ -2519,32 +2529,32 @@
                   plugin.Categories.load();
                 }
               );
-              
+
               return false;
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !First run: initialize */
       FirstRunInitialize: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
         mvc.prototype.view = function()
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-startup');
-          
+
           this.content.appendTo(this.contentArea);
         }
-        
+
         mvc.prototype.controller = function()
         {
           this.content.find('#glomePublicFirstRunProceed')
@@ -2552,7 +2562,7 @@
             {
               plugin.MVC.run('FirstRunSubscriptions');
             });
-            
+
           this.content.find('a.glome-skip')
             .off('click')
             .on('click', function()
@@ -2560,36 +2570,36 @@
               plugin.container.find('.glome-close').trigger('click');
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !First run: subscriptions */
       FirstRunSubscriptions: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
         mvc.prototype.view = function()
         {
           this.viewInit();
           this.content = plugin.Templates.populate('public-subscriptions', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
           this.content.appendTo(this.contentArea);
-          
+
           for (var i in plugin.Categories.stack)
           {
             var row = this.contentArea.find('.glome-category[data-category="' + plugin.Categories.stack[i].id + '"]');
-            
+
             if (!row.size())
             {
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
-            
+
             if (plugin.Categories.stack[i].subscribed)
             {
               row.find('button.glome-subscribe').attr('data-state', 'on');
@@ -2600,7 +2610,7 @@
             }
           }
         }
-        
+
         mvc.prototype.controller = function()
         {
           this.contentArea.find('.glome-subscribe')
@@ -2612,7 +2622,7 @@
                 var count = plugin.Categories.count({subscribed: 1});
                 plugin.container.find('.glome-current').text(count);
               }
-              
+
               if (plugin.Categories.stack[id].subscribed)
               {
                 jQuery(this).attr('data-state', 'off');
@@ -2623,44 +2633,44 @@
                 jQuery(this).attr('data-state', 'on');
                 plugin.Categories.stack[id].subscribe(changeCount);
               }
-              
+
               plugin.Categories.onchange('subscriptions');
             });
-          
+
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
             .on('click', function()
             {
               plugin.MVC.run('FirstRunInitialize');
             });
-          
+
           this.contentArea.find('.glome-pager .glome-navigation-button.right')
             .on('click', function()
             {
               plugin.MVC.run('FirstRunPassword');
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !First run: set optional password */
       FirstRunPassword: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
         mvc.prototype.view = function()
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-password');
-          
+
           this.content.appendTo(this.contentArea);
         }
-        
+
         mvc.prototype.controller = function()
         {
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
@@ -2668,20 +2678,20 @@
             {
               plugin.MVC.run('FirstRunSubscriptions');
             });
-          
+
           this.contentArea.find('.glome-pager .glome-navigation-button.right')
             .on('click', function()
             {
               plugin.MVC.run('FirstRunFinish');
             });
-          
+
           // Set the password if requested for
           jQuery('#glomePublicSetPassword')
             .on('submit', function(e)
             {
               var pw1 = jQuery(this).find('input[type="password"]').eq(0).val();
               var pw2 = jQuery(this).find('input[type="password"]').eq(1).val();
-              
+
               if (pw1 !== pw2)
               {
                 alert('Passwords do not match');
@@ -2707,39 +2717,39 @@
                   }
                 );
               }
-              
+
               e.preventDefault();
               return false;
             });
-          
+
           jQuery('#glomePublicSetPassword').find('button')
             .on('click', function()
             {
               jQuery(this).parents('form').trigger('click');
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !First run: finish */
       FirstRunFinish: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
         mvc.prototype.view = function()
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-finish');
-          
+
           this.content.appendTo(this.contentArea);
         }
-        
+
         mvc.prototype.controller = function()
         {
           this.content.find('#glomePublicFinishClose')
@@ -2747,7 +2757,7 @@
             {
               plugin.container.find('.glome-close').trigger('click');
             });
-            
+
           this.content.find('a.glome-settings')
             .off('click')
             .on('click', function()
@@ -2757,21 +2767,21 @@
               return false;
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !Public: Show an ad */
       ShowAd: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
-        
+
         mvc.prototype.model = function(args)
         {
           if (!args)
@@ -2782,7 +2792,7 @@
               adId: Object.keys(plugin.Ads.stack)[0]
             }
           }
-          
+
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);
@@ -2791,7 +2801,7 @@
           {
             this.ad = args;
           }
-          
+
           if (args.forceCategory)
           {
             this.category = new plugin.Categories.Category(args.forceCategory);
@@ -2801,7 +2811,7 @@
             this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
           }
         }
-        
+
         mvc.prototype.view = function(args)
         {
           var vars =
@@ -2814,13 +2824,13 @@
             adId: this.ad.id,
             categoryId: this.category.id
           }
-          
+
           this.viewInit();
           this.content = plugin.Templates.populate('public-ad', vars);
           this.content.appendTo(this.contentArea);
-          
+
           this.content.find('.glome-ad-image').get(0).src = this.ad.content;
-          
+
           this.content.find('.glome-ad-image, .glome-goto-ad')
             .on('click', function(e)
             {
@@ -2830,16 +2840,16 @@
               return false;
             });
         }
-        
+
         mvc.prototype.controller = function(args)
         {
           plugin.container.find('.glome-category-title, .glome-category-title a')
             .on('click', function(e)
             {
               e.preventDefault();
-              
+
               var categoryId = jQuery(this).parents('[data-category-id]').attr('data-category-id');
-              
+
               if (!categoryId)
               {
                 plugin.MVC.run('ShowAllCategories');
@@ -2848,25 +2858,25 @@
               {
                 plugin.MVC.run('ShowCategory', {categoryId: categoryId});
               }
-              
+
               return false;
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !Public: Show category ads */
       ShowCategory: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
-        
+
         mvc.prototype.model = function(args)
         {
           if (!args)
@@ -2877,31 +2887,31 @@
           {
             args.categoryId = Object.keys(plugin.Categories.stack)[0];
           }
-          
+
           this.category = new plugin.Categories.Category(args.categoryId);
           this.ads = plugin.Ads.listAds({category: Number(args.categoryId)});
         }
-        
+
         mvc.prototype.view = function(args)
         {
           this.viewInit();
           this.content = plugin.Templates.populate('public-category', this.category);
           this.content.appendTo(this.contentArea);
-          
+
           // Display ads
           this.content.find('.glome-ad-list > .glome-ad-row').remove();
-          
+
           for (var i in this.ads)
           {
             var ad = this.ads[i];
             var row = plugin.Templates.populate('ad-row', ad);
-            
+
             row.find('img').attr('src', ad.content);
-            
+
             row.appendTo(this.content.find('.glome-ad-list'));
           }
         }
-        
+
         mvc.prototype.controller = function(args)
         {
           this.content.find('.glome-link-previous')
@@ -2911,7 +2921,7 @@
               plugin.MVC.run('ShowAllCategories');
               return false;
             });
-          
+
           this.content.find('.glome-ad-row').find('a')
             .off('click')
             .on('click', function(e)
@@ -2921,40 +2931,40 @@
               return false;
             });
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !Public: Show all categories */
       ShowAllCategories: function()
       {
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Public();
-        
+
         mvc.prototype.model = function(args)
         {
         }
-        
+
         mvc.prototype.view = function(args)
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-categorylist');
           this.content.appendTo(this.contentArea);
-          
+
           this.content.find('.glome-category-list > .glome-category').remove();
-          
+
           for (var i in plugin.Categories.listCategories({subscribed: 1}))
           {
             var category = plugin.Categories.stack[i];
             var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
           }
         }
-        
+
         mvc.prototype.controller = function(args)
         {
           this.content.find('.glome-category-list > .glome-category')
@@ -2965,18 +2975,18 @@
               return false;
             });
         }
-        
+
         var m = new mvc();
         return m;
       },
-      
+
       Navigation: function()
       {
         function mvc()
         {
-          
+
         }
-        
+
         mvc.prototype = new plugin.MVC.Prototype();
         mvc.prototype.view = function(args)
         {
@@ -2985,14 +2995,14 @@
           {
             return;
           }
-          
+
           var nav = args.header.find('.glome-navigation');
           if (!nav.size())
           {
             var nav = plugin.Templates.get('navigation-container');
             nav.insertAfter(args.header.find('.glome-icon'));
           }
-          
+
           var items =
           {
             Subscriptions:
@@ -3040,11 +3050,11 @@
               }
             }
           }
-          
+
           for (var i in items)
           {
             var li = nav.find('> [data-mvc="' + items[i].mvc + '"]');
-            
+
             if (!li.size())
             {
               var li = plugin.Templates.get('navigation-item');
@@ -3055,23 +3065,23 @@
                 .attr('data-mvc', items[i].mvc)
                 .appendTo(nav);
             }
-            
+
             if (items[i].children)
             {
               var subnav = plugin.Templates.get('subnavigation-container').appendTo(li);
-              
+
               for (var n in items[i].children)
               {
                 var child = items[i].children[n];
-                
+
                 var subli = subnav.find('> [data-mvc="' + child.mvc + '"]');
-                
+
                 if (!subli.size())
                 {
                   var subli = plugin.Templates.get('subnavigation-item')
                     .attr('data-mvc', child.mvc)
                     .appendTo(subnav);
-                  
+
                 }
                 subli.find('> a')
                   .attr('href', '#' + child.mvc)
@@ -3079,13 +3089,13 @@
               }
             }
           }
-          
+
           nav.find('a')
             .off('click')
             .on('click', function(e)
             {
               e.preventDefault();
-              
+
               try
               {
                 plugin.MVC.run(jQuery(this).parent().attr('data-mvc'));
@@ -3094,51 +3104,51 @@
               {
                 console.warn('Navigation failed due to ' + e.toString());
               }
-              
-              
+
+
               return false;
             });
-          
+
           if (args.selected)
           {
             var sel = nav.find('[data-mvc="' + args.selected + '"]');
-            
+
             sel.each(function()
             {
               sel.addClass('selected');
               sel.siblings().removeClass('selected');
-              
+
               sel.parents('li').addClass('selected');
               sel.parents('li').siblings().removeClass('selected');
             });
           }
         }
-        
+
         var m = new mvc();
         return m;
       },
-      
+
       /* !MVC Admin */
       Admin: function()
       {
-        // 
+        //
         function mvc()
         {
         }
-        
+
         mvc.prototype = new plugin.MVC.Prototype();
-        
+
         // Prototype for initializing a view
         mvc.prototype.viewInit = function(args)
         {
           var wrapper = jQuery('[data-glome-template="admin-wrapper"]');
-          
+
           if (!wrapper.size())
           {
             var wrapper = plugin.Templates.get('admin-wrapper')
               .appendTo(plugin.container);
           }
-          
+
           var header = wrapper.find('[data-glome-template="admin-header"]');
           if (!header.size())
           {
@@ -3150,70 +3160,70 @@
                 plugin.container.find('[data-glome-template="admin-wrapper"]').remove();
                 plugin.MVC.run('Widget');
               });
-            
+
             header.appendTo(wrapper);
           }
-          
+
           var selected = args.selected || '';
           plugin.MVC.run('Navigation', {header: header, selected: selected});
-          
+
           if (!wrapper.find('[data-glome-template="admin-footer"]').size())
           {
             plugin.Templates.get('admin-footer').appendTo(wrapper);
           }
-          
+
           if (!wrapper.find('[data-glome-template="admin-content"]').size())
           {
             plugin.Templates.get('admin-content').insertAfter(wrapper.find('[data-glome-template="admin-header"]'));
           }
-          
+
           this.contentArea = wrapper.find('[data-glome-template="admin-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
-        
+
         var m = new mvc();
-        
+
         return m;
       },
-      
+
       /* !MVC: Admin subscriptions */
       AdminSubscriptions: function()
       {
         function mvc()
         {
-          
+
         }
-        
+
         var admin = new plugin.MVC.Admin();
-        
+
         mvc.prototype = new plugin.MVC.FirstRunSubscriptions();
         mvc.prototype.viewInit = admin.viewInit;
-        
+
         mvc.prototype.view = function(args)
         {
           if (!args)
           {
             args = {}
           }
-          
+
           args.selected = 'AdminSubscriptions';
-          
+
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-subscriptions', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
           this.content.appendTo(this.contentArea);
-          
+
           this.content.find('.glome-category').remove();
-          
+
           for (var i in plugin.Categories.stack)
           {
             var row = this.contentArea.find('.glome-category[data-category="' + plugin.Categories.stack[i].id + '"]');
-            
+
             if (!row.size())
             {
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
-            
+
             if (plugin.Categories.stack[i].subscribed)
             {
               row.find('button.glome-subscribe').attr('data-state', 'on');
@@ -3224,100 +3234,100 @@
             }
           }
         }
-        
+
         var m = new mvc();
         return m;
       },
-      
+
       /* !MVC: Admin statistics */
       AdminStatistics: function()
       {
         function mvc()
         {
-          
+
         }
-        
+
         mvc.prototype = new plugin.MVC.Admin();
-        
+
         mvc.prototype.view = function(args)
         {
           if (!args)
           {
             args = {}
           }
-          
+
           args.selected = 'AdminStatistics';
-          
+
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-statistics', {});
           this.content.appendTo(this.contentArea);
         }
-        
+
         var m = new mvc();
         return m;
       },
-      
+
       /* !MVC: Admin statistics */
       AdminRewards: function()
       {
         function mvc()
         {
-          
+
         }
-        
+
         mvc.prototype = new plugin.MVC.Admin();
-        
+
         mvc.prototype.view = function(args)
         {
           if (!args)
           {
             args = {}
           }
-          
+
           args.selected = 'AdminRewards';
-          
+
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-rewards', {});
           this.content.appendTo(this.contentArea);
         }
-        
+
         var m = new mvc();
         return m;
       },
-      
+
       /* !MVC: Admin statistics */
       AdminSettings: function()
       {
         function mvc()
         {
-          
+
         }
-        
+
         mvc.prototype = new plugin.MVC.Admin();
-        
+
         mvc.prototype.view = function(args)
         {
           if (!args)
           {
             args = {}
           }
-          
+
           args.selected = 'AdminSettings';
-          
+
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-settings', {});
           this.content.appendTo(this.contentArea);
         }
-        
+
         var m = new mvc();
         return m;
       }
     };
-    
+
     /* !Initialize */
     /**
      * Initialize Glome
-     * 
+     *
      * @param mixed el           @optional DOM object (either plain of jQuery wrapped) or a string with traversable path
      * @param function callback  @optional @see Callback, triggered after initialization is complete
      * @param function onerror   @optional @see Onerror, triggered in the initialization fails
@@ -3326,7 +3336,7 @@
     {
       plugin.Tools.validateCallback(options.callback);
       plugin.Tools.validateCallback(options.onerror);
-      
+
       if (options.container)
       {
         this.Templates.load(function()
@@ -3334,7 +3344,12 @@
           plugin.container = jQuery(options.container);
         });
       }
-      
+
+      if (options.server)
+      {
+        plugin.pref('api.server', options.server);
+      }
+
       // Create a new Glome ID if previous ID does not exist
       if (   !plugin.id()
           || window.location.hash == '#debug')
@@ -3358,7 +3373,7 @@
       else
       {
         this.firstrun = false;
-        
+
         plugin.Auth.login
         (
           plugin.id(),
@@ -3388,15 +3403,15 @@
               },
               options.onerror
             );
-            
+
             plugin.Tools.triggerCallbacks(onerrors);
           }
         );
       }
-      
+
       return true;
     };
-    
+
     if (options)
     {
       var defaults =
@@ -3405,9 +3420,9 @@
         callback: null,
         onerror: null
       }
-      
+
       options = jQuery.extend(defaults, options);
-      
+
       if (options.container)
       {
         return plugin.initialize(options);
