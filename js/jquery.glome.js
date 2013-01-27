@@ -32,6 +32,15 @@
   {
     'use strict';
 
+    var defaults =
+    {
+      container: null,
+      callback: null,
+      onerror: null
+    }
+
+    options = jQuery.extend(defaults, options);
+    
     var plugin = this;
     var context = null;
 
@@ -808,11 +817,11 @@
 
           throw new Error('No Internet connection');
         }
-
+        
         var request = jQuery.ajax
         (
           {
-            url: plugin.API.parseURL(plugin.pref('api.server') + this.types[type].url),
+            url: plugin.API.parseURL(plugin.API.server + this.types[type].url),
             data: data,
             type: method.toString(),
             dataType: 'json',
@@ -3459,21 +3468,9 @@
       return true;
     };
 
-    if (options)
+    if (options.container)
     {
-      var defaults =
-      {
-        container: null,
-        callback: null,
-        onerror: null
-      }
-
-      options = jQuery.extend(defaults, options);
-
-      if (options.container)
-      {
-        return plugin.initialize(options);
-      }
+      return plugin.initialize(options);
     }
   };
 }(jQuery)
