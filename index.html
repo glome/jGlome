@@ -10,7 +10,13 @@
       var glome = new jQuery.Glome();
       glome.pref('server', window.location.protocol + '//' + window.location.hostname + '/');
       glome.idPrefix = 'web';
-      glome.initialize('body');
+      glome.initialize
+      (
+        {
+          container: 'body',
+          widgetContainer: '#glomeWidgetWrapper',
+        }
+      );
       
       jQuery(function()
       {
@@ -36,5 +42,6 @@
     </script>
   </head>
   <body>
+    <div id="glomeWidgetWrapper"></div>
   </body>
 </html>

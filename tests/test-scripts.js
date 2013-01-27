@@ -1986,7 +1986,7 @@ QUnit.asyncTest('Public', function()
     QUnit.start();
     
     // Bind Glome to QUnit fixture
-    Glome.container = jQuery('#qunit-fixture');
+    Glome.options.container = jQuery('#qunit-fixture');
     
     // Check that there is a wrapper for MVC for the public context
     QUnit.ok(Glome.MVC.Public, 'Public wrapper exists');
@@ -1994,10 +1994,10 @@ QUnit.asyncTest('Public', function()
     var mvc = new Glome.MVC.Public();
     mvc.viewInit();
     
-    QUnit.ok(Glome.container.find('[data-glome-template="public-header"]').size(), 'Headers were found from the fixture');
-    QUnit.ok(Glome.container.find('[data-glome-template="public-content"]').size(), 'Content area was found from the fixture');
-    QUnit.ok(Glome.container.find('[data-glome-template="public-footer"]').size(), 'Footers were found from the fixture');
-    QUnit.equal(0, Glome.container.find('[data-context="glome-content-area"]').find('> *').size(), 'Content area is empty');
+    QUnit.ok(Glome.options.container.find('[data-glome-template="public-header"]').size(), 'Headers were found from the fixture');
+    QUnit.ok(Glome.options.container.find('[data-glome-template="public-content"]').size(), 'Content area was found from the fixture');
+    QUnit.ok(Glome.options.container.find('[data-glome-template="public-footer"]').size(), 'Footers were found from the fixture');
+    QUnit.equal(0, Glome.options.container.find('[data-context="glome-content-area"]').find('> *').size(), 'Content area is empty');
     QUnit.ok(mvc.contentArea, 'There is a reference to content area');
   });
 });
@@ -2043,7 +2043,7 @@ QUnit.asyncTest('Require password', function()
   Glome.Templates.load(function()
   {
     // Bind Glome to QUnit fixture
-    Glome.container = jQuery('#qunit-fixture');
+    Glome.options.container = jQuery('#qunit-fixture');
     
     var pw = new Glome.MVC.RequirePassword();
     
@@ -2058,7 +2058,7 @@ QUnit.asyncTest('First Run: Initialize', function()
   Glome.Templates.load(function()
   {
     // Bind Glome to QUnit fixture
-    Glome.container = jQuery('#qunit-fixture');
+    Glome.options.container = jQuery('#qunit-fixture');
     
     // First run
     QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
@@ -2078,7 +2078,7 @@ QUnit.asyncTest('First Run: Subscriptions', function()
     Glome.Categories.load(function()
     {
       // Bind Glome to QUnit fixture
-      Glome.container = jQuery('#qunit-fixture');
+      Glome.options.container = jQuery('#qunit-fixture');
       
       // First run
       QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
@@ -2101,7 +2101,7 @@ QUnit.asyncTest('Widget', function()
     Glome.Ads.load(function()
     {
       // Bind Glome to QUnit fixture
-      Glome.container = jQuery('#qunit-fixture');
+      Glome.options.widgetContainer = jQuery('#qunit-fixture');
       
       var widget = new Glome.MVC.Widget();
       var categoryId = 100000;

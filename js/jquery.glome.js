@@ -38,18 +38,27 @@
       callback: null,
       onerror: null
     }
-
-    options = jQuery.extend(defaults, options);
     
     var plugin = this;
     var context = null;
-
+    
+    if (typeof this.options === 'undefined')
+    {
+      this.options = {};
+    }
+    
+    if (typeof options === 'undefined')
+    {
+      options = {};
+    }
+    
+    jQuery.extend(this.options, defaults, options);
+    
     this.version = version;
     this.glomeid = null;
     this.idPrefix = '';
     this.ads = {};
     this.container = null;
-    this.widgetContainer = null;
     this.sessionCookie = null;
     this.sessionToken = null;
     this.contentPrefix = '';
@@ -429,9 +438,9 @@
         }
     }
 
-    if (options.dataBackend)
+    if (this.options.dataBackend)
     {
-      plugin.setDataBackend(options.dataBackend);
+      plugin.setDataBackend(this.options.dataBackend);
     }
 
     /**
@@ -2389,19 +2398,12 @@
 
         mvc.prototype.view = function(args)
         {
-          this.widget = plugin.container.find('[data-glome-template="widget"]');
+          this.widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
 
           // Reuse the old widget or create new
           if (!this.widget.size())
           {
-            if (plugin.widgetContainer)
-            {
-              this.widget = plugin.Templates.get('widget').appendTo(plugin.widgetContainer);
-            }
-            else
-            {
-              this.widget = plugin.Templates.get('widget').appendTo(plugin.container);
-            }
+            this.widget = plugin.Templates.get('widget').appendTo(plugin.options.widgetContainer);
           }
 
           if (this.widgetAd)
@@ -2474,7 +2476,7 @@
           if (!wrapper.size())
           {
             var wrapper = plugin.Templates.get('public-wrapper')
-              .appendTo(plugin.container);
+              .appendTo(plugin.options.container);
           }
 
           if (!wrapper.find('[data-glome-template="public-header"]').size())
@@ -2484,7 +2486,7 @@
               .off('click')
               .on('click', function()
               {
-                plugin.container.find('[data-glome-template="public-wrapper"]').remove();
+                plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
                 plugin.MVC.run('Widget');
               });
 
@@ -2556,7 +2558,7 @@
                 {
                   plugin.Ads.load(function()
                   {
-                    plugin.container.find('.glome-close').trigger('click');
+                    plugin.options.container.find('.glome-close').trigger('click');
                   });
                   plugin.Categories.load();
                   plugin.pref('loggedin', true);
@@ -2600,7 +2602,7 @@
             .off('click')
             .on('click', function()
             {
-              plugin.container.find('.glome-close').trigger('click');
+              plugin.options.container.find('.glome-close').trigger('click');
             });
         }
 
@@ -2653,7 +2655,7 @@
               var changeCount = function()
               {
                 var count = plugin.Categories.count({subscribed: 1});
-                plugin.container.find('.glome-current').text(count);
+                plugin.options.container.find('.glome-current').text(count);
               }
 
               if (plugin.Categories.stack[id].subscribed)
@@ -2788,14 +2790,14 @@
           this.content.find('#glomePublicFinishClose')
             .on('click', function()
             {
-              plugin.container.find('.glome-close').trigger('click');
+              plugin.options.container.find('.glome-close').trigger('click');
             });
 
           this.content.find('a.glome-settings')
             .off('click')
             .on('click', function()
             {
-              plugin.container.find('.glome-close').trigger('click');
+              plugin.options.container.find('.glome-close').trigger('click');
               plugin.MVC.run('AdminSubscriptions');
               return false;
             });
@@ -2869,14 +2871,14 @@
             {
               e.preventDefault();
               plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
-              plugin.container.find('.glome-close').trigger('click');
+              plugin.options.container.find('.glome-close').trigger('click');
               return false;
             });
         }
 
         mvc.prototype.controller = function(args)
         {
-          plugin.container.find('.glome-category-title, .glome-category-title a')
+          plugin.options.container.find('.glome-category-title, .glome-category-title a')
             .on('click', function(e)
             {
               e.preventDefault();
@@ -3179,7 +3181,7 @@
           if (!wrapper.size())
           {
             var wrapper = plugin.Templates.get('admin-wrapper')
-              .appendTo(plugin.container);
+              .appendTo(plugin.options.container);
           }
 
           var header = wrapper.find('[data-glome-template="admin-header"]');
@@ -3190,7 +3192,7 @@
               .off('click')
               .on('click', function()
               {
-                plugin.container.find('[data-glome-template="admin-wrapper"]').remove();
+                plugin.options.container.find('[data-glome-template="admin-wrapper"]').remove();
                 plugin.MVC.run('Widget');
               });
 
@@ -3367,25 +3369,39 @@
      */
     plugin.initialize = function(options)
     {
-      plugin.Tools.validateCallback(options.callback);
-      plugin.Tools.validateCallback(options.onerror);
+      jQuery.extend(plugin.options, defaults, options);
+      
+      plugin.Tools.validateCallback(plugin.options.callback);
+      plugin.Tools.validateCallback(plugin.options.onerror);
 
-      if (options.container)
+      if (plugin.options.container)
       {
         this.Templates.load(function()
         {
-          plugin.container = jQuery(options.container);
+          // Wrap the containers with jQuery
+          plugin.options.container = jQuery(plugin.options.container);
+          
+          console.log(plugin.options);
+          if (plugin.options.widgetContainer)
+          {
+            plugin.options.widgetContainer = jQuery(plugin.options.widgetContainer);
+            console.log('widgetContainer', plugin.options.widgetContainer, plugin.options.widgetContainer.size());
+          }
+          else
+          {
+            plugin.options.widgetContainer = plugin.options.container;
+          }
         });
       }
 
-      if (options.server)
+      if (plugin.options.server)
       {
-        plugin.pref('api.server', options.server);
+        plugin.pref('api.server', plugin.options.server);
       }
 
-      if (options.idPrefix)
+      if (plugin.options.idPrefix)
       {
-        plugin.idPrefix = options.idPrefix;
+        plugin.idPrefix = plugin.options.idPrefix;
       }
 
       // Create a new Glome ID if previous ID does not exist
@@ -3404,9 +3420,9 @@
             plugin.Ads.load();
             plugin.Categories.load();
           },
-          options.callback
+          plugin.options.callback
         );
-        this.Auth.createGlomeId(plugin.idPrefix + String(date.getTime()), callbacks, options.onerror);
+        this.Auth.createGlomeId(plugin.idPrefix + String(date.getTime()), callbacks, plugin.options.onerror);
       }
       else
       {
@@ -3424,7 +3440,7 @@
               });
               plugin.Categories.load();
             },
-            options.callback
+            plugin.options.callback
           );
         }
         else
@@ -3445,7 +3461,7 @@
                   });
                   plugin.Categories.load();
                 },
-                options.callback
+                plugin.options.callback
               );
             },
             function()
@@ -3456,7 +3472,7 @@
                 {
                   plugin.MVC.run('RequirePassword');
                 },
-                options.onerror
+                plugin.options.onerror
               );
 
               plugin.Tools.triggerCallbacks(onerrors);
@@ -3468,9 +3484,9 @@
       return true;
     };
 
-    if (options.container)
+    if (this.options.container)
     {
-      return plugin.initialize(options);
+      return plugin.initialize();
     }
   };
 }(jQuery)
