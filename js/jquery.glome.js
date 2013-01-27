@@ -1124,7 +1124,7 @@
 
         if (counter >= 10)
         {
-          throw new Error('Exceeded maximum number of times to create a Glome ID');
+          throw new Error('Exceeded maximum number of times to create a Glome ID: ' + id);
         }
 
         if (!id)
@@ -3348,6 +3348,11 @@
       if (options.server)
       {
         plugin.pref('api.server', options.server);
+      }
+
+      if (options.idPrefix)
+      {
+        plugin.idPrefix = options.idPrefix;
       }
 
       // Create a new Glome ID if previous ID does not exist
