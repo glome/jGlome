@@ -44,6 +44,65 @@ $full_page_z_index: 10000;
   #{$property}: $value;
 }
 
+@mixin respond-to($cols)
+{
+  @if $cols >= 7
+  {
+    @media screen and (min-width: 970px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 6
+  {
+    @media screen and (max-width: 969px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 5
+  {
+    @media screen and (max-width: 824px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 4
+  {
+    @media screen and (max-width: 689px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 3
+  {
+    @media screen and (max-width: 554px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 2
+  {
+    @media screen and (max-width: 419px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 1
+  {
+    @media screen and (max-width: 284px)
+    {
+      @content;
+    }
+  }
+}
+
 @mixin container
 {
   @include vendor-specific(box-sizing, border-box);
@@ -228,6 +287,95 @@ $full_page_z_index: 10000;
 [data-glome-container="true"] .glome-fixed
 {
   position: fixed;
+}
+
+/* !Column widths */
+@for $i from 1 through 7
+{
+  .glome-cols-#{$i}
+  {
+    width: ($col_width + $col_margin) * $i - $col_margin;
+    
+/*
+    @media screen and (min-width: 835px) and (max-width: 969px)
+    {
+      @if $i >= 6
+      {
+        width: ($col_width + $col_margin) * 6 - $col_margin;
+      }
+      @else
+      {
+        width: ($col_width + $col_margin) * $i - $col_margin;
+      }
+    }
+    
+    @media screen and (min-width: 700px) and (max-width: 834px)
+    {
+      @if $i >= 5
+      {
+        width: ($col_width + $col_margin) * 5 - $col_margin;
+      }
+      @else
+      {
+        width: ($col_width + $col_margin) * $i - $col_margin;
+      }
+    }
+    
+    @media screen and (min-width: 565px) and (max-width: 699px)
+    {
+      @if $i >= 4
+      {
+        width: ($col_width + $col_margin) * 4 - $col_margin;
+      }
+      @else
+      {
+        width: ($col_width + $col_margin) * $i - $col_margin;
+      }
+    }
+    
+    @media screen and (min-width: 430px) and (max-width: 564px)
+    {
+      @if $i >= 3
+      {
+        width: ($col_width + $col_margin) * 3 - $col_margin;
+      }
+      @else
+      {
+        width: ($col_width + $col_margin) * $i - $col_margin;
+      }
+    }
+    
+    @media screen and (min-width: 295px) and (max-width: 429px)
+    {
+      @if $i >= 2
+      {
+        width: ($col_width + $col_margin) * 2 - $col_margin;
+      }
+      @else
+      {
+        width: ($col_width + $col_margin) * $i - $col_margin;
+      }
+    }
+    
+    @media screen and (max-width: 294px)
+    {
+      width: $col_width
+    }
+*/
+  }
+}
+
+@for $i from 1 to 8
+{
+  @include respond-to($i)
+  {
+    [data-glome-container="true"] .glome-full-width
+    {
+      width: ($col_width + $col_margin) * $i - $col_margin;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
 }
 
 /* !General rules */
@@ -495,21 +643,6 @@ $full_page_z_index: 10000;
   margin: 0;
 }
 
-/* !Column widths */
-@for $i from 1 through 7
-{
-  [data-glome-container="true"] .glome-cols-#{$i}
-  {
-    width: ($col_width + $col_margin) * $i - $col_margin;
-  }
-}
-
-[data-glome-container="true"] .glome-full-width
-{
-  width: ($col_width + $col_margin) * 7 - $col_margin;
-  margin: 0 auto;
-}
-
 /* !Admin view */
 #glomeAdmin
 {
@@ -594,6 +727,8 @@ $full_page_z_index: 10000;
 {
   height: 80px;
   overflow: visible;
+  
+  @respond
 }
 
 #glomeAdmin .glome-navigation > li + li
@@ -819,6 +954,23 @@ $full_page_z_index: 10000;
   {
     size: $font_size;
     weight: 500;
+  }
+}
+
+#glomeAdminSubscriptions .glome-categories,
+#glomePublicSubscriptions .glome-categories
+{
+  @include respond-to(5)
+  {
+    width: ($col_width + $col_margin) * 3 - $col_margin;
+  }
+  @include respond-to(4)
+  {
+    width: ($col_width + $col_margin) * 2 - $col_margin;
+  }
+  @include respond-to(3)
+  {
+    width: $col_width;
   }
 }
 
