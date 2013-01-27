@@ -1679,7 +1679,7 @@
 
                   for (var j = 0; j < ad[filterKey].length; j++)
                   {
-                    if (ad[filterKey][j].id == filter)
+                    if (ad[filterKey][j].id == filter[n])
                     {
                       found = true;
                       break;
