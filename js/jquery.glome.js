@@ -824,6 +824,19 @@
             beforeSend: function(jqXHR, settings)
             {
               jqXHR.settings = settings;
+              // revert the token and cookie from prefs if available
+              if (typeof plugin.pref('session.token') != 'undefined'
+                  && plugin.pref('session.token') != null)
+              {
+                plugin.sessionToken = plugin.pref('session.token');
+              }
+              if (typeof plugin.pref('session.cookie') != 'undefined'
+                  && plugin.pref('session.cookie') != null)
+              {
+                plugin.cookie = plugin.pref('session.cookie');
+              }
+              jqXHR.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+              jqXHR.setRequestHeader('Cookie', plugin.cookie);
             }
           }
         );
@@ -1067,6 +1080,7 @@
           {
             //passwd = prompt('Login failed, please enter the password');
             plugin.Auth.loginAttempts++;
+            plugin.pref('loggedin', false);
           },
           function()
           {
@@ -2497,6 +2511,8 @@
 
         mvc.prototype.controller = function()
         {
+          var request = null;
+
           this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
             .off('click')
             .on('click', function()
@@ -2508,12 +2524,11 @@
             .off('submit')
             .on('submit', function(e)
             {
-              var request;
               e.preventDefault();
 
               if (request)
               {
-                request.abort();
+                return;
               }
 
               request = plugin.Auth.login
@@ -2527,6 +2542,7 @@
                     plugin.container.find('.glome-close').trigger('click');
                   });
                   plugin.Categories.load();
+                  plugin.pref('loggedin', true);
                 }
               );
 
@@ -3379,39 +3395,57 @@
       {
         this.firstrun = false;
 
-        plugin.Auth.login
-        (
-          plugin.id(),
-          '',
-          function()
-          {
-            plugin.Tools.triggerCallbacks
-            (
-              function()
+        if (plugin.pref('loggedin'))
+        {
+          plugin.Tools.triggerCallbacks
+          (
+            function()
+            {
+              plugin.Ads.load(function()
               {
-                plugin.Ads.load(function()
+                plugin.MVC.run('Widget');
+              });
+              plugin.Categories.load();
+            },
+            options.callback
+          );
+        }
+        else
+        {
+          plugin.Auth.login
+          (
+            plugin.id(),
+            '',
+            function()
+            {
+              plugin.Tools.triggerCallbacks
+              (
+                function()
                 {
-                  plugin.MVC.run('Widget');
-                });
-                plugin.Categories.load();
-              },
-              options.callback
-            );
-          },
-          function()
-          {
-            var onerrors = plugin.Tools.mergeCallbacks
-            (
-              function()
-              {
-                plugin.MVC.run('RequirePassword');
-              },
-              options.onerror
-            );
+                  plugin.Ads.load(function()
+                  {
+                    plugin.MVC.run('Widget');
+                  });
+                  plugin.Categories.load();
+                },
+                options.callback
+              );
+            },
+            function()
+            {
+              var onerrors = plugin.Tools.mergeCallbacks
+              (
+                function()
+                {
+                  plugin.MVC.run('RequirePassword');
+                },
+                options.onerror
+              );
 
-            plugin.Tools.triggerCallbacks(onerrors);
-          }
-        );
+              plugin.Tools.triggerCallbacks(onerrors);
+            }
+          );
+        }
       }
 
       return true;
