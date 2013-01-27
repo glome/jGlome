@@ -76,6 +76,525 @@
 [data-glome-container="true"] .glome-fixed {
   position: fixed; }
 
+/* !Column widths */
+.glome-cols-1 {
+  width: 120px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-2 {
+  width: 255px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-3 {
+  width: 390px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-4 {
+  width: 525px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-5 {
+  width: 660px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-6 {
+  width: 795px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+.glome-cols-7 {
+  width: 930px;
+  /*
+      @media screen and (min-width: 835px) and (max-width: 969px)
+      {
+        @if $i >= 6
+        {
+          width: ($col_width + $col_margin) * 6 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 700px) and (max-width: 834px)
+      {
+        @if $i >= 5
+        {
+          width: ($col_width + $col_margin) * 5 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 565px) and (max-width: 699px)
+      {
+        @if $i >= 4
+        {
+          width: ($col_width + $col_margin) * 4 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 430px) and (max-width: 564px)
+      {
+        @if $i >= 3
+        {
+          width: ($col_width + $col_margin) * 3 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (min-width: 295px) and (max-width: 429px)
+      {
+        @if $i >= 2
+        {
+          width: ($col_width + $col_margin) * 2 - $col_margin;
+        }
+        @else
+        {
+          width: ($col_width + $col_margin) * $i - $col_margin;
+        }
+      }
+      
+      @media screen and (max-width: 294px)
+      {
+        width: $col_width
+      }
+  */ }
+
+@media screen and (max-width: 284px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 120px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (max-width: 419px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 255px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (max-width: 554px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 390px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (max-width: 689px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 525px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (max-width: 824px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 660px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (max-width: 969px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 795px;
+    margin-left: auto;
+    margin-right: auto; } }
+@media screen and (min-width: 970px) {
+  [data-glome-container="true"] .glome-full-width {
+    width: 930px;
+    margin-left: auto;
+    margin-right: auto; } }
 /* !General rules */
 [data-glome-container="true"] a:link,
 [data-glome-container="true"] a:visited {
@@ -286,32 +805,6 @@
 [data-glome-container="true"] .glome-row p {
   margin: 0; }
 
-/* !Column widths */
-[data-glome-container="true"] .glome-cols-1 {
-  width: 120px; }
-
-[data-glome-container="true"] .glome-cols-2 {
-  width: 255px; }
-
-[data-glome-container="true"] .glome-cols-3 {
-  width: 390px; }
-
-[data-glome-container="true"] .glome-cols-4 {
-  width: 525px; }
-
-[data-glome-container="true"] .glome-cols-5 {
-  width: 660px; }
-
-[data-glome-container="true"] .glome-cols-6 {
-  width: 795px; }
-
-[data-glome-container="true"] .glome-cols-7 {
-  width: 930px; }
-
-[data-glome-container="true"] .glome-full-width {
-  width: 930px;
-  margin: 0 auto; }
-
 /* !Admin view */
 #glomeAdmin {
   position: fixed;
@@ -382,7 +875,8 @@
 
 #glomeAdmin .glome-navigation > li {
   height: 80px;
-  overflow: visible; }
+  overflow: visible;
+  @respond; }
 
 #glomeAdmin .glome-navigation > li + li {
   margin-left: 15px; }
@@ -573,6 +1067,19 @@
 #glomePublicSubscriptions .glome-selection-counter .glome-unit {
   font-size: 13px;
   font-weight: 500; }
+
+@media screen and (max-width: 824px) {
+  #glomeAdminSubscriptions .glome-categories,
+  #glomePublicSubscriptions .glome-categories {
+    width: 390px; } }
+@media screen and (max-width: 689px) {
+  #glomeAdminSubscriptions .glome-categories,
+  #glomePublicSubscriptions .glome-categories {
+    width: 255px; } }
+@media screen and (max-width: 554px) {
+  #glomeAdminSubscriptions .glome-categories,
+  #glomePublicSubscriptions .glome-categories {
+    width: 120px; } }
 
 /* !Admin pages: rewards */
 #glomeAdmin .glome-total-rewards {
