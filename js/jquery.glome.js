@@ -40,6 +40,7 @@
     this.idPrefix = '';
     this.ads = {};
     this.container = null;
+    this.widgetContainer = null;
     this.sessionCookie = null;
     this.sessionToken = null;
     this.contentPrefix = '';
@@ -2384,7 +2385,14 @@
           // Reuse the old widget or create new
           if (!this.widget.size())
           {
-            this.widget = plugin.Templates.get('widget').appendTo(plugin.container);
+            if (plugin.widgetContainer)
+            {
+              this.widget = plugin.Templates.get('widget').appendTo(plugin.widgetContainer);
+            }
+            else
+            {
+              this.widget = plugin.Templates.get('widget').appendTo(plugin.container);
+            }
           }
 
           if (this.widgetAd)
