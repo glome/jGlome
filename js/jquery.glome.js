@@ -38,22 +38,22 @@
       callback: null,
       onerror: null
     }
-    
+
     var plugin = this;
     var context = null;
-    
+
     if (typeof this.options === 'undefined')
     {
       this.options = {};
     }
-    
+
     if (typeof options === 'undefined')
     {
       options = {};
     }
-    
+
     jQuery.extend(this.options, defaults, options);
-    
+
     this.version = version;
     this.glomeid = null;
     this.idPrefix = '';
@@ -690,7 +690,12 @@
         {
           url: 'users/{glomeid}/adcategory/{subscriptionId}/{subscriptionStatus}.json',
           allowed: ['create']
-        }
+        },
+        adclick:
+        {
+          url: 'ads/{adId}/click/{glomeid}.json',
+          allowed: ['read']
+        },
       },
 
       /**
@@ -724,6 +729,10 @@
 
             case 'subscriptionStatus':
               to = plugin.Categories.subscriptionStatus;
+              break;
+
+            case 'adId':
+              to = plugin.Ads.adId;
               break;
 
             default:
@@ -826,7 +835,7 @@
 
           throw new Error('No Internet connection');
         }
-        
+
         var request = jQuery.ajax
         (
           {
@@ -1538,6 +1547,13 @@
       listeners: [],
 
       /**
+       * Selected ad. This is for enabling parsing of the action URL
+       *
+       * @param int
+       */
+      adId: 0,
+
+      /**
        * Is ads updating in progress right now? This is to prevent flooding of onchange events
        *
        * @param boolean
@@ -1774,7 +1790,6 @@
         delete this.stack[id];
         plugin.Ads.onchange();
 
-
         if (typeof this.stack[id] == 'undefined')
         {
           return true;
@@ -1864,6 +1879,33 @@
           return;
         }
         return plugin.Tools.triggerListeners('Ads', type);
+      },
+
+      /**
+       * Redirects to an ad action URL
+       *
+       * @param id of the ad to be clicked
+       */
+      click: function(id)
+      {
+        if (typeof id !== 'number')
+        {
+          throw new Error('Ad id must be a valid integer');
+        }
+
+        // must set this to be able to parse URL
+        plugin.Ads.adId = id;
+
+        return plugin.Api.get
+        (
+          'adclick',
+          null,
+          function(json)
+          {
+            plugin.Browser.openUrl(json.url);
+          },
+          null
+        );
       }
     };
 
@@ -2855,7 +2897,6 @@
             title: this.ad.title,
             description: this.ad.description,
             bonus: this.ad.bonus,
-            adAction: this.ad.action,
             adId: this.ad.id,
             categoryId: this.category.id
           }
@@ -2870,7 +2911,8 @@
             .on('click', function(e)
             {
               e.preventDefault();
-              plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
+              plugin.Ads.click(parseInt(jQuery(this).parents('[data-ad-id]').attr('data-ad-id')));
+              //plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
               plugin.options.container.find('.glome-close').trigger('click');
               return false;
             });
@@ -3370,7 +3412,7 @@
     plugin.initialize = function(options)
     {
       jQuery.extend(plugin.options, defaults, options);
-      
+
       plugin.Tools.validateCallback(plugin.options.callback);
       plugin.Tools.validateCallback(plugin.options.onerror);
 
@@ -3380,7 +3422,7 @@
         {
           // Wrap the containers with jQuery
           plugin.options.container = jQuery(plugin.options.container);
-          
+
           console.log(plugin.options);
           if (plugin.options.widgetContainer)
           {
