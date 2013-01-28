@@ -1530,8 +1530,8 @@ QUnit.test('Fetch ads', function()
   );
 });
 
-/* !Click an ad */
-QUnit.test('Click an ad', function()
+/* !Click getit an ad */
+QUnit.test('Click getit on an ad', function()
 {
   QUnit.stop();
   Glome.Ads.load
@@ -1575,6 +1575,63 @@ QUnit.test('Click an ad', function()
         function()
         {
           Glome.Ads.click(false)
+        },
+        'Ad id must be a valid integer'
+      );
+    },
+    function()
+    {
+      QUnit.start();
+      QUnit.ok(false, 'Glome ads were loaded (caught on error)');
+    }
+  );
+});
+
+/* !Click getit an ad */
+QUnit.test('Click notnow on an ad', function()
+{
+  QUnit.stop();
+  Glome.Ads.load
+  (
+    function()
+    {
+      QUnit.start();
+
+      QUnit.notEqual(0, Object.keys(Glome.Ads.stack).length, 'Glome ads were loaded');
+
+      var adId = null;
+      for (var [key, value] in Iterator(Glome.Ads.stack))
+      {
+        adId = key;
+        break;
+      }
+
+      QUnit.ok(adId, 'Ads in ad stack should have valid IDs. ' + adId + ' is valid.');
+
+      var request = Glome.Ads.notnow(adId);
+      QUnit.equal(typeof request, 'object', 'Function exists and it returns an object');
+
+      QUnit.throws
+      (
+        function()
+        {
+          Glome.Ads.notnow()
+        },
+        'Ad id must be a valid integer'
+      );
+      QUnit.throws
+      (
+        function()
+        {
+          Glome.Ads.notnow('foo')
+        },
+        'Ad id must be a valid integer'
+      );
+      QUnit.throws
+      (
+        function()
+        {
+          Glome.Ads.notnow(false)
         },
         'Ad id must be a valid integer'
       );

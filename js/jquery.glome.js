@@ -696,6 +696,11 @@
           url: 'ads/{adId}/click/{glomeid}.json',
           allowed: ['read']
         },
+        adnotnow:
+        {
+          url: 'ads/{adId}/notnow.json',
+          allowed: ['create']
+        }
       },
 
       /**
@@ -1896,7 +1901,7 @@
         // must set this to be able to parse URL
         plugin.Ads.adId = id;
 
-        return plugin.Api.get
+        return plugin.Api.read
         (
           'adclick',
           null,
@@ -1904,6 +1909,35 @@
           {
             plugin.Browser.openUrl(json.url);
           },
+          null
+        );
+      },
+
+      /**
+       * Registers notnow action on an ad
+       *
+       * @param id of the ad to be clicked
+       */
+      notnow: function(id)
+      {
+        if (typeof id !== 'number')
+        {
+          throw new Error('Ad id must be a valid integer');
+        }
+
+        // must set this to be able to parse URL
+        plugin.Ads.adId = id;
+
+        return plugin.Api.create
+        (
+          'adnotnow',
+          {
+            user:
+            {
+              glomeid: plugin.id()
+            }
+          },
+          null,
           null
         );
       }
@@ -2913,6 +2947,15 @@
               e.preventDefault();
               plugin.Ads.click(parseInt(jQuery(this).parents('[data-ad-id]').attr('data-ad-id')));
               //plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
+              plugin.options.container.find('.glome-close').trigger('click');
+              return false;
+            });
+
+          this.content.find('.glome-ad-image, .glome-notnow-ad')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              plugin.Ads.notnow(parseInt(jQuery(this).parents('[data-ad-id]').attr('data-ad-id')));
               plugin.options.container.find('.glome-close').trigger('click');
               return false;
             });
