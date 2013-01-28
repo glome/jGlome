@@ -440,6 +440,11 @@ $full_page_z_index: 10000;
   margin: 0;
 }
 
+.glome-copyright:before
+{
+  content: '© ';
+}
+
 /* !Navigation button */
 [data-glome-container="true"] .glome-navigation-button
 {
@@ -671,19 +676,26 @@ $full_page_z_index: 10000;
 #glomeAdmin .glome-header
 {
   box-shadow: 0 $navigation_height 0 rgba(77, 77, 77, 1);
+  
+  .glome-icon
+  {
+    @include container;
+    background-image: url("../images/icons/glome-icon.svg");
+    background-repeat: no-repeat;
+    background-position: center center;
+    width: 76px;
+    height: 106px;
+    display: inline-block;
+  }
   @media screen and (max-height: $small_screen_height)
   {
     height: $header_height / 2;
-  }
-  
-  img.glome-icon
-  {
-    width: 76px;
-    height: 106px;
-    @media screen and (max-height: $small_screen_height)
+    padding: 20px 0;
+    .glome-icon
     {
       width: (76px / 2);
       height: (106px / 2);
+      background-size: (76px / 2) (106px / 2);
     }
   }
 }
@@ -1063,9 +1075,12 @@ $full_page_z_index: 10000;
   right: 0;
   padding: 40px 0;
   height: $header_height;
-  img.glome-icon
+  .glome-icon
   {
     @include container;
+    background-image: url("../images/icons/glome-icon-light.svg");
+    background-repeat: no-repeat;
+    background-position: center center;
     width: 76px;
     height: 106px;
   }
@@ -1073,10 +1088,11 @@ $full_page_z_index: 10000;
   {
     height: $header_height / 2;
     padding: 20px 0;
-    img.glome-icon
+    .glome-icon
     {
       width: (76px / 2);
       height: (106px / 2);
+      background-size: (76px / 2) (106px / 2);
     }
   }
 }

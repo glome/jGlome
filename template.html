@@ -1,5 +1,6 @@
-<!doctype html>
-<html>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Glome Template</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -18,7 +19,7 @@
         <div class="glome-header glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
           <div class="glome-close" data-close-context="admin"></div>
             <div class="glome-full-width">
-              <img src="images/icons/glome-icon.svg" alt="Glome" class="glome-icon" />
+              <div class="glome-icon"></div>
               <ul class="glome-navigation" data-glome-template="navigation-container">
                 <li class="glome-cols-1" data-glome-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
                   <a href="#admin-subscriptions">Subscriptions</a>
@@ -174,9 +175,9 @@
                     </div>
                     <div id="glomeAdminSettingsPairDevices" class="glome-cols-4">
                       <button class="glome-button"><span data-i18n="generate code">Generate code</span></button>
-                      <input type="text" placeholder="0000" readonly />
-                      <input type="text" placeholder="0000" readonly />
-                      <input type="text" placeholder="0000" readonly />
+                      <input type="text" placeholder="0000" readonly="readonly" />
+                      <input type="text" placeholder="0000" readonly="readonly" />
+                      <input type="text" placeholder="0000" readonly="readonly" />
                     </div>
                   </div>
                 </div>
@@ -185,7 +186,7 @@
           </div>
         <div class="glome-footer glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
           <div class="glome-full-width">
-            &copy; Glome Inc, 2013
+            <span class="glome-copyright">Glome Inc, 2013</span>
           </div>
         </div>
       </div>
@@ -195,7 +196,7 @@
         <div class="glome-header glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
           <div class="glome-close" data-close-context="public"></div>
           <div class="glome-full-width">
-            <img src="images/icons/glome-icon-light.svg" alt="Glome" class="glome-icon" />
+            <div class="glome-icon"></div>
           </div>
         </div>
         <div id="glomePublicContent" class="glome-clearfix" data-glome-template="public-content">
@@ -413,7 +414,7 @@
         </div>
         <div class="glome-footer glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
           <div class="glome-full-width">
-            <span>&copy; Glome Inc, 2013</span>
+            <span><span class="glome-copyright">Glome Inc, 2013</span></span>
             <span class="glome-text-separator"></span>
             <a>FAQ</a>
             <span class="glome-text-separator"></span>
