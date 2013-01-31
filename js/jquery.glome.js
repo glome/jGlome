@@ -646,7 +646,9 @@
 
         tmp = tmp.replace(/‹«([A-Za-z0-9_]+)»›/g, '{$1}');
 
-        return jQuery(tmp);
+        var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+        div.innerHTML = tmp;
+        return jQuery(div).find('> *');
       }
     }
 
@@ -2547,6 +2549,8 @@
         // Prototype for initializing a view
         mvc.prototype.viewInit = function()
         {
+          jQuery('#glomeContentBindings').removeAttr('hidden');
+          
           var wrapper = jQuery('[data-glome-template="public-wrapper"]');
 
           if (!wrapper.size())
@@ -3465,8 +3469,6 @@
         {
           // Wrap the containers with jQuery
           plugin.options.container = jQuery(plugin.options.container);
-
-          console.log(plugin.options);
           if (plugin.options.widgetContainer)
           {
             plugin.options.widgetContainer = jQuery(plugin.options.widgetContainer);
