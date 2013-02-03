@@ -2549,9 +2549,9 @@
         // Prototype for initializing a view
         mvc.prototype.viewInit = function()
         {
-          jQuery('#glomeContentBindings').removeAttr('hidden');
+          plugin.options.container.removeAttr('hidden');
           
-          var wrapper = jQuery('[data-glome-template="public-wrapper"]');
+          var wrapper = plugin.options.container.find('[data-glome-template="public-wrapper"]');
 
           if (!wrapper.size())
           {
@@ -2567,6 +2567,7 @@
               .on('click', function()
               {
                 plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
+                plugin.options.container.attr('hidden', 'true');
                 plugin.MVC.run('Widget');
               });
 
@@ -3469,6 +3470,8 @@
         {
           // Wrap the containers with jQuery
           plugin.options.container = jQuery(plugin.options.container);
+
+          console.log(plugin.options);
           if (plugin.options.widgetContainer)
           {
             plugin.options.widgetContainer = jQuery(plugin.options.widgetContainer);
