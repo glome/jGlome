@@ -3629,7 +3629,7 @@
                 {
                   plugin.Ads.load(function()
                   {
-                    plugin.MVC.run('FirstRunInitialize');
+                    plugin.MVC.run('Widget');
                   });
                   plugin.Categories.load();
                 },
