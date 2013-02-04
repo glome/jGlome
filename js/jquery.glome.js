@@ -122,24 +122,20 @@
       
       escapeAmpersandsRecursive: function(input)
       {
-        switch (typeof input)
+        if (typeof input === 'string')
         {
-          case 'string':
-            return this.escapeAmpersands(input);
+          return this.escapeAmpersands(input);
+        }
+        else if (jQuery.isPlainObject(input))
+        {
+          var tmp = {};
           
-          case 'object':
-            for (var i in input)
-            {
-              input[i] = this.escapeAmpersands(input[i]);
-            }
-            break;
+          for (var i in input)
+          {
+            tmp[i] = this.escapeAmpersands(input[i]);
+          }
           
-          case 'array':
-            for (var i = 0; i < input.length; i++)
-            {
-              input[i] = this.escapeAmpersands(input[i]);
-            }
-            break;
+          return tmp;
         }
         
         return input;
@@ -1443,6 +1439,7 @@
           else
           {
             this[i] = plugin.Tools.escapeAmpersandsRecursive(data[i]);
+            //this[i] = data[i];
           }
         }
       }
@@ -2604,7 +2601,9 @@
         mvc.prototype.viewInit = function()
         {
           plugin.options.container.removeAttr('hidden');
+          plugin.options.container.find('> *').remove();
           
+          plugin.options.container.find('[data-glome-template="admin-wrapper"]').remove();
           var wrapper = plugin.options.container.find('[data-glome-template="public-wrapper"]');
 
           if (!wrapper.size())
@@ -2692,7 +2691,7 @@
             .off('click')
             .on('click', function(e)
             {
-              jQuery('#glomePublicRequirePasswordContainer').trigger('submit');
+              plugin.options.container.find('#glomePublicRequirePasswordContainer').trigger('submit');
               e.preventDefault();
               return false;
             });
@@ -2862,23 +2861,25 @@
           this.content.appendTo(this.contentArea);
         }
 
-        mvc.prototype.controller = function()
+        mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
             .on('click', function()
             {
+              dump('subscriptions\n');
               plugin.MVC.run('FirstRunSubscriptions');
             });
 
           this.contentArea.find('.glome-pager .glome-navigation-button.right')
             .on('click', function()
             {
+              dump('finish\n');
               plugin.MVC.run('FirstRunFinish');
             });
 
           // Set the password if requested for
-          jQuery('#glomePublicSetPassword')
+          plugin.options.container.find('#glomePublicSetPassword')
             .on('submit', function(e)
             {
               var pw1 = jQuery(this).find('input[type="password"]').eq(0).val();
@@ -2890,7 +2891,7 @@
               }
               else if (!pw1)
               {
-                jQuery('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
+                plugin.options.container.find('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
               }
               else if (pw1.length < 6)
               {
@@ -2905,7 +2906,7 @@
                   null,
                   function()
                   {
-                    jQuery('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
+                    plugin.options.container.find('#glomePublicPassword').find('.glome-navigation-button.right').trigger('click');
                   }
                 );
               }
@@ -2914,7 +2915,7 @@
               return false;
             });
 
-          jQuery('#glomePublicSetPassword').find('button')
+          plugin.options.container.find('#glomePublicSetPassword').find('button')
             .on('click', function()
             {
               jQuery(this).parents('form').trigger('click');
@@ -2934,7 +2935,7 @@
         }
 
         mvc.prototype = new plugin.MVC.Public();
-        mvc.prototype.view = function()
+        mvc.prototype.view = function(args)
         {
           this.viewInit();
           this.content = plugin.Templates.get('public-finish');
@@ -2942,7 +2943,7 @@
           this.content.appendTo(this.contentArea);
         }
 
-        mvc.prototype.controller = function()
+        mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
           this.content.find('#glomePublicFinishClose')
@@ -3162,7 +3163,7 @@
 
           this.content.find('.glome-category-list > .glome-category').remove();
 
-          for (var i in plugin.Categories.listCategories())
+          for (var i in plugin.Categories.listCategories({subscribed: 1}))
           {
             var category = plugin.Categories.stack[i];
             var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
@@ -3346,7 +3347,8 @@
         // Prototype for initializing a view
         mvc.prototype.viewInit = function(args)
         {
-          var wrapper = jQuery('[data-glome-template="admin-wrapper"]');
+          plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
+          var wrapper = plugin.options.container.find('[data-glome-template="admin-wrapper"]');
 
           if (!wrapper.size())
           {
@@ -3627,7 +3629,7 @@
                 {
                   plugin.Ads.load(function()
                   {
-                    plugin.MVC.run('Widget');
+                    plugin.MVC.run('FirstRunInitialize');
                   });
                   plugin.Categories.load();
                 },
