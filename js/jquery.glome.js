@@ -103,6 +103,47 @@
       {
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
       },
+      
+      /**
+       * Escape plain ampersands that are not HTML character references
+       * 
+       * @param String str    Input string
+       * @return String       Escaped string
+       */
+      escapeAmpersands: function(str)
+      {
+        if (!str)
+        {
+          return null;
+        }
+        
+        return str.toString().replace(/&(?!([a-zA-Z0-9%$-_\.+!*'\(\),]+=|[#a-z0-9]+;))/g, '&amp;');
+      },
+      
+      escapeAmpersandsRecursive: function(input)
+      {
+        switch (typeof input)
+        {
+          case 'string':
+            return this.escapeAmpersands(input);
+          
+          case 'object':
+            for (var i in input)
+            {
+              input[i] = this.escapeAmpersands(input[i]);
+            }
+            break;
+          
+          case 'array':
+            for (var i = 0; i < input.length; i++)
+            {
+              input[i] = this.escapeAmpersands(input[i]);
+            }
+            break;
+        }
+        
+        return input;
+      },
 
       /**
        * Validate callbacks
@@ -647,7 +688,7 @@
         tmp = tmp.replace(/‹«([A-Za-z0-9_]+)»›/g, '{$1}');
 
         var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-        div.innerHTML = tmp;
+        div.innerHTML = plugin.Tools.escapeAmpersands(tmp);
         return jQuery(div).find('> *');
       }
     }
@@ -1321,12 +1362,6 @@
           if (typeof plugin[container].stack == 'undefined')
           {
             plugin[container].stack = {};
-/*
-            plugin[container].stack.prototype.__defineGetter__('length', function()
-            {
-              return Object.keys(this).length;
-            });
-*/
           }
 
           if (typeof plugin[container].listeners == 'undefined')
@@ -1385,6 +1420,10 @@
           if (i === 'id')
           {
             this.setId(data[i]);
+          }
+          else if (typeof data[i] === 'string')
+          {
+            this[i] = plugin.Tools.escapeAmpersands(data[i]);
           }
           else
           {
@@ -2587,6 +2626,26 @@
           this.contentArea = wrapper.find('[data-glome-template="public-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
+        
+        // Initialize default controllers
+        mvc.prototype.controllerInit = function(args)
+        {
+          plugin.options.container.find('[data-glome-mvc]')
+            .off('click')
+            .on('click', function(e)
+            {
+              
+              e.preventDefault();
+              plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
+              return false;
+            });
+        }
+        
+        // Set default controller
+        mvc.prototype.controller = function(args)
+        {
+          this.controllerInit(args);
+        }
 
         var m = new mvc();
 
@@ -2609,8 +2668,9 @@
           this.content.appendTo(this.contentArea);
         }
 
-        mvc.prototype.controller = function()
+        mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           var request = null;
 
           this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
@@ -2671,8 +2731,9 @@
           this.content.appendTo(this.contentArea);
         }
 
-        mvc.prototype.controller = function()
+        mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           this.content.find('#glomePublicFirstRunProceed')
             .on('click', function()
             {
@@ -2727,8 +2788,9 @@
           }
         }
 
-        mvc.prototype.controller = function()
+        mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           this.contentArea.find('.glome-subscribe')
             .on('click', function()
             {
@@ -2789,6 +2851,7 @@
 
         mvc.prototype.controller = function()
         {
+          this.controllerInit(args);
           this.contentArea.find('.glome-pager .glome-navigation-button.left')
             .on('click', function()
             {
@@ -2868,6 +2931,7 @@
 
         mvc.prototype.controller = function()
         {
+          this.controllerInit(args);
           this.content.find('#glomePublicFinishClose')
             .on('click', function()
             {
@@ -2935,7 +2999,7 @@
             name: this.category.name,
             title: this.ad.title,
             description: this.ad.description,
-            bonus: this.ad.bonus,
+            bonus: this.ad.bonus || ' ',
             adId: this.ad.id,
             categoryId: this.category.id
           }
@@ -2968,6 +3032,7 @@
 
         mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           plugin.options.container.find('.glome-category-title, .glome-category-title a')
             .on('click', function(e)
             {
@@ -3039,6 +3104,7 @@
 
         mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           this.content.find('.glome-link-previous')
             .on('click', function(e)
             {
@@ -3083,7 +3149,7 @@
 
           this.content.find('.glome-category-list > .glome-category').remove();
 
-          for (var i in plugin.Categories.listCategories({subscribed: 1}))
+          for (var i in plugin.Categories.listCategories())
           {
             var category = plugin.Categories.stack[i];
             var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
@@ -3092,6 +3158,7 @@
 
         mvc.prototype.controller = function(args)
         {
+          this.controllerInit(args);
           this.content.find('.glome-category-list > .glome-category')
             .on('click', function(e)
             {

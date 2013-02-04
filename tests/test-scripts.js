@@ -241,6 +241,51 @@ QUnit.test('Glome methods', function()
   Glome.Ads.listeners = {};
 });
 
+QUnit.test('Escape ampersands', function()
+{
+  var dataset =
+  {
+    people: 'Arthur Dent & Ford Prefect',
+    url: 'http://api.glome.me/?subject=HGGH&earth=Mostly%20harmless',
+    chromeUrl: 'chrome://glome/content/browser.js?do=not&touch=me',
+  }
+  
+  // Just copy the dataset as a new child object
+  dataset.sub = dataset;
+  
+  // New array, copy the values as new array items
+  dataset.subarray = [];
+  for (var i in dataset)
+  {
+    dataset.subarray.push(dataset[i]);
+  }
+  
+  // New function
+  dataset.subfunction = function()
+  {
+    var foo, bar;
+    
+    if (foo && bar)
+    {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.people), dataset.people.replace(/&/, '&amp;'), 'Ampersand was replaced');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.url), dataset.url, 'URL was not escaped');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.chromeUrl), dataset.chromeUrl, 'Chrome URL was not escaped');
+  
+  var escaped = Glome.Tools.escapeAmpersandsRecursive(dataset);
+  
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.people), escaped.people, 'First level of the object was escaped');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.sub.people), escaped.sub.people, 'Second level of the object was escaped');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.subarray[0]), escaped.subarray[0], 'First array key was escaped');
+  QUnit.equal(dataset.subfunction, escaped.subfunction, 'Function was not escaped');
+  console.log('escaped', escaped);
+});
+
 /* !Browser rules */
 QUnit.test('Browser rules', function()
 {
@@ -450,7 +495,16 @@ QUnit.test('Constructor', function()
     'ID has to be an integer'
   );
 
-  // Constructor creates stack and listeners placeholders for newly created objects
+  // Ampersands are escaped on everything that doesn't resemble too much of a URL
+  dataset.id = objectId + 1;
+  dataset.people = 'Arthur Dent & Ford Prefect';
+  dataset.url = 'http://api.glome.me/?subject=HGGH&earth=Mostly%20harmless';
+  dataset.chromeUrl = 'chrome://glome/content/browser.js?do=not&touch=me';
+  
+  var o = new Glome.Prototype(dataset);
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.people), o.people, 'Ampersand was replaced');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.url), o.url, 'URL was not escaped');
+  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.chromeUrl), o.chromeUrl, 'Chrome URL was not escaped');
 });
 
 /* !Extend */
@@ -2021,7 +2075,11 @@ QUnit.asyncTest('Populate template', function()
       .text('Hello {world}!');
 
     QUnit.equal(Glome.Templates.parse(template, {world: 'Earth'}).get(0).outerHTML, '<div>Hello Earth!</div>', 'Attribute was parsed correctly');
-
+    
+    var html = Glome.Templates.parse(template, {world: 'Earth & Mars'}).get(0).outerHTML;
+    console.log(html);
+    QUnit.ok(html.match(/\u0026/), 'Ampersand was parsed correctly as XML');
+    
     QUnit.start();
   });
 });
