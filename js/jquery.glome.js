@@ -688,7 +688,7 @@
         tmp = tmp.replace(/‹«([A-Za-z0-9_]+)»›/g, '{$1}');
 
         var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-        div.innerHTML = plugin.Tools.escapeAmpersands(tmp);
+        div.innerHTML = tmp;
         return jQuery(div).find('> *');
       }
     }
@@ -813,12 +813,14 @@
        *
        * @param string type
        * @param Object data
-       * @param function callback   @optional Callback function
-       * @param function onerror    @optional On error function
-       * @param string method       @optional Request method (GET, POST, PUT, DELETE)
-       * @return jqXHR              jQuery XMLHttpRequest
+       * @param function callback      @optional Callback function
+       * @param function onerror       @optional On error function
+       * @param string method          @optional Request method (GET, POST, PUT, DELETE)
+       * @param function beforeSend    @optional Custom beforeSend function
+       * @param function xhrFields     @optional Custom xhrFields data
+       * @return jqXHR                 jQuery XMLHttpRequest
        */
-      request: function(type, data, callback, onerror, method)
+      request: function(type, data, callback, onerror, method, beforeSend, xhrFields)
       {
         if (arguments.length < 2)
         {
@@ -883,6 +885,40 @@
 
           throw new Error('No Internet connection');
         }
+        
+        
+        if (typeof beforeSend === 'undefined')
+        {
+          var beforeSend = function(jqXHR, settings)
+          {
+            jqXHR.settings = settings;
+            // revert the token and cookie from prefs if available
+            if (typeof plugin.pref('session.token') != 'undefined'
+                && plugin.pref('session.token') != null)
+            {
+              plugin.sessionToken = plugin.pref('session.token');
+            }
+            if (typeof plugin.pref('session.cookie') != 'undefined'
+                && plugin.pref('session.cookie') != null)
+            {
+              plugin.cookie = plugin.pref('session.cookie');
+            }
+            
+            if (plugin.sessionToken)
+            {
+              jqXHR.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+              jqXHR.setRequestHeader('Cookie', plugin.cookie);
+            }
+          };
+        }
+
+        if (typeof customXhrFields === 'undefined')
+        {
+          var xhrFields =
+          {
+            withCredentials: true
+          };
+        }
 
         var request = jQuery.ajax
         (
@@ -891,29 +927,10 @@
             data: data,
             type: method.toString(),
             dataType: 'json',
-            xhrFields:
-            {
-              withCredentials: true
-            },
+            xhrFields: xhrFields,
+            beforeSend: beforeSend,
             success: callback,
-            error: onerror,
-            beforeSend: function(jqXHR, settings)
-            {
-              jqXHR.settings = settings;
-              // revert the token and cookie from prefs if available
-              if (typeof plugin.pref('session.token') != 'undefined'
-                  && plugin.pref('session.token') != null)
-              {
-                plugin.sessionToken = plugin.pref('session.token');
-              }
-              if (typeof plugin.pref('session.cookie') != 'undefined'
-                  && plugin.pref('session.cookie') != null)
-              {
-                plugin.cookie = plugin.pref('session.cookie');
-              }
-              jqXHR.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
-              jqXHR.setRequestHeader('Cookie', plugin.cookie);
-            }
+            error: onerror
           }
         );
         return request;
@@ -1178,7 +1195,9 @@
           },
           callbacks,
           onerrors,
-          'POST'
+          'POST',
+          null,
+          null
         );
 
         return true;
@@ -1421,13 +1440,9 @@
           {
             this.setId(data[i]);
           }
-          else if (typeof data[i] === 'string')
-          {
-            this[i] = plugin.Tools.escapeAmpersands(data[i]);
-          }
           else
           {
-            this[i] = data[i];
+            this[i] = plugin.Tools.escapeAmpersandsRecursive(data[i]);
           }
         }
       }
@@ -2672,12 +2687,14 @@
         {
           this.controllerInit(args);
           var request = null;
-
+          
           this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
             .off('click')
-            .on('click', function()
+            .on('click', function(e)
             {
               jQuery('#glomePublicRequirePasswordContainer').trigger('submit');
+              e.preventDefault();
+              return false;
             });
 
           this.contentArea.find('#glomePublicRequirePasswordContainer')
@@ -2685,11 +2702,7 @@
             .on('submit', function(e)
             {
               e.preventDefault();
-
-              if (request)
-              {
-                return;
-              }
+              console.log(jQuery(this).find('input[type="password"]').val());
 
               request = plugin.Auth.login
               (
