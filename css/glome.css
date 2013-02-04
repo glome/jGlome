@@ -68,6 +68,11 @@
 
 [data-glome-container="true"] .glome-layout-cols-2 > * {
   float: left; }
+  @media screen and (max-width: 689px) {
+    [data-glome-container="true"] .glome-layout-cols-2 > * {
+      float: none !important;
+      margin-left: 0 !important;
+      clear: both; } }
 
 [data-glome-container="true"] .glome-layout-cols-2 > * + * {
   float: right;
@@ -75,523 +80,190 @@
 
 [data-glome-container="true"] .glome-fixed {
   position: fixed; }
+  @media screen and (max-width: 689px) {
+    [data-glome-container="true"] .glome-fixed {
+      position: static; } }
 
 /* !Column widths */
 .glome-cols-1 {
-  width: 120px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 120px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-1 {
+      width: 120px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-1 {
+      width: 120px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-1 {
+      width: 120px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-1 {
+      width: 120px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-1 {
+      width: 120px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-1 {
+      width: 120px; } }
 
 .glome-cols-2 {
-  width: 255px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 255px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-2 {
+      width: 255px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-2 {
+      width: 255px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-2 {
+      width: 255px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-2 {
+      width: 255px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-2 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-2 {
+      width: 120px; } }
 
 .glome-cols-3 {
-  width: 390px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 390px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-3 {
+      width: 390px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-3 {
+      width: 390px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-3 {
+      width: 390px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-3 {
+      width: 390px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-3 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-3 {
+      width: 120px; } }
 
 .glome-cols-4 {
-  width: 525px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 525px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-4 {
+      width: 525px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-4 {
+      width: 525px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-4 {
+      width: 525px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-4 {
+      width: 390px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-4 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-4 {
+      width: 120px; } }
 
 .glome-cols-5 {
-  width: 660px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 660px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-5 {
+      width: 660px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-5 {
+      width: 660px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-5 {
+      width: 525px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-5 {
+      width: 390px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-5 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-5 {
+      width: 120px; } }
 
 .glome-cols-6 {
-  width: 795px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 795px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-6 {
+      width: 795px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-6 {
+      width: 660px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-6 {
+      width: 525px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-6 {
+      width: 390px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-6 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-6 {
+      width: 120px; } }
 
 .glome-cols-7 {
-  width: 930px;
-  /*
-      @media screen and (min-width: 835px) and (max-width: 969px)
-      {
-        @if $i >= 6
-        {
-          width: ($col_width + $col_margin) * 6 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 700px) and (max-width: 834px)
-      {
-        @if $i >= 5
-        {
-          width: ($col_width + $col_margin) * 5 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 565px) and (max-width: 699px)
-      {
-        @if $i >= 4
-        {
-          width: ($col_width + $col_margin) * 4 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 430px) and (max-width: 564px)
-      {
-        @if $i >= 3
-        {
-          width: ($col_width + $col_margin) * 3 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (min-width: 295px) and (max-width: 429px)
-      {
-        @if $i >= 2
-        {
-          width: ($col_width + $col_margin) * 2 - $col_margin;
-        }
-        @else
-        {
-          width: ($col_width + $col_margin) * $i - $col_margin;
-        }
-      }
-      
-      @media screen and (max-width: 294px)
-      {
-        width: $col_width
-      }
-  */ }
+  width: 930px; }
+  @media screen and (min-width: 835px) and (max-width: 969px) {
+    .glome-cols-7 {
+      width: 795px; } }
+  @media screen and (min-width: 700px) and (max-width: 834px) {
+    .glome-cols-7 {
+      width: 660px; } }
+  @media screen and (min-width: 565px) and (max-width: 699px) {
+    .glome-cols-7 {
+      width: 525px; } }
+  @media screen and (min-width: 430px) and (max-width: 564px) {
+    .glome-cols-7 {
+      width: 390px; } }
+  @media screen and (min-width: 295px) and (max-width: 429px) {
+    .glome-cols-7 {
+      width: 255px; } }
+  @media screen and (max-width: 294px) {
+    .glome-cols-7 {
+      width: 120px; } }
 
 @media screen and (max-width: 284px) {
-  [data-glome-container="true"] .glome-full-width {
+  .glome-full-width {
     width: 120px;
     margin-left: auto;
     margin-right: auto; } }
-@media screen and (max-width: 419px) {
-  [data-glome-container="true"] .glome-full-width {
+@media screen and (max-width: 419px) and (min-width: 285px) {
+  .glome-full-width {
     width: 255px;
     margin-left: auto;
     margin-right: auto; } }
-@media screen and (max-width: 554px) {
-  [data-glome-container="true"] .glome-full-width {
+@media screen and (max-width: 554px) and (min-width: 420px) {
+  .glome-full-width {
     width: 390px;
     margin-left: auto;
     margin-right: auto; } }
-@media screen and (max-width: 689px) {
-  [data-glome-container="true"] .glome-full-width {
+@media screen and (max-width: 689px) and (min-width: 555px) {
+  .glome-full-width {
     width: 525px;
     margin-left: auto;
     margin-right: auto; } }
-@media screen and (max-width: 824px) {
-  [data-glome-container="true"] .glome-full-width {
+@media screen and (max-width: 824px) and (min-width: 690px) {
+  .glome-full-width {
     width: 660px;
     margin-left: auto;
     margin-right: auto; } }
-@media screen and (max-width: 969px) {
-  [data-glome-container="true"] .glome-full-width {
+@media screen and (max-width: 969px) and (min-width: 825px) {
+  .glome-full-width {
     width: 795px;
     margin-left: auto;
     margin-right: auto; } }
 @media screen and (min-width: 970px) {
-  [data-glome-container="true"] .glome-full-width {
+  .glome-full-width {
     width: 930px;
     margin-left: auto;
     margin-right: auto; } }
@@ -652,6 +324,7 @@
   background-image: url(../images/icons/arrow-button-gradient-gray.svg);
   background-repeat: no-repeat;
   background-color: transparent;
+  background-size: 900px 35px;
   display: inline-block;
   overflow: hidden;
   width: 120px;
@@ -799,7 +472,8 @@
   padding-left: 15px; }
 
 [data-glome-container="true"] .glome-row > .glome-button-container {
-  padding-left: 0; }
+  padding-left: 0;
+  width: 120px; }
 
 [data-glome-container="true"] .glome-row > .glome-price-container {
   white-space: nowrap; }
@@ -1075,21 +749,27 @@
   vertical-align: bottom;
   font-weight: 100;
   bottom: 68px; }
+  @media screen and (max-width: 689px) {
+    #glomeAdminSubscriptions .glome-selection-counter {
+      position: static;
+      padding: 15px 0;
+      margin: 15px 0;
+      border-bottom: solid 1px #b1b1b1; } }
 
 #glomeAdminSubscriptions .glome-selection-counter .glome-unit,
 #glomePublicSubscriptions .glome-selection-counter .glome-unit {
   font-size: 13px;
   font-weight: 500; }
 
-@media screen and (max-width: 824px) {
+@media screen and (max-width: 824px) and (min-width: 690px) {
   #glomeAdminSubscriptions .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 390px; } }
-@media screen and (max-width: 689px) {
+@media screen and (max-width: 689px) and (min-width: 555px) {
   #glomeAdminSubscriptions .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 255px; } }
-@media screen and (max-width: 554px) {
+@media screen and (max-width: 554px) and (min-width: 420px) {
   #glomeAdminSubscriptions .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 120px; } }
@@ -1288,6 +968,12 @@
   vertical-align: bottom;
   font-weight: 100;
   bottom: 132px; }
+  @media screen and (max-width: 689px) {
+    #glomePublicSubscriptions .glome-selection-counter {
+      position: static;
+      padding: 15px 0;
+      margin: 15px 0;
+      border-bottom: solid 1px #b1b1b1; } }
 
 /* !First run, stage 3: set password */
 #glomePublicSetPassword,

@@ -56,6 +56,65 @@ $full_page_z_index: 10000;
   
   @if $cols == 6
   {
+    @media screen and (max-width: 969px) and (min-width: 825px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 5
+  {
+    @media screen and (max-width: 824px) and (min-width: 690px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 4
+  {
+    @media screen and (max-width: 689px) and (min-width: 555px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 3
+  {
+    @media screen and (max-width: 554px) and (min-width: 420px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 2
+  {
+    @media screen and (max-width: 419px) and (min-width: 285px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 1
+  {
+    @media screen and (max-width: 284px)
+    {
+      @content;
+    }
+  }
+}
+
+@mixin respond-to-lte($cols)
+{
+  @if $cols >= 7
+  {
+    @media screen and (min-width: 970px)
+    {
+      @content;
+    }
+  }
+  
+  @if $cols == 6
+  {
     @media screen and (max-width: 969px)
     {
       @content;
@@ -176,6 +235,14 @@ $full_page_z_index: 10000;
   font-size: 215%;
   vertical-align: bottom;
   font-weight: 100;
+  
+  @include respond-to-lte(4)
+  {
+    position: static;
+    padding: $col_margin 0;
+    margin: $col_margin 0;
+    border-bottom: solid 1px $separator;
+  }
 }
 
 @mixin close
@@ -276,6 +343,13 @@ $full_page_z_index: 10000;
 [data-glome-container="true"] .glome-layout-cols-2 > *
 {
   float: left;
+  
+  @include respond-to-lte(4)
+  {
+    float: none !important;
+    margin-left: 0 !important;
+    clear: both;
+  }
 }
 
 [data-glome-container="true"] .glome-layout-cols-2 > * + *
@@ -287,6 +361,11 @@ $full_page_z_index: 10000;
 [data-glome-container="true"] .glome-fixed
 {
   position: fixed;
+  
+  @include respond-to-lte(4)
+  {
+    position: static;
+  }
 }
 
 /* !Column widths */
@@ -296,7 +375,6 @@ $full_page_z_index: 10000;
   {
     width: ($col_width + $col_margin) * $i - $col_margin;
     
-/*
     @media screen and (min-width: 835px) and (max-width: 969px)
     {
       @if $i >= 6
@@ -361,7 +439,6 @@ $full_page_z_index: 10000;
     {
       width: $col_width
     }
-*/
   }
 }
 
@@ -369,7 +446,7 @@ $full_page_z_index: 10000;
 {
   @include respond-to($i)
   {
-    [data-glome-container="true"] .glome-full-width
+    .glome-full-width
     {
       width: ($col_width + $col_margin) * $i - $col_margin;
       margin-left: auto;
@@ -455,6 +532,7 @@ $full_page_z_index: 10000;
     image: url(../images/icons/arrow-button-gradient-gray.svg);
     repeat: no-repeat;
     color: transparent;
+    size: 900px 35px;
   }
   display: inline-block;
   overflow: hidden;
@@ -635,6 +713,7 @@ $full_page_z_index: 10000;
 [data-glome-container="true"] .glome-row > .glome-button-container
 {
   padding-left: 0;
+  width: $col_width;
 }
 
 [data-glome-container="true"] .glome-row > .glome-price-container
