@@ -232,6 +232,237 @@
     .glome-cols-7 {
       width: 120px; } }
 
+.cols-1-minus {
+  width: -15px; }
+  @media screen and (max-width: 969px) {
+    .cols-1-minus {
+      width: -15px; } }
+  @media screen and (max-width: 824px) {
+    .cols-1-minus {
+      width: -15px; } }
+  @media screen and (max-width: 689px) {
+    .cols-1-minus {
+      width: 120px; } }
+  @media screen and (max-width: 554px) {
+    .cols-1-minus {
+      width: 120px; } }
+  @media screen and (max-width: 419px) {
+    .cols-1-minus {
+      width: 120px; } }
+
+.cols-2-minus {
+  width: 120px; }
+  @media screen and (max-width: 969px) {
+    .cols-2-minus {
+      width: 120px; } }
+  @media screen and (max-width: 824px) {
+    .cols-2-minus {
+      width: 120px; } }
+  @media screen and (max-width: 689px) {
+    .cols-2-minus {
+      width: 120px; } }
+  @media screen and (max-width: 554px) {
+    .cols-2-minus {
+      width: 120px; } }
+  @media screen and (max-width: 419px) {
+    .cols-2-minus {
+      width: 120px; } }
+
+.cols-3-minus {
+  width: 255px; }
+  @media screen and (max-width: 969px) {
+    .cols-3-minus {
+      width: 255px; } }
+  @media screen and (max-width: 824px) {
+    .cols-3-minus {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-3-minus {
+      width: 120px; } }
+  @media screen and (max-width: 554px) {
+    .cols-3-minus {
+      width: 255px; } }
+  @media screen and (max-width: 419px) {
+    .cols-3-minus {
+      width: 120px; } }
+
+.cols-4-minus {
+  width: 390px; }
+  @media screen and (max-width: 969px) {
+    .cols-4-minus {
+      width: 390px; } }
+  @media screen and (max-width: 824px) {
+    .cols-4-minus {
+      width: 390px; } }
+  @media screen and (max-width: 689px) {
+    .cols-4-minus {
+      width: 390px; } }
+  @media screen and (max-width: 554px) {
+    .cols-4-minus {
+      width: 255px; } }
+  @media screen and (max-width: 419px) {
+    .cols-4-minus {
+      width: 120px; } }
+
+.cols-5-minus {
+  width: 525px; }
+  @media screen and (max-width: 969px) {
+    .cols-5-minus {
+      width: 525px; } }
+  @media screen and (max-width: 824px) {
+    .cols-5-minus {
+      width: 525px; } }
+  @media screen and (max-width: 689px) {
+    .cols-5-minus {
+      width: 390px; } }
+  @media screen and (max-width: 554px) {
+    .cols-5-minus {
+      width: 255px; } }
+  @media screen and (max-width: 419px) {
+    .cols-5-minus {
+      width: 120px; } }
+
+.cols-6-minus {
+  width: 660px; }
+  @media screen and (max-width: 969px) {
+    .cols-6-minus {
+      width: 660px; } }
+  @media screen and (max-width: 824px) {
+    .cols-6-minus {
+      width: 525px; } }
+  @media screen and (max-width: 689px) {
+    .cols-6-minus {
+      width: 390px; } }
+  @media screen and (max-width: 554px) {
+    .cols-6-minus {
+      width: 255px; } }
+  @media screen and (max-width: 419px) {
+    .cols-6-minus {
+      width: 120px; } }
+
+.cols-7-minus {
+  width: 795px; }
+  @media screen and (max-width: 969px) {
+    .cols-7-minus {
+      width: 660px; } }
+  @media screen and (max-width: 824px) {
+    .cols-7-minus {
+      width: 525px; } }
+  @media screen and (max-width: 689px) {
+    .cols-7-minus {
+      width: 390px; } }
+  @media screen and (max-width: 554px) {
+    .cols-7-minus {
+      width: 255px; } }
+  @media screen and (max-width: 419px) {
+    .cols-7-minus {
+      width: 120px; } }
+
+.cols-1-minus-2 {
+  width: -150px; }
+  @media screen and (max-width: 969px) {
+    .cols-1-minus-2 {
+      width: -15px; } }
+  @media screen and (max-width: 824px) {
+    .cols-1-minus-2 {
+      width: -15px; } }
+  @media screen and (max-width: 689px) {
+    .cols-1-minus-2 {
+      width: -15px; } }
+  @media screen and (max-width: 554px) {
+    .cols-1-minus-2 {
+      width: 120px; } }
+
+.cols-2-minus-2 {
+  width: -15px; }
+  @media screen and (max-width: 969px) {
+    .cols-2-minus-2 {
+      width: 120px; } }
+  @media screen and (max-width: 824px) {
+    .cols-2-minus-2 {
+      width: 120px; } }
+  @media screen and (max-width: 689px) {
+    .cols-2-minus-2 {
+      width: 120px; } }
+  @media screen and (max-width: 554px) {
+    .cols-2-minus-2 {
+      width: 120px; } }
+
+.cols-3-minus-2 {
+  width: 120px; }
+  @media screen and (max-width: 969px) {
+    .cols-3-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 824px) {
+    .cols-3-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-3-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 554px) {
+    .cols-3-minus-2 {
+      width: 120px; } }
+
+.cols-4-minus-2 {
+  width: 255px; }
+  @media screen and (max-width: 969px) {
+    .cols-4-minus-2 {
+      width: 390px; } }
+  @media screen and (max-width: 824px) {
+    .cols-4-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-4-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 554px) {
+    .cols-4-minus-2 {
+      width: 120px; } }
+
+.cols-5-minus-2 {
+  width: 390px; }
+  @media screen and (max-width: 969px) {
+    .cols-5-minus-2 {
+      width: 390px; } }
+  @media screen and (max-width: 824px) {
+    .cols-5-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-5-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 554px) {
+    .cols-5-minus-2 {
+      width: 120px; } }
+
+.cols-6-minus-2 {
+  width: 525px; }
+  @media screen and (max-width: 969px) {
+    .cols-6-minus-2 {
+      width: 390px; } }
+  @media screen and (max-width: 824px) {
+    .cols-6-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-6-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 554px) {
+    .cols-6-minus-2 {
+      width: 120px; } }
+
+.cols-7-minus-2 {
+  width: 660px; }
+  @media screen and (max-width: 969px) {
+    .cols-7-minus-2 {
+      width: 390px; } }
+  @media screen and (max-width: 824px) {
+    .cols-7-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 689px) {
+    .cols-7-minus-2 {
+      width: 255px; } }
+  @media screen and (max-width: 554px) {
+    .cols-7-minus-2 {
+      width: 120px; } }
+
 @media screen and (max-width: 284px) {
   .glome-full-width {
     width: 120px;
@@ -840,7 +1071,7 @@
 /* !Public views */
 #glomePublic {
   z-index: 10000;
-  background-color: rgba(0, 0, 0, 0.95); }
+  background-color: rgba(0, 0, 0, 0.8); }
 
 #glomePublicHeader {
   -webkit-box-sizing: border-box;
