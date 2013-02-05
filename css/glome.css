@@ -678,6 +678,17 @@
   @media screen and (max-height: 550px) {
     #glomeAdmin .glome-navigation > li.selected > ul {
       top: 88.5px; } }
+  @media screen and (max-width: 969px) and (min-width: 825px) {
+    #glomeAdmin .glome-navigation > li.selected > ul {
+      margin-left: -127.5px; } }
+  @media screen and (max-width: 824px) and (min-width: 690px) {
+    #glomeAdmin .glome-navigation > li.selected > ul {
+      margin-left: -195px; } }
+  @media screen and (max-width: 689px) {
+    #glomeAdmin .glome-navigation > li.selected > ul {
+      position: static;
+      margin-left: 0;
+      clear: both; } }
 
 #glomeAdmin .glome-navigation > li.selected > ul li {
   display: block;

@@ -942,9 +942,27 @@ $full_page_z_index: 10000;
   width: ($col_width + $col_margin) * 4 - $col_margin;
   height: $navigation_height;
   line-height: $navigation_height;
+  
   @media screen and (max-height: $small_screen_height)
   {
     top: $header_height / 2;
+  }
+  
+  @include respond-to(6)
+  {
+    margin-left: -1 * (($col_width + $col_margin) * 2 - $col_margin) / 2;
+  }
+  
+  @include respond-to(5)
+  {
+    margin-left: -1 * (($col_width + $col_margin) * 3 - $col_margin) / 2;
+  }
+  
+  @include respond-to-lte(4)
+  {
+    position: static;
+    margin-left: 0;
+    clear: both;
   }
 }
 
