@@ -1011,24 +1011,28 @@
 /* !View ad */
 #glomePublicAd button {
   font-size: 138% !important; }
-
 #glomePublicAd button + button {
   float: right; }
-
 #glomePublicAd .glome-ad-actions {
   margin-top: 20px; }
-
 #glomePublicAd .glome-cols-ad-description {
   width: 165px; }
-
 #glomePublicAd .glome-ad-bonus h2 {
   margin-top: 0 !important; }
-
 #glomePublicAd .glome-cols-ad-image {
   width: 300px; }
   #glomePublicAd .glome-cols-ad-image img {
     min-width: 300px;
     max-width: 300px; }
+@media screen and (max-width: 824px) and (min-width: 690px) {
+  #glomePublicAd .glome-cols-4 {
+    width: 390px; }
+    #glomePublicAd .glome-cols-4 .glome-layout-cols-2 > * {
+      clear: both !important;
+      float: none !important; } }
+@media screen and (max-width: 689px) and (min-width: 555px) {
+  #glomePublicAd .glome-cols-4 {
+    width: 390px; } }
 
 #glomePublicCategory .glome-ad-row .glome-text-container h1,
 #glomePublicCategory .glome-ad-row .glome-text-container p {

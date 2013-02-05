@@ -1371,38 +1371,63 @@ $full_page_z_index: 10000;
 }
 
 /* !View ad */
-#glomePublicAd button
+#glomePublicAd
 {
-  font-size: 138% !important;
-}
-
-#glomePublicAd button + button
-{
-  float: right;
-}
-
-#glomePublicAd .glome-ad-actions
-{
-  margin-top: 20px;
-}
-
-#glomePublicAd .glome-cols-ad-description
-{
-  width: ($col_width * 4 - $col_margin) - $ad_image_width;
-}
-
-#glomePublicAd .glome-ad-bonus h2
-{
-  margin-top: 0 !important;
-}
-
-#glomePublicAd .glome-cols-ad-image
-{
-  width: $ad_image_width;
-  img
+  button
   {
-    min-width: $ad_image_width;
-    max-width: $ad_image_width;
+    font-size: 138% !important;
+  }
+  
+  button + button
+  {
+    float: right;
+  }
+  
+  .glome-ad-actions
+  {
+    margin-top: 20px;
+  }
+  
+  .glome-cols-ad-description
+  {
+    width: ($col_width * 4 - $col_margin) - $ad_image_width;
+  }
+  
+  .glome-ad-bonus h2
+  {
+    margin-top: 0 !important;
+  }
+  
+  .glome-cols-ad-image
+  {
+    width: $ad_image_width;
+    img
+    {
+      min-width: $ad_image_width;
+      max-width: $ad_image_width;
+    }
+  }
+  
+  @include respond-to(5)
+  {
+    .glome-cols-4
+    {
+      width: ($col_width + $col_margin) * 3 - $col_margin;
+      
+      .glome-layout-cols-2 > *
+      {
+        clear: both !important;
+        float: none !important;
+      }
+    }
+  }
+  
+  @include respond-to(4)
+  {
+    .glome-cols-4
+    {
+      width: ($col_width + $col_margin) * 3 - $col_margin;
+    }
   }
 }
 
