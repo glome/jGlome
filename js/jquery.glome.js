@@ -2556,6 +2556,16 @@
 
         mvc.prototype.controller = function(args)
         {
+          this.widget.find('[data-glome-mvc]')
+            .off('click.glome')
+            .on('click.glome', function(e)
+            {
+              
+              e.preventDefault();
+              plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
+              return false;
+            });
+          
           // Open and close the widget. Closing widget hides always the knocking
           // until a new knock is initialized
           this.widget.find('#glomeWidgetIcon')
@@ -3353,7 +3363,8 @@
         // Prototype for initializing a view
         mvc.prototype.viewInit = function(args)
         {
-          plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
+          plugin.options.container.find('> *').remove();
+          
           var wrapper = plugin.options.container.find('[data-glome-template="admin-wrapper"]');
 
           if (!wrapper.size())
