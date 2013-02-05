@@ -229,6 +229,23 @@ $full_page_z_index: 10000;
   text-shadow: 0 1px rgba(255, 255, 255, 0.4);
 }
 
+@mixin glome-config
+{
+  background:
+  {
+    image: url(../images/icons/icon-settings.svg);
+    size: 30px 30px;
+  }
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  opacity: 0.7;
+  &:hover
+  {
+    opacity: 1;
+  }
+}
+
 @mixin selection-counter
 {
   position: fixed;
@@ -1428,6 +1445,10 @@ $full_page_z_index: 10000;
     {
       width: ($col_width + $col_margin) * 3 - $col_margin;
     }
+  }
+  .glome-config
+  {
+    @include glome-config;
   }
 }
 

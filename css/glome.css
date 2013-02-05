@@ -1033,6 +1033,15 @@
 @media screen and (max-width: 689px) and (min-width: 555px) {
   #glomePublicAd .glome-cols-4 {
     width: 390px; } }
+#glomePublicAd .glome-config {
+  background-image: url(../images/icons/icon-settings.svg);
+  background-size: 30px 30px;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  opacity: 0.7; }
+  #glomePublicAd .glome-config:hover {
+    opacity: 1; }
 
 #glomePublicCategory .glome-ad-row .glome-text-container h1,
 #glomePublicCategory .glome-ad-row .glome-text-container p {
