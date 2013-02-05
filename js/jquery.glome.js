@@ -2532,13 +2532,17 @@
           // That is why the widget is removed completely and a new one is placed in stead. This causes
           // a very small footprint, but a footprint nevertheless and should be inspected "when
           // there is time"... ;)
-          plugin.options.widgetContainer.find('[data-glome-template="widget"]').remove();
+          plugin.options.widgetContainer.find('[data-glome-template="widget"] > *').remove();
           this.widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
 
           // Reuse the old widget or create new
           if (!this.widget.size())
           {
             this.widget = plugin.Templates.get('widget').appendTo(plugin.options.widgetContainer);
+          }
+          else
+          {
+            plugin.Templates.get('widget').find('> *').appendTo(this.widget);
           }
 
           if (this.widgetAd)
@@ -2556,6 +2560,11 @@
 
         mvc.prototype.controller = function(args)
         {
+          jQuery(window).oneTime(50, function()
+          {
+            jQuery(window).trigger('resize.glome');
+          });
+          
           this.widget.find('[data-glome-mvc]')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -2660,6 +2669,7 @@
         // Initialize default controllers
         mvc.prototype.controllerInit = function(args)
         {
+          //jQuery(window).trigger('resize.glome');
           plugin.options.container.find('[data-glome-mvc]')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -3182,6 +3192,13 @@
           for (var i in plugin.Categories.listCategories({subscribed: 1}))
           {
             var category = plugin.Categories.stack[i];
+            
+            // Hide categories without any ads
+            if (!plugin.Ads.count({category: category.id}))
+            {
+              continue;
+            }
+            
             var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
           }
         }
@@ -3404,6 +3421,11 @@
           this.contentArea = wrapper.find('[data-glome-template="admin-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
+        
+        mvc.prototype.controllerInit = function(args)
+        {
+          //jQuery(window).trigger('resize.glome');
+        }
 
         var m = new mvc();
 
@@ -3458,6 +3480,11 @@
             }
           }
         }
+        
+        mvc.prototype.controller = function(args)
+        {
+          this.controllerInit(args);
+        }
 
         var m = new mvc();
         return m;
@@ -3487,6 +3514,11 @@
           this.content.appendTo(this.contentArea);
         }
 
+        mvc.prototype.controller = function(args)
+        {
+          this.controllerInit(args);
+        }
+        
         var m = new mvc();
         return m;
       },
@@ -3515,6 +3547,11 @@
           this.content.appendTo(this.contentArea);
         }
 
+        mvc.prototype.controller = function(args)
+        {
+          this.controllerInit(args);
+        }
+        
         var m = new mvc();
         return m;
       },
@@ -3543,6 +3580,11 @@
           this.content.appendTo(this.contentArea);
         }
 
+        mvc.prototype.controller = function(args)
+        {
+          this.controllerInit(args);
+        }
+        
         var m = new mvc();
         return m;
       }
