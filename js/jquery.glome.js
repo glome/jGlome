@@ -1630,10 +1630,25 @@
         {
           this.container = 'Ads';
           this._constructor(data);
+          
+          // @TODO: this has to be localized and it should be a getter function
+          if (this.bonus_text)
+          {
+            this.bonus = this.bonus_text;
+          }
+          else if (this.bonus_money != 0)
+          {
+            this.bonus = 'Your bonus: ' + this.bonus_money + ' e';
+          }
+          else if (this.bonus_percent != 0)
+          {
+            this.bonus = 'Your bonus: ' + this.bonus_percent + ' %';
+          }
         }
 
         Ad.prototype = new plugin.Prototype();
         Ad.prototype.constructor = Ad;
+        Ad.prototype.bonus = '';
 
 
         Ad.prototype.status = 0;
@@ -2547,7 +2562,19 @@
 
           if (this.widgetAd)
           {
+            var bonus = '';
+            
+            if (this.widgetAd.bonus_money != 0)
+            {
+              bonus = this.widgetAd.bonus_money.toString().replace(/\.00$/, '') + ' e';
+            }
+            else if (this.widgetAd.bonus_percent != 0)
+            {
+              bonus = this.widgetAd.bonus_percent.toString().replace(/\.00$/, '') + ' %';
+            }
+            
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
+            this.widget.find('.glome-ad-reward').text(bonus);
             this.widget.find('.glome-ad-logo img').attr('src', this.widgetAd.logo);
             this.widget.attr('data-knocking-ad', this.widgetAd.id);
           }
@@ -3043,7 +3070,7 @@
             adId: this.ad.id,
             categoryId: this.category.id
           }
-
+          
           this.viewInit();
           this.content = plugin.Templates.populate('public-ad', vars);
           this.content.appendTo(this.contentArea);
