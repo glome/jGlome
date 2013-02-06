@@ -3496,6 +3496,9 @@
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
+            
+            // Ensure that the ID is there
+            row.attr('data-glome-category', i);
 
             if (plugin.Categories.stack[i].subscribed)
             {
@@ -3511,6 +3514,42 @@
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
+          
+          this.contentArea.find('.glome-subscribe')
+            .on('click.glome', function()
+            {
+              var id = jQuery(this).parents('[data-glome-category]').attr('data-glome-category');
+              var changeCount = function()
+              {
+                var count = plugin.Categories.count({subscribed: 1});
+                plugin.options.container.find('.glome-current').text(count);
+              }
+
+              if (plugin.Categories.stack[id].subscribed)
+              {
+                jQuery(this).attr('data-state', 'off');
+                plugin.Categories.stack[id].unsubscribe(changeCount);
+              }
+              else
+              {
+                jQuery(this).attr('data-state', 'on');
+                plugin.Categories.stack[id].subscribe(changeCount);
+              }
+
+              plugin.Categories.onchange('subscriptions');
+            });
+
+          this.contentArea.find('.glome-pager .glome-navigation-button.left')
+            .on('click.glome', function()
+            {
+              plugin.MVC.run('FirstRunInitialize');
+            });
+
+          this.contentArea.find('.glome-pager .glome-navigation-button.right')
+            .on('click.glome', function()
+            {
+              plugin.MVC.run('FirstRunPassword');
+            });
         }
 
         var m = new mvc();
