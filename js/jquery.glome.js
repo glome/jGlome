@@ -2818,6 +2818,10 @@
                   });
                   plugin.Categories.load();
                   plugin.pref('loggedin', true);
+                },
+                function()
+                {
+                  alert('Login failed due to wrong password');
                 }
               );
 
