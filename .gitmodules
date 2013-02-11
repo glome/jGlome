@@ -4,3 +4,6 @@
 [submodule "js/qunit"]
 	path = js/qunit
 	url = git://github.com/jquery/qunit.git
+[submodule "js/jquery.timers"]
+	path = js/jquery.timers
+	url = git@github.com:adrenalin/jquery.timers.git
