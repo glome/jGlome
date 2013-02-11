@@ -66,6 +66,9 @@
   visibility: hidden;
   clear: both; }
 
+.glome-hidden {
+  display: none !important; }
+
 [data-glome-container="true"] .glome-layout-cols-2 > * {
   float: left; }
   @media screen and (max-width: 689px) {

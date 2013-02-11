@@ -64,6 +64,36 @@
     this.contentPrefix = '';
     this.templateLocation = 'template.html';
     this.userData = null;
+    
+    /**
+     * Timestamp of the last successful action. This can be used in the
+     * future for delayed logout or session time
+     * 
+     * @var integer
+     */
+    this.lastActionTime = null;
+    
+    /**
+     * Update last action time
+     * 
+     * @param boolean force
+     * @return int timestamp
+     */
+    this.updateLastActionTime = function(force)
+    {
+      // First time the last action time has to be enforced
+      // upon successful login
+      if (   !force
+          && !plugin.lastActionTime)
+      {
+        return;
+      }
+      
+      var date = new Date();
+      plugin.lastActionTime = Math.round(date.getTime() / 1000);
+      
+      return plugin.lastActionTime;
+    }
 
     /**
      * Switch to determine if first run should be the starting point
@@ -915,6 +945,12 @@
             withCredentials: true
           };
         }
+        
+        // Update the last action timestamp
+        callback = plugin.Tools.mergeCallbacks(callback, function()
+        {
+          plugin.updateLastActionTime();
+        });
 
         var request = jQuery.ajax
         (
@@ -1121,6 +1157,10 @@
             plugin.pref('glomeid', id);
             plugin.userData = data;
 
+            // Enforce the last action time. This is a sign of a successful
+            // login
+            plugin.updateLastActionTime(true);
+
             var token = jqXHR.getResponseHeader('X-CSRF-Token');
             var cookie = jqXHR.getResponseHeader('Set-Cookie');
 
@@ -1135,7 +1175,7 @@
               plugin.cookie = cookie;
               plugin.pref('session.cookie', cookie);
             }
-
+            
             jQuery.ajaxSetup
             (
               {
@@ -2443,6 +2483,7 @@
         if (typeof mvc.run !== 'undefined')
         {
           mvc.run(args);
+          plugin.updateLastActionTime();
         }
 
         return mvc;
@@ -2602,12 +2643,21 @@
               return false;
             });
           
+          
           // Open and close the widget. Closing widget hides always the knocking
           // until a new knock is initialized
           this.widget.find('#glomeWidgetIcon')
             .off('click.glome')
-            .on('click.glome', function()
+            .on('click.glome', function(e)
             {
+              e.preventDefault();
+              
+              if (!plugin.lastActionTime)
+              {
+                plugin.MVC.run('RequirePassword');
+                return false;
+              }
+              
               if (jQuery(this).parent().attr('data-state') === 'open')
               {
                 jQuery(this).parent().attr('data-state', 'closed');
@@ -2927,7 +2977,6 @@
           this.contentArea.find('.glome-pager .glome-navigation-button.right')
             .on('click.glome', function()
             {
-              dump('finish\n');
               plugin.MVC.run('FirstRunFinish');
             });
 
@@ -3649,6 +3698,46 @@
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
+          m.passwordChange = this.content.find('#glomeAdminSettingsChangePassword');
+          
+          this.content.find('#glomeAdminSettingsChangePassword').find('button')
+            .off('click')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+              
+              var old = m.passwordChange.find('input.old').val();
+              var pw1 = m.passwordChange.find('input.pw1').val();
+              var pw2 = m.passwordChange.find('input.pw2').val();
+              
+              if (pw1.length < 6)
+              {
+                alert('Password is too short, it should be over 6 characters');
+                return false;
+              }
+              
+              if (pw1 !== pw2)
+              {
+                alert('Passwords do not match');
+                return false;
+              }
+              
+              plugin.Auth.setPassword
+              (
+                pw1,
+                pw2,
+                old,
+                function()
+                {
+                  alert('Your password was changed successfully');
+                  plugin.MVC.run('AdminSettings');
+                },
+                function(jqXHR)
+                {
+                  alert('Password change failed');
+                }
+              )
+            });
         }
         
         var m = new mvc();
