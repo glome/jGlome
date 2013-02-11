@@ -1657,6 +1657,17 @@
        * @param boolean
        */
       disableListeners: false,
+      
+      /**
+       * View states
+       */
+      states:
+      {
+        unread: 0,
+        read: 1,
+        visited: 2,
+        ignore: -1
+      },
 
       /**
        * Create a new ad or fetch an existing from stack. Constructor
@@ -1689,7 +1700,7 @@
         Ad.prototype = new plugin.Prototype();
         Ad.prototype.constructor = Ad;
         Ad.prototype.bonus = '';
-
+        Ad.prototype.view_state = plugin.Ads.states.unread;
 
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
@@ -1872,6 +1883,16 @@
               // Matching of the categories has already been done
               case 'subscribed':
                 break;
+              
+              case 'view_state':
+              case 'state':
+                if (ad.view_state === filters[k])
+                {
+                  found = true;
+                  break;
+                }
+                
+                break;
 
               default:
                 throw new Error('Glome.Ads.listAds does not have a filter ' + k);
@@ -2006,6 +2027,9 @@
           throw new Error('Ad id must be a valid integer');
         }
 
+        // Set status as visited
+        plugin.Ads.stack[id].view_state = plugin.Ads.states.visited;
+
         // must set this to be able to parse URL
         plugin.Ads.adId = id;
 
@@ -2032,6 +2056,9 @@
         {
           throw new Error('Ad id must be a valid integer');
         }
+        
+        // Set status as ignored
+        plugin.Ads.stack[id].view_state = plugin.Ads.states.ignore;
 
         // must set this to be able to parse URL
         plugin.Ads.adId = id;
@@ -2567,12 +2594,12 @@
           }
           else if (!this.widgetAd)
           {
-            var ads = Object.keys(plugin.Ads.listAds({subscribed: 1}));
+            var ads = Object.keys(plugin.Ads.listAds({subscribed: 1, view_state: plugin.Ads.states.unread}));
 
             if (ads.length)
             {
-              var last = ads.length - 1;
-              this.widgetAd = new plugin.Ads.Ad(ads[last]);
+              var random = Math.floor(Math.random() * ads.length);
+              this.widgetAd = new plugin.Ads.Ad(ads[random]);
             }
             else
             {
@@ -2595,10 +2622,27 @@
           if (!this.widget.size())
           {
             this.widget = plugin.Templates.get('widget').appendTo(plugin.options.widgetContainer);
+            this.widget.everyTime(60000, function()
+            {
+              if (jQuery(this).attr('data-state') === 'open')
+              {
+                return;
+              }
+              
+              m.widgetAd = null;
+              m.run();
+            });
           }
           else
           {
             plugin.Templates.get('widget').find('> *').appendTo(this.widget);
+          }
+
+          // Start with the widget closed if no arguments were passed
+          if (!args)
+          {
+            this.widget
+              .attr('data-state', 'closed');
           }
 
           if (this.widgetAd)
@@ -2612,6 +2656,11 @@
             else if (this.widgetAd.bonus_percent != 0)
             {
               bonus = this.widgetAd.bonus_percent.toString().replace(/\.00$/, '') + ' %';
+            }
+            
+            if (this.widget.attr('data-knocking-ad') != this.widgetAd.id)
+            {
+              this.widget.attr('data-state', 'knock');
             }
             
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
@@ -2667,13 +2716,6 @@
                 jQuery(this).parent().attr('data-state', 'open');
               }
             });
-
-          // Start with the widget closed if no arguments were passed
-          if (!args)
-          {
-            this.widget
-              .attr('data-state', 'closed');
-          }
 
           this.widget.find('a')
             .off('click.glome')
