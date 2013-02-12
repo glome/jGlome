@@ -1462,7 +1462,7 @@ QUnit.test('Ads list filters', function()
     id: 100,
     title: 'Test',
     adcategories: [],
-    read_state: Glome.Ads.states.ignore
+    view_state: Glome.Ads.states.ignore
   }
 
   var id = ad.id;
@@ -1556,7 +1556,7 @@ QUnit.test('Ads list filters', function()
     'Glome.Ads.listAds throws an error when trying to get with an undefined filter'
   );
   
-  var ads = Glome.Ads.listAds({read_state: Glome.Ads.states.ignore});
+  var ads = Glome.Ads.listAds({view_state: Glome.Ads.states.ignore});
   QUnit.equal(Object.keys(ads).length, 1, 'There should be one match for ignored items');
 });
 
