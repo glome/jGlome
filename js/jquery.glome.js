@@ -2550,23 +2550,9 @@
           {
             // Usability improvement: since focus itself doesn't empty the input fields,
             // remove placeholder text on focus and return them on blur
-            if (plugin.options.container)
+            if (   plugin.options.container
+                && typeof plugin.options.container !== 'undefined')
             {
-              plugin.options.container
-                .off('keyup.glomeDefaults')
-                .on('keyup.glomeDefaults', function(e)
-                {
-                  switch (e.keyCode)
-                  {
-                    case 27:
-                      jQuery(this)
-                        .attr('value', '')
-                        .trigger('blur');
-                  }
-                  
-                  return true;
-                });
-              
               plugin.options.container.find('input[placeholder]')
                 .off('focus.glomeDefaults')
                 .on('focus.glomeDefaults', function()
@@ -2778,7 +2764,23 @@
               }
               else if (jQuery(this).parent().attr('data-knocking-ad'))
               {
-                jQuery(this).parent().attr('data-state', 'open');
+                jQuery(this).parent()
+                  .attr('data-state', 'open')
+                  .off('mouseover.glome')
+                  .on('mouseover.glome', function()
+                  {
+                    jQuery(this).removeTime('widgetAutoclose');
+                  })
+                  .off('mouseout.glome')
+                  .on('mouseout.glome', function()
+                  {
+                    jQuery(this).oneTime(3000, 'widgetAutoclose', function()
+                    {
+                      jQuery(this)
+                        .off('mouseover.glome mouseout.glome')
+                        .attr('data-state', 'closed');
+                    });
+                  });
               }
             });
 
