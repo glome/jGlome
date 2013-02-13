@@ -2521,10 +2521,22 @@
       {
         var MVC = function()
         {
+          // Model, default operations for all routes
+          this.modelDefaults = function(args)
+          {
+            // There might never be need for this
+          };
+
           // Model
           this.model = function(args)
           {
 
+          };
+
+          // View, default operations for all routes
+          this.viewDefaults = function(args)
+          {
+            // There might never be need for this
           };
 
           // View
@@ -2533,12 +2545,56 @@
 
           };
 
+          // Controller, default operations for all routes
+          this.controllerDefaults = function(args)
+          {
+            // Usability improvement: since focus itself doesn't empty the input fields,
+            // remove placeholder text on focus and return them on blur
+            if (plugin.options.container)
+            {
+              plugin.options.container
+                .off('keyup.glomeDefaults')
+                .on('keyup.glomeDefaults', function(e)
+                {
+                  switch (e.keyCode)
+                  {
+                    case 27:
+                      jQuery(this)
+                        .attr('value', '')
+                        .trigger('blur');
+                  }
+                  
+                  return true;
+                });
+              
+              plugin.options.container.find('input[placeholder]')
+                .off('focus.glomeDefaults')
+                .on('focus.glomeDefaults', function()
+                {
+                  if (!jQuery(this).attr('data-placeholder'))
+                  {
+                    jQuery(this).attr('data-placeholder', jQuery(this).attr('placeholder'));
+                  }
+                  
+                  jQuery(this).attr('placeholder', '');
+                })
+                .off('blur.glomeDefaults')
+                .on('blur.glomeDefaults' ,function()
+                {
+                  if (jQuery(this).attr('data-placeholder'))
+                  {
+                    jQuery(this).attr('placeholder', jQuery(this).attr('data-placeholder'));
+                  }
+                });
+            }
+          };
+
           // Controller
           this.controller = function(args)
           {
 
           };
-
+          
           // Triggers for context changes
           this.contextChange = function(args)
           {
@@ -2555,8 +2611,17 @@
           this.run = function(args)
           {
             this.contextChange(args);
+            
+            // Model the data
+            this.modelDefaults(args);
             this.model(args);
+            
+            // Create views
+            this.viewDefaults(args);
             this.view(args);
+            
+            // Set controllers
+            this.controllerDefaults(args);
             this.controller(args);
 
             return true;
