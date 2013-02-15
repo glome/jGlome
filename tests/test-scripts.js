@@ -1363,12 +1363,16 @@ QUnit.test('Glome.Ads.Ad object', function()
   var ad =
   {
     id: 1,
-    title: 'Test'
+    title: 'Test',
+    bonus_percent: 22.00,
+    bonus_money: 11.00
   };
 
   var gad = new Glome.Ads.Ad(ad);
 
   QUnit.equal(gad.constructor.name, 'Ad', 'Constructor name was changed');
+  QUnit.ok(gad.bonus.match(/11/), 'Bonus percent was included in the bonus text');
+  QUnit.ok(gad.bonus.match(/22/), 'Bonus money was included in the bonus text');
 
   for (var i in ad)
   {
