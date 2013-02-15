@@ -1690,15 +1690,15 @@
           else if (this.bonus_money != 0
               && this.bonus_percent != 0)
           {
-            this.bonus = 'Your bonus: ' + this.bonus_money + ' e / ' + this.bonus_percent + ' %';
+            this.bonus = this.bonus_money + ' e + ' + this.bonus_percent + ' % cashback';
           }
           else if (this.bonus_money != 0)
           {
-            this.bonus = 'Your bonus: ' + this.bonus_money + ' e';
+            this.bonus = this.bonus_money + ' e cashback';
           }
           else if (this.bonus_percent != 0)
           {
-            this.bonus = 'Your bonus: ' + this.bonus_percent + ' %';
+            this.bonus = this.bonus_percent + ' % cashback';
           }
         }
 
@@ -2705,7 +2705,12 @@
           {
             var bonus = '';
             
-            if (this.widgetAd.bonus_money != 0)
+            if (   this.widgetAd.bonus_money != 0
+                && this.widgetAd.bonus_percent != 0)
+            {
+              bonus = this.widgetAd.bonus_money.toString().replace(/\.00$/, '') + ' e / ' + this.widgetAd.bonus_percent.toString().replace(/\.00$/, '') + ' %';
+            }
+            else if (this.widgetAd.bonus_money != 0)
             {
               bonus = this.widgetAd.bonus_money.toString().replace(/\.00$/, '') + ' e';
             }
