@@ -2598,10 +2598,18 @@
 
             plugin.MVC.currentContext = this;
           };
+          
+          this.requireAuth = true;
 
           this.run = function(args)
           {
             this.contextChange(args);
+            
+            if (   this.requireAuth
+                && !plugin.glomeid)
+            {
+              return;
+            }
             
             // Model the data
             this.modelDefaults(args);
@@ -2630,6 +2638,7 @@
 
         mvc.prototype = new plugin.MVC.Prototype();
         mvc.prototype.widgetAd = null;
+        mvc.prototype.requireAuth = false;
 
         mvc.prototype.model = function(args)
         {
@@ -2896,6 +2905,7 @@
         }
 
         mvc.prototype = new plugin.MVC.Public();
+        mvc.prototype.requireAuth = false;
         mvc.prototype.view = function()
         {
           this.viewInit();
