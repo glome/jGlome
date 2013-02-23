@@ -29,30 +29,30 @@
                 <div class="glome-icon"></div>
                 <ul class="glome-navigation" data-glome-template="navigation-container">
                   <li class="glome-cols-1" data-glome-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
-                    <a href="#admin-subscriptions">Profile</a>
+                    <a href="#admin-subscriptions" data-i18n="profile">Profile</a>
                     <ul data-glome-template="subnavigation-container">
-                      <li data-glome-template="subnavigation-item"><a>Profile</a></li>
+                      <li data-glome-template="subnavigation-item"><a data-i18n="profile">Profile</a></li>
                     </ul>
                   </li>
                   <li class="glome-cols-1" data-glome-template="null" data-page="statistics" data-i18n="statistics">
-                    <a href="#admin-statistics">Statistics</a>
+                    <a href="#admin-statistics" data-i18n="statistics">Statistics</a>
                     <ul data-glome-template="null">
-                      <li><a>History</a></li>
-                      <li><a>Downloads</a></li>
-                      <li><a>Footprint</a></li>
-                      <li><a>Social stream</a></li>
+                      <li><a data-i18n="history">History</a></li>
+                      <li><a data-i18n="downloads">Downloads</a></li>
+                      <li><a data-i18n="footprint">Footprint</a></li>
+                      <li><a data-i18n="social stream">Social stream</a></li>
                     </ul>
                   </li>
                   <li class="glome-cols-1" data-glome-template="null" data-page="rewards" data-i18n="rewards">
-                    <a href="#admin-rewards">Rewards</a>
+                    <a href="#admin-rewards" data-i18n="rewards">Rewards</a>
                     <ul data-glome-template="null">
-                      <li><a>Rewards</a></li>
+                      <li><a data-i18n="rewards">Rewards</a></li>
                     </ul>
                   </li>
                   <li class="glome-cols-1" data-glome-template="null" data-page="settings" data-i18n="settings">
-                    <a href="#admin-settings">Settings</a>
+                    <a href="#admin-settings" data-i18n="settings">Settings</a>
                     <ul data-glome-template="null">
-                      <li><a>Settings</a></li>
+                      <li><a data-i18n="settings">Settings</a></li>
                     </ul>
                   </li>
                 </ul>
@@ -64,7 +64,7 @@
                   <!-- !Category subscriptions -->
                   <div id="glomeAdminProfile" class="glome-content glome-layout-cols-2" data-glome-template="admin-subscriptions">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                      <h1>Your Glome Profile</h1>
+                      <h1 data-i18n="your glome profile">Your Glome Profile</h1>
                       <p>
                         <span data-i18n="the glome profile is the anonymous description of the things you are interested in - this is how you control the web">The Glome profile is the anonymous description of the things you are interested in - this is how you control the web</span>.
                         <span data-i18n="your profile is built from these items">Your profile is built from these items</span>
@@ -171,7 +171,7 @@
                           <h1 class="glome-category-title">Ad/campaign name</h1>
                         </div>
                         <div class="glome-price-container">
-                          <span data-type="currency">€</span> <span data-type="full">20</span>.<span data-type="cents">20</span>
+                          <span data-type="currency">€</span> <span data-type="full">20</span><span data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
                         </div>
                       </div>
                     </div>
@@ -244,8 +244,8 @@
                 <div id="glomePublicRequirePassword" class="glome-content glome-clearfix glome-layout-cols-2" data-glome-template="public-requirepassword" data-page="requirepassword">
                   <div class="glome-cols-2">
                     <h1 data-i18n="password protected">Password protected</h1>
-                    <p data-i18n="this glome account is protected with a password">
-                      This Glome account is protected with a password
+                    <p>
+                      <span data-i18n="this glome account is protected with a password">This Glome account is protected with a password</span>.
                     </p>
                   </div>
                   <form id="glomePublicRequirePasswordContainer" class="glome-cols-2">
@@ -277,9 +277,9 @@
                 <!-- !Startup, stage 2: category subscriptions -->
                 <div id="glomePublicSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="public-subscriptions" data-page="subscriptions">
                   <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                    <h1 data-i18n="subscribe from $1 {{plural:$1|category|categories}}" data-i18n-arguments="[1]">Subscribe from {count} categories</h1>
-                    <p data-i18n="by subscribing to a category you determine which brands can reach you">
-                      By subscribing to a category you determine which brands can reach you.
+                    <h1 data-i18n="subscribe from $1 {{plural:$1|category|categories}}" data-i18n-arguments="[&quot;{count}&quot;]">Subscribe from {count} categories</h1>
+                    <p>
+                      <span data-i18n="by subscribing to a category you determine which brands can reach you">By subscribing to a category you determine which brands can reach you</span>.
                     </p>
                     <hr class="glome-short" />
                     <div class="glome-selection-counter">
@@ -361,9 +361,10 @@
                 <!-- !All categories view -->
                 <div id="glomePublicCategoryList" class="glome-content glome-layout-cols-2" data-glome-template="public-categorylist" data-page="categorylist">
                   <div class="glome-cols-2 glome-fixed">
-                    <h1 data-i18n="all categories">Get bonus for shopping online</h1>
+                    <h1 data-i18n="get bonus for shopping online">Get bonus for shopping online</h1>
                     <p>
-                      <span data-i18n="we are on a constant journey">We are on a constant journey to gather the best deals from the online world and bring them to you with a bonus. It's really simple</span>:
+                      <span data-i18n="e are on a constant journey to gather the best deals from the online world and bring them to you with a bonus">We are on a constant journey to gather the best deals from the online world and bring them to you with a bonus</span>.
+                      <span data-i18n="it is really simple">It's really simple</span>:
                     </p>
                     <ol>
                       <li data-i18n="browse the categories to find offers you are interested in">Browse the categories to find offers you are interested in</li>
@@ -393,7 +394,7 @@
                       <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
                       {name}
                     </h1>
-                    <p data-i18n="there {{plural:$1|is|are}} $1 {{plural:$1|offer|offers}} in this category" data-i18n-args="{offers}">
+                    <p data-i18n="there {{plural:$1|is|are}} $1 {{plural:$1|offer|offers}} in this category" data-i18n-arguments="[&quot;{offers}&quot;]">
                       There are offers in this category
                     </p>
                     <hr class="glome-short" />
@@ -420,7 +421,7 @@
                   <div class="glome-cols-2 glome-fixed">
                     <h1 class="glome-category-title"><a href="#public-category" class="glome-link glome-link-previous"></a> {name}</h1>
                     <p>
-                      <a class="glome-category-title" href="#public-category">See more in {name}</a>
+                      <a class="glome-category-title" href="#public-category" data-i18n="see more in $1" data-i18n-arguments="[&quot;{name}&quot;]">See more</a>
                     </p>
                     <hr class="glome-short" />
                     <div class="glome-configuration">
@@ -441,7 +442,7 @@
                     </div>
                     <div class="glome-layout-cols-2 glome-clearfix glome-ad-actions">
                       <div class="glome-cols-ad-description glome-ad-bonus">
-                        <h2 data-i18n="up to $1 per order">{bonus}</h2>
+                        <h2 data-i18n="up to $1 per order" data-i18n-arguments="[&quot;{bonus}&quot;]">{bonus}</h2>
                       </div>
                       <div class="glome-cols-ad-image">
                         <button class="glome-button glome-cols-1 glome-goto-ad" data-state="on" data-state-change="false"><span data-state="on" data-i18n="get it">Get it</span></button>
@@ -463,7 +464,7 @@
               <span class="glome-text-separator"></span>
               <a href="http://glome.me/" target="_blank">glome.me</a>
               <span class="glome-text-separator"></span>
-              <a href="#admin-profile" data-glome-mvc="AdminProfile">Profile</a>
+              <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
             </div>
           </div>
         </div>
