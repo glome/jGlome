@@ -6,6 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
     <script type="text/javascript" src="js/jquery.timers.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.js"></script>
     <script type="text/javascript" src="js/jquery.glome_template.js"></script>
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
@@ -14,7 +15,7 @@
   </head>
   <body>
     <div>
-      <div id="glomeWindow">
+      <div id="glomeWindow" lang="en">
         <!-- !Admin interface -->
         <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container" style="display: none;">
           <div class="glome-header glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
@@ -23,9 +24,9 @@
                 <div class="glome-icon"></div>
                 <ul class="glome-navigation" data-glome-template="navigation-container">
                   <li class="glome-cols-1" data-glome-template="navigation-item" data-page="subscriptions" data-i18n="subscriptions">
-                    <a href="#admin-subscriptions">Subscriptions</a>
+                    <a href="#admin-subscriptions">Profile</a>
                     <ul data-glome-template="subnavigation-container">
-                      <li data-glome-template="subnavigation-item"><a>Subscriptions</a></li>
+                      <li data-glome-template="subnavigation-item"><a>Profile</a></li>
                     </ul>
                   </li>
                   <li class="glome-cols-1" data-glome-template="null" data-page="statistics" data-i18n="statistics">
@@ -56,11 +57,22 @@
               <div class="glome-content-wrapper">
                 <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
                   <!-- !Category subscriptions -->
-                  <div id="glomeAdminSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="admin-subscriptions">
+                  <div id="glomeAdminProfile" class="glome-content glome-layout-cols-2" data-glome-template="admin-subscriptions">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                      <h1 data-i18n="subscribe from %s categories">Subscribe from {count} categories</h1>
-                      <p data-i18n="by subscribing to a category you determine which brands can reach you">
-                        By subscribing to a category you determine which brands can reach you.
+                      <h1>Your Glome Profile</h1>
+                      <p>
+                        <span data-i18n="the glome profile is the anonymous description of the things you are interested in - this is how you control the web">The Glome profile is the anonymous description of the things you are interested in - this is how you control the web</span>.
+                        <span data-i18n="your profile is built from these items">Your profile is built from these items</span>
+                        (<span data-i18n="and more will follow">and more will follow</span>)
+                      </p>
+                      <ol>
+                        <li><span data-i18n="categories">categories</span></li>
+                        <li><span data-i18n="brands">brands</span> / <span data-i18n="businesses">businesses</span> (<span data-i18n="coming soon">coming soon</span>)</li>
+                        <li><span data-i18n="interests">interests</span> / <span data-i18n="likes">likes</span> (<span data-i18n="coming soon">coming soon</span>)</li>
+                        <li></li>
+                      </ol>
+                      <p>
+                        <span data-i18n="by subscribing to a category you show interest to that area and the businesses beneath it">By subscribing to a category you show interest to that area and the businesses beneath it</span>.
                       </p>
                       <hr class="glome-short" />
                       <div class="glome-selection-counter">
@@ -94,8 +106,12 @@
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
                       <h1 data-i18n="your digital footprint">Your Digital<br /> Footprint</h1>
                       <p>
-                        Your digital footprint. We will gather - on your permission, unidentifiable and your private -
-                        information on how you use your browser. So that you yourself know.
+                        <span data-i18n="glome will collect information about how you use the web">Glome will collect information about how you use the web</span>.
+                        <span data-i18n="this information is yours - you own it and you control it">This information is yours - you own it and you control it</span>.
+                        <span data-i18n="we collect it so that we can make smart suggestions for you to update your glome profile">We collect it so that we can make smart suggestions for you to update your Glome Profile</span>
+                      </p>
+                      <p>
+                        <span data-i18n="this is how the web sees you">This is how the web sees you</span>
                       </p>
                       <hr class="glome-short" />
                     </div>
@@ -106,22 +122,37 @@
                   <!-- !Rewards -->
                   <div class="glome-content glome-layout-cols-2" data-glome-template="admin-rewards">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                      <h1 data-i18n="here is your reward">Here is your reward</h1>
-                      <p>
-                        Redeem your cash.
-                      </p>
-                      <hr class="glome-short" />
-                      <p>
-                        <span data-i18n="total amount">Total amount</span>:
-                      </p>
+                      <h1 data-i18n="redeem your reward">Redeem your reward</h1>
+                      <div class="glome-current-release">
+                        <span data-i18n="total amount to redeem">Total amount to redeem</span>:
+                      </div>
+                      <div class="glome-future-releases">
+                        <span data-i18n="earned reward">Earned reward</span>:
+                      </div>
                       <p class="glome-total-rewards" id="glomeTotalRewards">
                         <span data-type="currency">€</span> <span data-type="full">20</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
                       </p>
+                      <div class="glome-future-releases">
+                        <p>
+                          <span data-i18n="money transfer costs">Money transfer costs</span>:
+                          XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
+                        </p>
+                        <p>
+                          <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="glome-cols-4-margin-2 glome-cols-alt-3 glome-clearfix glome-current-release">
                       <p>
-                        <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                        <span data-i18n="all your bonus purchases are being tracked and marked for you">All your bonus purchases are being tracked and marked for you</span>.
+                        <span data-i18n="it is safe to shop, the money is marked for you">It is safe to shop, the money is marked for you</span>.
+                        <span data-i18n="we are working very hard to get the transaction information here as soon as possible">We are working very hard to get the transaction information here as soon as possible</span>.
+                      </p>
+                      <p>
+                        <span data-i18n="thank you for your patience">Thank you for your patience</span>.
                       </p>
                     </div>
-                    <div class="glome-cols-4-margin-2 glome-cols-alt-3 glome-clearfix">
+                    <div class="glome-cols-4-margin-2 glome-cols-alt-3 glome-clearfix glome-future-releases">
                       <p>
                         <span data-i18n="reclaimed offers">Reclaimed offers</span>:
                       </p>
@@ -146,8 +177,9 @@
                     <div class="glome-layout-cols-2 glome-clearfix">
                       <div class="glome-cols-2">
                         <h1 data-i18n="create or change your password">Create or Change your password</h1>
-                        <p data-i18n="with an optional password you can set an additional layer of security for your information">
-                          With an optional password you can set an additional layer of security for your information.
+                        <p>
+                          <span data-i18n="with an optional password you can set an additional layer of security for your information">With an optional password you can set an additional layer of security for your information</span>.
+                          <span data-i18n="we strongly recommend this">We strongly recommend this</span>.
                         </p>
                       </div>
                       <div id="glomeAdminSettingsChangePassword" class="glome-cols-4">
@@ -185,6 +217,7 @@
             </div>
           <div class="glome-footer glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
             <div class="glome-full-width">
+              <a href="#widget-widget" data-i18n="close admin">Close admin</a>
               <span class="glome-copyright">Glome Inc, 2013</span>
             </div>
           </div>
@@ -316,17 +349,22 @@
                     </button>
                   </p>
                   <p>
-                    <a href="#admin-subscriptions" class="glome-settings"></a>
+                    <a href="#admin-profile" class="glome-settings"></a>
                   </p>
                 </div>
 
                 <!-- !All categories view -->
                 <div id="glomePublicCategoryList" class="glome-content glome-layout-cols-2" data-glome-template="public-categorylist" data-page="categorylist">
                   <div class="glome-cols-2 glome-fixed">
-                    <h1 data-i18n="all categories">All categories</h1>
+                    <h1 data-i18n="all categories">Get bonus for shopping online</h1>
                     <p>
-                      List all categories here
+                      <span data-i18n="we are on a constant journey">We are on a constant journey to gather the best deals from the online world and bring them to you with a bonus. It's really simple</span>:
                     </p>
+                    <ol>
+                      <li data-i18n="browse the categories to find offers you are interested in">Browse the categories to find offers you are interested in</li>
+                      <li data-i18n="click through our offer and buy online as normal">Click through our offer and buy online as normal</li>
+                      <li data-i18n="earn bonus from purchases made">Earn bonus from purchases made</li>
+                    </ol>
                     <hr class="glome-short" />
                   </div>
                   <div class="glome-cols-4-margin-2 glome-clearfix glome-category-list">
@@ -348,11 +386,10 @@
                   <div class="glome-cols-2 glome-fixed">
                     <h1>
                       <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
-                      <!-- <span data-i18n="all categories" class="glome-all-categories">All categories</span> « -->
                       {name}
                     </h1>
-                    <p>
-                      {description}
+                    <p data-i18n="there $1 {{plural:is|are}} $1 $1 {{plural:offer|offers}} in this category" data-i18n-args="{offers}">
+                      There are offers in this category
                     </p>
                     <hr class="glome-short" />
                   </div>
@@ -382,7 +419,7 @@
                     </p>
                     <hr class="glome-short" />
                     <div class="glome-configuration">
-                      <div class="glome-config" data-glome-mvc="AdminSubscriptions"></div>
+                      <div class="glome-config" data-glome-mvc="AdminProfile"></div>
                     </div>
                   </div>
                   <div class="glome-cols-4">
@@ -421,7 +458,7 @@
               <span class="glome-text-separator"></span>
               <a href="http://glome.me/" target="_blank">glome.me</a>
               <span class="glome-text-separator"></span>
-              <a href="#admin-subscriptions" data-glome-mvc="AdminSubscriptions">Settings</a>
+              <a href="#admin-profile" data-glome-mvc="AdminProfile">Profile</a>
             </div>
           </div>
         </div>
