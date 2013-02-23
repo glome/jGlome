@@ -1,0 +1,58 @@
+body
+{
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+}
+
+table
+{
+  width: 100%;
+  border:
+  {
+    collapse: collapse;
+    spacing: 0;
+  }
+  
+  thead
+  {
+    background-color: black;
+    color: white;
+  }
+  
+  tr.odd
+  {
+    background-color: #eeeeee;
+  }
+  
+  th
+  {
+    vertical-align: middle;
+    text-align: left;
+    max-width: 10em;
+  }
+  
+  td
+  {
+    vertical-align: top;
+    text-align: left;
+    
+    textarea
+    {
+      display: block;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -ms-box-sizing: border-box;
+      -o-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 20em;
+      height: 3em;
+      resize: none;
+    }
+    
+    &.hidden > *
+    {
+      display: none;
+    }
+  }
+}
