@@ -39,10 +39,17 @@ jQuery(function()
       // Check for arguments
       if (jQuery(this).attr('data-i18n-arguments'))
       {
-        var args = [str];
-        args = args.concat(JSON.parse(jQuery(this).attr('data-i18n-arguments')));
-        
-        var l10n = jQuery.i18n.apply(null, args)
+        var i18nArgs = [str];
+        try
+        {
+          var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
+          i18nArgs = i18nArgs.concat(args);
+          var l10n = jQuery.i18n.apply(null, i18nArgs)
+        }
+        catch (e)
+        {
+          console.warn(e, str);
+        }
       }
       else
       {
