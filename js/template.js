@@ -30,6 +30,34 @@ jQuery(function()
   {
     window.location.hash = '#public-startup';
   }
+  
+  jQuery('[data-i18n]')
+    .each(function()
+    {
+      var str = jQuery(this).attr('data-i18n');
+      
+      // Check for arguments
+      if (jQuery(this).attr('data-i18n-arguments'))
+      {
+        var args = [str];
+        args = args.concat(JSON.parse(jQuery(this).attr('data-i18n-arguments')));
+        
+        var l10n = jQuery.i18n.apply(null, args)
+      }
+      else
+      {
+        var l10n = jQuery.i18n(str);
+      }
+      
+      if (jQuery(this).attr('placeholder'))
+      {
+        jQuery(this).attr('placeholder', l10n);
+      }
+      else
+      {
+        jQuery(this).text(l10n);
+      }
+    });
 
   var select = jQuery('<select />')
     .on('change', function()
