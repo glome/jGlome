@@ -886,34 +886,34 @@
       line-height: 29px; } }
 
 /* !Admin pages: subscriptions */
-#glomeAdminSubscriptions .glome-selection-counter {
+#glomeAdminProfile .glome-selection-counter {
   position: fixed;
   font-size: 215%;
   vertical-align: bottom;
   font-weight: 100;
   bottom: 68px; }
   @media screen and (max-width: 689px) {
-    #glomeAdminSubscriptions .glome-selection-counter {
+    #glomeAdminProfile .glome-selection-counter {
       position: static;
       padding: 15px 0;
       margin: 15px 0;
       border-bottom: solid 1px #b1b1b1; } }
 
-#glomeAdminSubscriptions .glome-selection-counter .glome-unit,
+#glomeAdminProfile .glome-selection-counter .glome-unit,
 #glomePublicSubscriptions .glome-selection-counter .glome-unit {
   font-size: 13px;
   font-weight: 500; }
 
 @media screen and (max-width: 824px) and (min-width: 690px) {
-  #glomeAdminSubscriptions .glome-categories,
+  #glomeAdminProfile .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 390px; } }
 @media screen and (max-width: 689px) and (min-width: 555px) {
-  #glomeAdminSubscriptions .glome-categories,
+  #glomeAdminProfile .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 255px; } }
 @media screen and (max-width: 554px) and (min-width: 420px) {
-  #glomeAdminSubscriptions .glome-categories,
+  #glomeAdminProfile .glome-categories,
   #glomePublicSubscriptions .glome-categories {
     width: 120px; } }
 

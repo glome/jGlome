@@ -1125,13 +1125,13 @@ $full_page_z_index: 10000;
 }
 
 /* !Admin pages: subscriptions */
-#glomeAdminSubscriptions .glome-selection-counter
+#glomeAdminProfile .glome-selection-counter
 {
   @include selection-counter;
   bottom: $footer_height + 10;
 }
 
-#glomeAdminSubscriptions .glome-selection-counter .glome-unit,
+#glomeAdminProfile .glome-selection-counter .glome-unit,
 #glomePublicSubscriptions .glome-selection-counter .glome-unit
 {
   font:
@@ -1141,7 +1141,7 @@ $full_page_z_index: 10000;
   }
 }
 
-#glomeAdminSubscriptions .glome-categories,
+#glomeAdminProfile .glome-categories,
 #glomePublicSubscriptions .glome-categories
 {
   @include respond-to(5)
