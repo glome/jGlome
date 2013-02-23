@@ -695,11 +695,17 @@
       {
         var tmp = jQuery(dom).get(0).outerHTML;
         var matches = {}
+        
+        // Match only with single wrapping braces (i.e. "{...}"), double
+        // braces are reserved for i18n library. What a beautiful regexp!
+        // JavaScript unfortunately doesn't support negative lookbehind
+        // assertions on the go, so we use *only* negative lookahead.
+        var matchMaker = new RegExp('\{([a-z0-9_]+)\}(?!\})');
 
-        while (tmp.match(/\{([A-Za-z0-9_]+)\}/))
+        while (tmp.match(matchMaker))
         {
-          var regs = tmp.match(/\{([A-Za-z0-9\_]+)\}/);
-          var regexp = new RegExp(plugin.Tools.escape(regs[0]), 'g');
+          var regs = tmp.match(matchMaker);
+          var regexp = new RegExp(plugin.Tools.escape(regs[0]) + '(?!\})', 'g');
           var value = '‹«' + regs[1] + '»›';
           var key = regs[1];
 

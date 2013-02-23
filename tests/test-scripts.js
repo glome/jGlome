@@ -2081,13 +2081,17 @@ QUnit.asyncTest('Populate template', function()
 
     var template = jQuery('<div />')
       .text('Hello {world}!');
-
+      
     QUnit.equal(Glome.Templates.parse(template, {world: 'Earth'}).get(0).outerHTML, '<div>Hello Earth!</div>', 'Attribute was parsed correctly');
     
     var html = Glome.Templates.parse(template, {world: 'Earth & Mars'}).get(0).outerHTML;
-    console.log(html);
     QUnit.ok(html.match(/\u0026/), 'Ampersand was parsed correctly as XML');
     
+    var template = jQuery('<div />')
+      .text('Hello {{world}}!');
+    
+    QUnit.equal('Hello {{world}}!', Glome.Templates.parse(template, {world: ''}).html(), 'Double brackets are reserved for other use and they were left alone');
+      
     QUnit.start();
   });
 });
