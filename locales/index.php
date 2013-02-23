@@ -76,6 +76,15 @@ if (isset($_POST['i18n']))
             continue;
         }
         
+        // Quickly check which keys have actually been populated
+        foreach ($values as $k => $v)
+        {
+            if (!$v)
+            {
+                unset($values[$k]);
+            }
+        }
+        
         $filename = "glome-{$lang}.json";
         
         if (!file_put_contents($filename, json_encode($values)))
