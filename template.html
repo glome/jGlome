@@ -7,7 +7,12 @@
     <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
     <script type="text/javascript" src="js/jquery.timers.js"></script>
     <script type="text/javascript" src="js/jquery.i18n.js"></script>
-    <script type="text/javascript" src="js/jquery.glome_template.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.emitter.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.fallbacks.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.parser.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.messages.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.language.js"></script>
+    <script type="text/javascript" src="js/template.js"></script>
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
     <link rel="localization" hreflang="fi" href="locales/glome-fi.json" type="application/l10n+json" data-glome-include="true" />
@@ -272,7 +277,7 @@
                 <!-- !Startup, stage 2: category subscriptions -->
                 <div id="glomePublicSubscriptions" class="glome-content glome-layout-cols-2" data-glome-template="public-subscriptions" data-page="subscriptions">
                   <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                    <h1 data-i18n="subscribe from $1 $1 {{plural:category|categories}}">Subscribe from {count} categories</h1>
+                    <h1 data-i18n="subscribe from $1 {{plural:$1|category|categories}}" data-i18n-arguments="[1]">Subscribe from {count} categories</h1>
                     <p data-i18n="by subscribing to a category you determine which brands can reach you">
                       By subscribing to a category you determine which brands can reach you.
                     </p>
@@ -388,7 +393,7 @@
                       <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
                       {name}
                     </h1>
-                    <p data-i18n="there $1 {{plural:is|are}} $1 $1 {{plural:offer|offers}} in this category" data-i18n-args="{offers}">
+                    <p data-i18n="there {{plural:$1|is|are}} $1 {{plural:$1|offer|offers}} in this category" data-i18n-args="{offers}">
                       There are offers in this category
                     </p>
                     <hr class="glome-short" />
