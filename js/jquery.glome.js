@@ -3192,7 +3192,7 @@
             .on('click.glome', function()
             {
               plugin.options.container.find('.glome-close').trigger('click');
-              plugin.MVC.run('AdminSubscriptions');
+              plugin.MVC.run('AdminProfile');
               return false;
             });
         }
@@ -3453,14 +3453,14 @@
 
           var items =
           {
-            Subscriptions:
+            Profile:
             {
-              mvc: 'AdminSubscriptions',
+              mvc: 'AdminProfile',
               children:
               {
-                Subscriptions:
+                Profile:
                 {
-                  mvc: 'AdminSubscriptions'
+                  mvc: 'AdminProfile'
                 }
               }
             },
@@ -3641,8 +3641,8 @@
         return m;
       },
 
-      /* !MVC: Admin subscriptions */
-      AdminSubscriptions: function()
+      /* !MVC: Admin Profile */
+      AdminProfile: function()
       {
         function mvc()
         {
@@ -3661,10 +3661,10 @@
             args = {}
           }
 
-          args.selected = 'AdminSubscriptions';
+          args.selected = 'AdminProfile';
 
           this.viewInit(args);
-          this.content = plugin.Templates.populate('admin-subscriptions', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
+          this.content = plugin.Templates.populate('admin-profile', {count: plugin.Categories.count(), selected: plugin.Categories.count({subscribed: 1})});
           this.content.appendTo(this.contentArea);
 
           this.content.find('.glome-category').remove();
