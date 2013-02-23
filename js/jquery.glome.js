@@ -721,6 +721,42 @@
 
         var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
         div.innerHTML = tmp;
+        
+        // Populate with i18n data
+        jQuery(div).find('data-i18n')
+          .each(function()
+          {
+            var str = jQuery(this).attr('data-i18n');
+            
+            // Check for arguments
+            if (jQuery(this).attr('data-i18n-arguments'))
+            {
+              var i18nArgs = [str];
+              try
+              {
+                var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
+                i18nArgs = i18nArgs.concat(args);
+                var l10n = jQuery.i18n.apply(null, i18nArgs)
+              }
+              catch (e)
+              {
+                console.warn(e, str);
+              }
+            }
+            else
+            {
+              var l10n = jQuery.i18n(str);
+            }
+            
+            if (jQuery(this).attr('placeholder'))
+            {
+              jQuery(this).attr('placeholder', l10n);
+            }
+            else
+            {
+              jQuery(this).text(l10n);
+            }
+          });
         return jQuery(div).find('> *');
       }
     }
