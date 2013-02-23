@@ -723,40 +723,44 @@
         div.innerHTML = tmp;
         
         // Populate with i18n data
-        jQuery(div).find('data-i18n')
-          .each(function()
-          {
-            var str = jQuery(this).attr('data-i18n');
-            
-            // Check for arguments
-            if (jQuery(this).attr('data-i18n-arguments'))
+        if (typeof jQuery.fn.i18n === 'function')
+        {
+          jQuery(div).find('data-i18n')
+            .each(function()
             {
-              var i18nArgs = [str];
-              try
+              var str = jQuery(this).attr('data-i18n');
+              
+              // Check for arguments
+              if (jQuery(this).attr('data-i18n-arguments'))
               {
-                var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
-                i18nArgs = i18nArgs.concat(args);
-                var l10n = jQuery.i18n.apply(null, i18nArgs)
+                var i18nArgs = [str];
+                try
+                {
+                  var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
+                  i18nArgs = i18nArgs.concat(args);
+                  var l10n = jQuery.i18n.apply(null, i18nArgs)
+                }
+                catch (e)
+                {
+                  console.warn(e, str);
+                }
               }
-              catch (e)
+              else
               {
-                console.warn(e, str);
+                var l10n = jQuery.i18n(str);
               }
-            }
-            else
-            {
-              var l10n = jQuery.i18n(str);
-            }
-            
-            if (jQuery(this).attr('placeholder'))
-            {
-              jQuery(this).attr('placeholder', l10n);
-            }
-            else
-            {
-              jQuery(this).text(l10n);
-            }
-          });
+              
+              if (jQuery(this).attr('placeholder'))
+              {
+                jQuery(this).attr('placeholder', l10n);
+              }
+              else
+              {
+                jQuery(this).text(l10n);
+              }
+            });
+        }
+        
         return jQuery(div).find('> *');
       }
     }
