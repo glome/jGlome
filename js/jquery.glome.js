@@ -751,7 +751,7 @@
         div.innerHTML = tmp;
         
         // Populate with i18n data
-        if (typeof jQuery.fn.i18n === 'function')
+        if (typeof jQuery.i18n === 'function')
         {
           jQuery(div).find('data-i18n')
             .each(function()
@@ -1486,14 +1486,28 @@
           {
             var o = plugin[container].stack[id];
 
-            for (i in o)
+            for (var i in o)
             {
               if (i === 'id')
               {
                 i = '_id';
               }
-
-              this[i] = o[i];
+              
+              // Skip getters and setters
+              if (   o.__lookupGetter__(i)
+                  || o.__lookupSetter__(i))
+              {
+                continue;
+              }
+              
+              try
+              {
+                this[i] = o[i];
+              }
+              catch (e)
+              {
+                console.warn('Failed to copy ' + i);
+              }
             }
 
             return this;
@@ -1729,6 +1743,11 @@
         }
         
         Ad.prototype = new plugin.Prototype();
+
+        Ad.prototype.container = 'Ads';
+        Ad.prototype.constructor = Ad;
+        Ad.prototype.bonus = '';
+        Ad.prototype.view_state = plugin.Ads.states.unread;
         
         /**
          * Default getter for property id. Validates the input.
@@ -1784,10 +1803,6 @@
           
           return '';
         });
-
-        Ad.prototype.constructor = Ad;
-        Ad.prototype.bonus = '';
-        Ad.prototype.view_state = plugin.Ads.states.unread;
 
         Ad.prototype.status = 0;
         Ad.prototype.adcategories = [];
@@ -2752,7 +2767,8 @@
             if (ads.length)
             {
               var random = Math.floor(Math.random() * ads.length);
-              this.widgetAd = new plugin.Ads.Ad(ads[random]);
+              var id = ads[random];
+              this.widgetAd = plugin.Ads.stack[id];
             }
             else
             {
@@ -2798,10 +2814,6 @@
               .attr('data-state', 'closed');
           }
           
-          dump('------------------------------------------------------------------------------------\n');
-          dump('bonusTextShort: ' + this.widgetAd.bonusTextShort + '\n');
-          dump('------------------------------------------------------------------------------------\n');
-
           if (this.widgetAd)
           {
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
@@ -3004,7 +3016,6 @@
             .on('submit.glome', function(e)
             {
               e.preventDefault();
-              console.log(jQuery(this).find('input[type="password"]').val());
 
               request = plugin.Auth.login
               (
@@ -3971,11 +3982,9 @@
           // Wrap the containers with jQuery
           plugin.options.container = jQuery(plugin.options.container);
 
-          console.log(plugin.options);
           if (plugin.options.widgetContainer)
           {
             plugin.options.widgetContainer = jQuery(plugin.options.widgetContainer);
-            console.log('widgetContainer', plugin.options.widgetContainer, plugin.options.widgetContainer.size());
           }
           else
           {

@@ -1401,8 +1401,21 @@ QUnit.test('Glome.Ads.Ad object', function()
   QUnit.equal(typeof gad.setStatus, 'function', 'setStatus method exists in ad object');
   QUnit.equal(typeof gad.onchange, 'function', 'onchange method exists in ad object');
   QUnit.equal(typeof gad.delete, 'function', 'Delete method exists in ad object');
+  QUnit.ok(Glome.Ads.stack[1], 'Ad was added to stack');
 
   // Get the newly created ad with constructor
+  var id = gad.id;
+  
+  try
+  {
+    var ad = new Glome.Ads.Ad(id);
+    QUnit.ok(ad.id, 'Constructor returned successfully the newly created ad');
+  }
+  catch (e)
+  {
+    QUnit.ok(false, 'Constructor returned successfully the newly created ad');
+  }
+  return;
 
   // Remove newly created ad
   QUnit.ok(gad.delete(), 'Removing the ad was successful');
@@ -1414,8 +1427,6 @@ QUnit.test('Glome.Ads.Ad object', function()
     },
     'Ad was removed successfully from the stack'
   );
-
-  var id = gad.id;
 
   QUnit.ok(Glome.Ads.removeAd(id), 'Removing an ad was successful');
   QUnit.equal(typeof Glome.Ads.stack[id], 'undefined', 'Ad was removed successfully from the stack');
