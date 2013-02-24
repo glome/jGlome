@@ -234,7 +234,6 @@ QUnit.test('Glome methods', function()
   var listenerId = 'foobar';
 
   QUnit.strictEqual(Glome.Tools.addListener(function(){}, listenerId, 'Ads'), listenerId, 'Listener returned the id it was given');
-  console.log(listener, Glome.Ads.listeners[listenerId]);
   QUnit.ok(Glome.Ads.listeners[listenerId], 'There is now a new listener with id "' + listenerId + '"');
 
   // Reset the listeners
@@ -250,13 +249,24 @@ QUnit.test('Escape ampersands', function()
     chromeUrl: 'chrome://glome/content/browser.js?do=not&touch=me',
   }
   
-  // Just copy the dataset as a new child object
-  dataset.sub = dataset;
+  // Copy the dataset as a new child object
+  var subset = {};
+  for (i in dataset)
+  {
+    subset[i] = dataset[i];
+  }
+  dataset.sub = subset;
   
   // New array, copy the values as new array items
   dataset.subarray = [];
   for (var i in dataset)
   {
+    // Prevent recursion
+    if (i === 'subarray')
+    {
+      continue;
+    }
+    
     dataset.subarray.push(dataset[i]);
   }
   
@@ -279,11 +289,10 @@ QUnit.test('Escape ampersands', function()
   
   var escaped = Glome.Tools.escapeAmpersandsRecursive(dataset);
   
-  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.people), escaped.people, 'First level of the object was escaped');
-  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.sub.people), escaped.sub.people, 'Second level of the object was escaped');
-  QUnit.equal(Glome.Tools.escapeAmpersands(dataset.subarray[0]), escaped.subarray[0], 'First array key was escaped');
+  QUnit.equal(escaped.people, Glome.Tools.escapeAmpersands(dataset.people), 'First level of the object was escaped');
+  QUnit.equal(escaped.sub.people, Glome.Tools.escapeAmpersands(dataset.sub.people), 'Second level of the object was escaped');
+  QUnit.equal(escaped.subarray[0], Glome.Tools.escapeAmpersands(dataset.subarray[0]), 'First array key was escaped');
   QUnit.equal(dataset.subfunction, escaped.subfunction, 'Function was not escaped');
-  console.log('escaped', escaped);
 });
 
 /* !Browser rules */
@@ -1371,8 +1380,12 @@ QUnit.test('Glome.Ads.Ad object', function()
   var gad = new Glome.Ads.Ad(ad);
 
   QUnit.equal(gad.constructor.name, 'Ad', 'Constructor name was changed');
-  QUnit.ok(gad.bonus.match(/11/), 'Bonus percent was included in the bonus text');
-  QUnit.ok(gad.bonus.match(/22/), 'Bonus money was included in the bonus text');
+  QUnit.ok(gad.bonusText.match(/11/), 'Bonus percent was included in the bonus text');
+  QUnit.ok(gad.bonusText.match(/22/), 'Bonus money was included in the bonus text');
+  QUnit.ok(gad.bonusText.match(/cashback/), 'Bonus text included the work cashback');
+  QUnit.ok(gad.bonusTextShort.match(/11/), 'Bonus percent was included in the bonus text');
+  QUnit.ok(gad.bonusTextShort.match(/22/), 'Bonus money was included in the bonus text');
+  QUnit.ok(!gad.bonusTextShort.match(/cashback/), 'Short bonus text did not include the work cashback');
 
   for (var i in ad)
   {
@@ -1390,7 +1403,6 @@ QUnit.test('Glome.Ads.Ad object', function()
   QUnit.equal(typeof gad.delete, 'function', 'Delete method exists in ad object');
 
   // Get the newly created ad with constructor
-  var ad = new Glome.Ads.Ad(gad.id);
 
   // Remove newly created ad
   QUnit.ok(gad.delete(), 'Removing the ad was successful');
@@ -1452,9 +1464,7 @@ QUnit.test('Glome.Ads API', function()
   );
 
   QUnit.equal(Glome.Ads.count(), Object.keys(Glome.Ads.stack).length, 'Glome.Ads.count gives the same as stack length');
-  console.log('start', filters);
   QUnit.equal(Glome.Ads.count(filters), Object.keys(Glome.Ads.listAds(filters)).length, 'Glome.Ads.count gives the same as stack length');
-  console.log('end');
 });
 
 /* !Ads list filters */

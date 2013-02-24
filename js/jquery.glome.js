@@ -36,7 +36,9 @@
     {
       container: null,
       callback: null,
-      onerror: null
+      onerror: null,
+      xhrFields: null,
+      beforeSend: null
     }
 
     var plugin = this;
@@ -150,21 +152,45 @@
         return str.toString().replace(/&(?!([a-zA-Z0-9%$-_\.+!*'\(\),]+=|[#a-z0-9]+;))/g, '&amp;');
       },
       
-      escapeAmpersandsRecursive: function(input)
+      /**
+       * Escape plain ampersands that are not HTML character references, recursively
+       * 
+       * @param String str    Input string
+       * @return String       Escaped string
+       */
+      escapeAmpersandsRecursive: function(input, level)
       {
+        if (typeof level === 'undefined')
+        {
+          level = 0;
+        }
+        
+        if (level > 10)
+        {
+          console.warn('Too much of recursion in escapeAmpersandsRecursive');
+          return null;
+        }
+        
         if (typeof input === 'string')
         {
-          return this.escapeAmpersands(input);
+          return plugin.Tools.escapeAmpersands(input);
+        }
+        else if (jQuery.isArray(input))
+        {
+          var tmp = [];
+          for (var i = 0; i < input.length; i++)
+          {
+            tmp.push(plugin.Tools.escapeAmpersandsRecursive(input[i], level + 1));
+          }
+          return tmp;
         }
         else if (jQuery.isPlainObject(input))
         {
           var tmp = {};
-          
           for (var i in input)
           {
-            tmp[i] = this.escapeAmpersands(input[i]);
+            tmp[i] = plugin.Tools.escapeAmpersandsRecursive(input[i], level + 1);
           }
-          
           return tmp;
         }
         
@@ -434,9 +460,6 @@
           throw new Error('Glome.get expects exactly one argument');
         }
 
-        // @TODO: support extensions and store the information on their local storage or preferences
-        // via their own interfaces
-
         var storage = JSON.parse(window.localStorage.getItem(key));
 
         // If there is nothing in the storage, return null
@@ -475,7 +498,7 @@
           type: typeof value,
           val: value
         }
-
+        
         window.localStorage.setItem(key, JSON.stringify(storage));
         return true;
       }
@@ -713,6 +736,11 @@
           {
             var value = String(data[key]);
           }
+          
+          if (typeof value === 'null')
+          {
+            value = '';
+          }
 
           tmp = tmp.replace(regexp, value);
         }
@@ -888,11 +916,11 @@
        * @param function callback      @optional Callback function
        * @param function onerror       @optional On error function
        * @param string method          @optional Request method (GET, POST, PUT, DELETE)
-       * @param function beforeSend    @optional Custom beforeSend function
-       * @param function xhrFields     @optional Custom xhrFields data
+       * @param function beforesend    @optional Custom beforeSend function
+       * @param function xhrfields     @optional Custom xhrFields data
        * @return jqXHR                 jQuery XMLHttpRequest
        */
-      request: function(type, data, callback, onerror, method, beforeSend, xhrFields)
+      request: function(type, data, callback, onerror, method, beforesend, xhrfields)
       {
         if (arguments.length < 2)
         {
@@ -958,38 +986,33 @@
           throw new Error('No Internet connection');
         }
         
-        
-        if (typeof beforeSend === 'undefined')
+        if (typeof beforesend === 'undefined')
         {
-          var beforeSend = function(jqXHR, settings)
+          var beforesend = function(jqxhr)
           {
-            jqXHR.settings = settings;
             // revert the token and cookie from prefs if available
-            if (typeof plugin.pref('session.token') != 'undefined'
-                && plugin.pref('session.token') != null)
+/*
+            if (typeof plugin.pref('session.token') != 'undefined')
             {
               plugin.sessionToken = plugin.pref('session.token');
             }
-            if (typeof plugin.pref('session.cookie') != 'undefined'
-                && plugin.pref('session.cookie') != null)
+            
+            if (typeof plugin.pref('session.cookie') != 'undefined')
             {
               plugin.cookie = plugin.pref('session.cookie');
             }
-            
-            if (plugin.sessionToken)
-            {
-              jqXHR.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
-              jqXHR.setRequestHeader('Cookie', plugin.cookie);
-            }
-          };
+*/
+            jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+            jqxhr.setRequestHeader('Cookie', plugin.cookie);
+          }
         }
 
-        if (typeof customXhrFields === 'undefined')
+        if (typeof xhrfields === 'undefined')
         {
-          var xhrFields =
+          var xhrfields =
           {
             withCredentials: true
-          };
+          }
         }
         
         // Update the last action timestamp
@@ -997,7 +1020,7 @@
         {
           plugin.updateLastActionTime();
         });
-
+        
         var request = jQuery.ajax
         (
           {
@@ -1005,8 +1028,8 @@
             data: data,
             type: method.toString(),
             dataType: 'json',
-            xhrFields: xhrFields,
-            beforeSend: beforeSend,
+            xhrFields: xhrfields,
+            beforeSend: beforesend,
             success: callback,
             error: onerror
           }
@@ -1208,8 +1231,8 @@
             plugin.updateLastActionTime(true);
 
             var token = jqXHR.getResponseHeader('X-CSRF-Token');
-            var cookie = jqXHR.getResponseHeader('Set-Cookie');
-
+            var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
+            
             if (token)
             {
               plugin.sessionToken = token;
@@ -1221,30 +1244,6 @@
               plugin.cookie = cookie;
               plugin.pref('session.cookie', cookie);
             }
-            
-            jQuery.ajaxSetup
-            (
-              {
-                xhrFields:
-                {
-                  withCredentials: true
-                },
-                beforeSend: function(jqxhr)
-                {
-                  // revert the token and cookie from prefs if available
-                  if (typeof plugin.pref('session.token') != 'undefined')
-                  {
-                    plugin.sessionToken = plugin.pref('session.token');
-                  }
-                  if (typeof plugin.pref('session.cookie') != 'undefined')
-                  {
-                    plugin.cookie = plugin.pref('session.cookie');
-                  }
-                  jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
-                  jqxhr.setRequestHeader('Cookie', plugin.cookie);
-                }
-              }
-            );
           },
           callback
         );
@@ -1727,28 +1726,65 @@
         {
           this.container = 'Ads';
           this._constructor(data);
+        }
+        
+        Ad.prototype = new plugin.Prototype();
+        
+        /**
+         * Default getter for property id. Validates the input.
+         */
+        Ad.prototype.__defineGetter__('bonusText', function(v)
+        {
+          var cashback = 'cashback';
           
-          // @TODO: this has to be localized and it should be a getter function
+          if (typeof jQuery.i18n === 'function')
+          {
+            cashback = jQuery.i18n(cashback);
+          }
+          
           if (this.bonus_text)
           {
-            this.bonus = this.bonus_text;
+            return this.bonus_text;
           }
           else if (this.bonus_money != 0
               && this.bonus_percent != 0)
           {
-            this.bonus = this.bonus_money + ' e + ' + this.bonus_percent + ' % cashback';
+            return this.bonus_money + ' e + ' + this.bonus_percent + ' % ' + cashback;
           }
           else if (this.bonus_money != 0)
           {
-            this.bonus = this.bonus_money + ' e cashback';
+            return this.bonus_money + ' e ' + cashback;
           }
           else if (this.bonus_percent != 0)
           {
-            this.bonus = this.bonus_percent + ' % cashback';
+            return this.bonus_percent + ' % ' + cashback;
           }
-        }
+          
+          return '';
+        });
 
-        Ad.prototype = new plugin.Prototype();
+        /**
+         * Default getter for property id. Validates the input.
+         */
+        Ad.prototype.__defineGetter__('bonusTextShort', function(v)
+        {
+          if (this.bonus_money != 0
+              && this.bonus_percent != 0)
+          {
+            return this.bonus_money + ' e + ' + this.bonus_percent + ' %';
+          }
+          else if (this.bonus_money != 0)
+          {
+            return this.bonus_money + ' e';
+          }
+          else if (this.bonus_percent != 0)
+          {
+            return this.bonus_percent + ' %';
+          }
+          
+          return '';
+        });
+
         Ad.prototype.constructor = Ad;
         Ad.prototype.bonus = '';
         Ad.prototype.view_state = plugin.Ads.states.unread;
@@ -2000,19 +2036,25 @@
           function(data)
           {
             var i, id, ad;
-
+            
             // Reset the ad stack
-            plugin.Ads.stack = {};
 
             // Temporarily store the listeners
             plugin.Ads.disableListeners = true;
+            
+            if (!data)
+            {
+              // @TODO: Display an error?
+              return;
+            }
 
-            for (i = 0; i < data.length; i++)
+            plugin.Ads.stack = {};
+            for (var i = 0; i < data.length; i++)
             {
               id = data[i].id;
               ad = new plugin.Ads.Ad(data[i]);
             }
-
+            
             plugin.Ads.disableListeners = false;
             plugin.Ads.onchange();
           },
@@ -2135,7 +2177,7 @@
      *
      * Methods:
      *
-     * GLome.Categories.load
+     * Glome.Categories.load
      */
     plugin.Categories =
     {
@@ -2755,32 +2797,15 @@
             this.widget
               .attr('data-state', 'closed');
           }
+          
+          dump('------------------------------------------------------------------------------------\n');
+          dump('bonusTextShort: ' + this.widgetAd.bonusTextShort + '\n');
+          dump('------------------------------------------------------------------------------------\n');
 
           if (this.widgetAd)
           {
-            var bonus = '';
-            
-            if (   this.widgetAd.bonus_money != 0
-                && this.widgetAd.bonus_percent != 0)
-            {
-              bonus = this.widgetAd.bonus_money.toString().replace(/\.00$/, '') + ' e / ' + this.widgetAd.bonus_percent.toString().replace(/\.00$/, '') + ' %';
-            }
-            else if (this.widgetAd.bonus_money != 0)
-            {
-              bonus = this.widgetAd.bonus_money.toString().replace(/\.00$/, '') + ' e';
-            }
-            else if (this.widgetAd.bonus_percent != 0)
-            {
-              bonus = this.widgetAd.bonus_percent.toString().replace(/\.00$/, '') + ' %';
-            }
-            
-            if (this.widget.attr('data-knocking-ad') != this.widgetAd.id)
-            {
-              this.widget.attr('data-state', 'knock');
-            }
-            
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
-            this.widget.find('.glome-ad-reward').text(bonus);
+            this.widget.find('.glome-ad-reward').text(this.widgetAd.bonusTextShort);
             this.widget.find('.glome-ad-logo img').attr('src', this.widgetAd.logo);
             this.widget.attr('data-knocking-ad', this.widgetAd.id);
           }
@@ -3294,7 +3319,7 @@
             name: this.category.name,
             title: this.ad.title,
             description: this.ad.description,
-            bonus: this.ad.bonus || ' ',
+            bonus: this.ad.bonusText,
             adId: this.ad.id,
             categoryId: this.category.id
           }
@@ -3970,8 +3995,7 @@
       }
 
       // Create a new Glome ID if previous ID does not exist
-      if (   !plugin.id()
-          || window.location.hash == '#debug')
+      if (!plugin.id())
       {
         var date = new Date();
         var callbacks = plugin.Tools.mergeCallbacks
@@ -4023,6 +4047,11 @@
                   plugin.Ads.load(function()
                   {
                     plugin.MVC.run('Widget');
+                  },
+                  function()
+                  {
+                    // Failed to load the ads
+                    // @TODO: display an error?
                   });
                   plugin.Categories.load();
                 },
