@@ -2842,8 +2842,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              
-              e.preventDefault();
               plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
               return false;
             });
@@ -2855,8 +2853,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
-              
               if (!plugin.lastActionTime)
               {
                 plugin.MVC.run('RequirePassword');
@@ -2893,7 +2889,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
               plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
               return false;
             });
@@ -2965,8 +2960,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              
-              e.preventDefault();
               plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
               return false;
             });
@@ -3010,7 +3003,6 @@
             .on('click.glome', function(e)
             {
               plugin.options.container.find('#glomePublicRequirePasswordContainer').trigger('submit');
-              e.preventDefault();
               return false;
             });
 
@@ -3018,8 +3010,6 @@
             .off('submit.glome')
             .on('submit.glome', function(e)
             {
-              e.preventDefault();
-
               request = plugin.Auth.login
               (
                 plugin.id(),
@@ -3231,7 +3221,6 @@
                 );
               }
 
-              e.preventDefault();
               return false;
             });
 
@@ -3343,25 +3332,6 @@
           this.content.appendTo(this.contentArea);
 
           this.content.find('.glome-ad-image').get(0).src = this.ad.content;
-
-          this.content.find('.glome-ad-image, .glome-goto-ad')
-            .on('click.glome', function(e)
-            {
-              e.preventDefault();
-              plugin.Ads.click(plugin.mvc.ad.id);
-              //plugin.Browser.openUrl(plugin.mvc.ad.id);
-              plugin.options.container.find('.glome-close').trigger('click');
-              return false;
-            });
-
-          this.content.find('.glome-notnow-ad')
-            .on('click.glome', function(e)
-            {
-              e.preventDefault()
-              plugin.options.container.find('.glome-close').trigger('click');
-              plugin.Ads.notnow(plugin.mvc.ad.id);
-              return false;
-            });
         }
 
         mvc.prototype.controller = function(args)
@@ -3370,8 +3340,6 @@
           plugin.options.container.find('.glome-category-title, .glome-category-title a')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
-
               var categoryId = jQuery(this).parents('[data-category-id]').attr('data-category-id');
 
               if (!categoryId)
@@ -3383,6 +3351,26 @@
                 plugin.MVC.run('ShowCategory', {categoryId: categoryId});
               }
 
+              return false;
+            });
+
+          this.content.find('.glome-ad-image, .glome-goto-ad')
+            .on('click.glome', function(e)
+            {
+              plugin.Ads.click(plugin.mvc.ad.id);
+              //plugin.Browser.openUrl(plugin.mvc.ad.id);
+              plugin.options.container.find('.glome-close').trigger('click');
+              return false;
+            });
+
+          this.content.find('.glome-notnow-ad')
+            .on('click.glome', function(e)
+            {
+              // Display parent category
+              plugin.options.container.find('.glome-category-title a').trigger('click');
+              
+              plugin.Ads.notnow(plugin.mvc.ad.id);
+              
               return false;
             });
         }
@@ -3442,7 +3430,6 @@
           this.content.find('.glome-link-previous')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
               plugin.MVC.run('ShowAllCategories');
               return false;
             });
@@ -3451,7 +3438,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
               plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-ad-id]').attr('data-ad-id'), forceCategory: Number(jQuery(this).parents('[data-category-id]').attr('data-category-id'))});
               return false;
             });
@@ -3503,7 +3489,6 @@
           this.content.find('.glome-category-list > .glome-category')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
               plugin.MVC.run('ShowCategory', {categoryId: jQuery(this).attr('data-category-id')});
               return false;
             });
@@ -3627,8 +3612,6 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
-
               try
               {
                 plugin.MVC.run(jQuery(this).parent().attr('data-mvc'));
@@ -3922,8 +3905,6 @@
             .off('click')
             .on('click', function(e)
             {
-              e.preventDefault();
-              
               var old = m.passwordChange.find('input.old').val();
               var pw1 = m.passwordChange.find('input.pw1').val();
               var pw2 = m.passwordChange.find('input.pw2').val();
@@ -3955,6 +3936,8 @@
                   alert('Password change failed');
                 }
               )
+              
+              return false;
             });
         }
         
