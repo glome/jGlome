@@ -20,17 +20,17 @@
   </head>
   <body>
     <div>
-      <div id="glomeWindow" lang="en">
+      <div id="glomeWindow">
         <!-- !Admin interface -->
-        <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container" style="display: none;">
-          <div class="glome-header glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
-            <div class="glome-close" data-close-context="admin"></div>
+        <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container glome-margin-top glome-margin-bottom" style="display: none;">
+          <div class="glome-header glome-margin-top glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
+            <div class="glome-close glome-margin-top" data-close-context="admin"></div>
               <div class="glome-full-width">
                 <div class="glome-icon"></div>
                 <ul class="glome-navigation" data-glome-template="navigation-container">
                   <li class="glome-cols-1" data-glome-template="navigation-item" data-page="profile">
                     <a href="#admin-profile" data-i18n="profile">Profile</a>
-                    <ul data-glome-template="subnavigation-container">
+                    <ul data-glome-template="subnavigation-container" class="glome-margin-top">
                       <li data-glome-template="subnavigation-item"><a data-i18n="profile">Profile</a></li>
                     </ul>
                   </li>
@@ -58,7 +58,7 @@
                 </ul>
               </div>
             </div>
-            <div id="glomeAdminContent" class="glome-clearfix" data-glome-template="admin-content">
+            <div id="glomeAdminContent" class="glome-content glome-margin-top glome-margin-bottom glome-clearfix" data-glome-template="admin-content">
               <div class="glome-content-wrapper">
                 <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
                   <!-- !Category subscriptions -->
@@ -79,7 +79,7 @@
                         <span data-i18n="by subscribing to a category you show interest to that area and the businesses beneath it">By subscribing to a category you show interest to that area and the businesses beneath it</span>.
                       </p>
                       <hr class="glome-short" />
-                      <div class="glome-selection-counter">
+                      <div class="glome-selection-counter glome-margin-bottom">
                         <span class="glome-current">{selected}</span><span class="glome-separator">/</span><span class="glome-max">{count}</span>
                         <span class="glome-unit" data-i18n="selected">selected</span>
                       </div>
@@ -219,7 +219,7 @@
                 </div>
               </div>
             </div>
-          <div class="glome-footer glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
+          <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
             <div class="glome-full-width">
               <a href="#widget-widget" data-i18n="close admin">Close admin</a>
               <span class="glome-copyright">Glome Inc, 2013</span>
@@ -228,14 +228,14 @@
         </div>
 
         <!-- !Public side -->
-        <div id="glomePublic" data-glome-template="public-wrapper" data-context="public" data-glome-container="true" class="glome-fullscreen-container" style="display: none;">
-          <div class="glome-header glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
-            <div class="glome-close" data-close-context="public"></div>
+        <div id="glomePublic" data-glome-template="public-wrapper" data-context="public" data-glome-container="true" class="glome-fullscreen-container glome-margin-top glome-margin-bottom" style="display: none;">
+          <div class="glome-header glome-margin-top glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
+            <div class="glome-close glome-margin-top" data-close-context="public"></div>
             <div class="glome-full-width">
               <div class="glome-icon"></div>
             </div>
           </div>
-          <div id="glomePublicContent" class="glome-clearfix" data-glome-template="public-content">
+          <div id="glomePublicContent" class="glome-content glome-margin-top glome-margin-bottom glome-clearfix" data-glome-template="public-content">
             <div class="glome-content-wrapper">
               <div class="glome-full-width glome-clearfix" data-context="glome-content-area">
 
@@ -281,7 +281,7 @@
                       <span data-i18n="by subscribing to a category you determine which brands can reach you">By subscribing to a category you determine which brands can reach you</span>.
                     </p>
                     <hr class="glome-short" />
-                    <div class="glome-selection-counter">
+                    <div class="glome-selection-counter glome-margin-bottom">
                       <span class="glome-current">{selected}</span><span class="glome-separator">/</span><span class="glome-max">{count}</span>
                       <span class="glome-unit" data-i18n="selected">selected</span>
                     </div>
@@ -453,7 +453,7 @@
               </div>
             </div>
           </div>
-          <div class="glome-footer glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
+          <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
             <div class="glome-full-width">
               <span><span class="glome-copyright">Glome Inc, 2013</span></span>
               <span class="glome-text-separator"></span>
