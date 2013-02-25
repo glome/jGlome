@@ -3348,8 +3348,8 @@
             .on('click.glome', function(e)
             {
               e.preventDefault();
-              plugin.Ads.click(parseInt(jQuery(this).parents('[data-ad-id]').attr('data-ad-id')));
-              //plugin.Browser.openUrl(jQuery(this).parents('[data-ad-action]').attr('data-ad-action'));
+              plugin.Ads.click(plugin.mvc.ad.id);
+              //plugin.Browser.openUrl(plugin.mvc.ad.id);
               plugin.options.container.find('.glome-close').trigger('click');
               return false;
             });
