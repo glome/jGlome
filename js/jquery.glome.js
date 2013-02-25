@@ -68,6 +68,11 @@
     this.userData = null;
     
     /**
+     * Current MVC instance
+     */
+    this.mvc = null;
+    
+    /**
      * Timestamp of the last successful action. This can be used in the
      * future for delayed logout or session time
      * 
@@ -1611,6 +1616,9 @@
         {
           throw new Error('ID has to be an integer');
         }
+        
+        // Typecast to integer
+        v = Number(v);
 
         if (this._id)
         {
@@ -1658,7 +1666,7 @@
        */
       Prototype.prototype.__defineGetter__('id', function(v)
       {
-        return this._id;
+        return Number(this._id);
       });
 
       Prototype.prototype.Extends = function(newClass)
@@ -2160,16 +2168,28 @@
        */
       notnow: function(id)
       {
-        if (typeof id !== 'number')
+        dump('got id "' + id + '"\n');
+        if (!id.toString().match(/^[1-9][0-9]*$/))
         {
           throw new Error('Ad id must be a valid integer');
         }
+        dump('is numeric\n');
+        
+        id = parseInt(id);
+        
+        if (typeof plugin.Ads.stack[id] === 'undefined')
+        {
+          throw new Error('There is no ad with id ' + id);
+        }
+        dump('ad was found\n');
         
         // Set status as ignored
         plugin.Ads.stack[id].view_state = plugin.Ads.states.ignore;
+        dump('was set as ignored \n');
 
         // must set this to be able to parse URL
         plugin.Ads.adId = id;
+        dump('added as active \n');
 
         return plugin.Api.create
         (
@@ -2216,6 +2236,13 @@
        * @param boolean
        */
       disableListeners: false,
+
+      /**
+       * Selected category. This is for enabling parsing of the action URL
+       *
+       * @param int
+       */
+      categoryId: 0,
 
       /**
        * Selected category. This is for enabling parsing of the action URL
@@ -2613,18 +2640,15 @@
           throw new Error('No route called "' + route.toString() + '"');
         }
 
-        var mvc = new plugin.MVC[route];
+        plugin.mvc = new plugin.MVC[route];
         
-        // Bind to context
-        plugin.mvc = mvc;
-
-        if (typeof mvc.run !== 'undefined')
+        if (typeof plugin.mvc.run !== 'undefined')
         {
-          mvc.run(args);
+          plugin.mvc.run(args);
           plugin.updateLastActionTime();
         }
 
-        return mvc;
+        return plugin.mvc;
       },
 
       /* !MVC Prototype */
@@ -3313,6 +3337,9 @@
           {
             this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
           }
+          
+          plugin.Ads.adId = parseInt(args.adId);
+          plugin.Categories.categoryId = this.category.id;
         }
 
         mvc.prototype.view = function(args)
@@ -3340,7 +3367,7 @@
           plugin.options.container.find('.glome-category-title, .glome-category-title a')
             .on('click.glome', function(e)
             {
-              var categoryId = jQuery(this).parents('[data-category-id]').attr('data-category-id');
+              var categoryId = plugin.Categories.categoryId;
 
               if (!categoryId)
               {
@@ -3366,10 +3393,11 @@
           this.content.find('.glome-notnow-ad')
             .on('click.glome', function(e)
             {
+              dump(typeof plugin.Ads.adId + ': ' + plugin.Ads.adId + '\n');
+              plugin.Ads.notnow(plugin.Ads.adId);
+              
               // Display parent category
               plugin.options.container.find('.glome-category-title a').trigger('click');
-              
-              plugin.Ads.notnow(plugin.mvc.ad.id);
               
               return false;
             });
@@ -3936,8 +3964,6 @@
                   alert('Password change failed');
                 }
               )
-              
-              return false;
             });
         }
         
