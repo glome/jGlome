@@ -725,9 +725,10 @@
         var matches = {}
         
         // Match only with single wrapping braces (i.e. "{...}"), double
-        // braces are reserved for i18n library. What a beautiful regexp!
-        // JavaScript unfortunately doesn't support negative lookbehind
-        // assertions on the go, so we use *only* negative lookahead.
+        // braces are reserved for i18n library. JavaScript unfortunately
+        // doesn't support negative lookbehind assertions on the go, so
+        // we use *only* negative lookahead. Full regexp would be
+        // /(?<!\{)\{([a-z0-9_]+)\}(?!\})/
         var matchMaker = new RegExp('\{([a-z0-9_]+)\}(?!\})');
 
         while (tmp.match(matchMaker))
@@ -739,14 +740,16 @@
 
           if (typeof data[key] !== 'undefined')
           {
-            var value = String(data[key]);
+            if (data[key])
+            {
+              value = String(data[key]);
+            }
+            else
+            {
+              value = '';
+            }
           }
           
-          if (typeof value === 'null')
-          {
-            value = '';
-          }
-
           tmp = tmp.replace(regexp, value);
         }
 
@@ -995,6 +998,12 @@
         {
           var beforesend = function(jqxhr)
           {
+            if (   !plugin.sessionToken
+                || !plugin.cookie)
+            {
+              return;
+            }
+            
             // revert the token and cookie from prefs if available
 /*
             if (typeof plugin.pref('session.token') != 'undefined')
@@ -1769,7 +1778,8 @@
             cashback = jQuery.i18n(cashback);
           }
           
-          if (this.bonus_text)
+          if (   this.bonus_text
+              && this.bonus_text !== 'missing')
           {
             return this.bonus_text;
           }
