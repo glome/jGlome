@@ -742,6 +742,14 @@
       height: 30px;
       background-size: 25px 25px; } }
 
+#glomeAdmin .glome-navigation > li[data-page="profile"] > a:before {
+  background-image: url(../images/icons/icon-profile.svg); }
+
+#glomeAdmin .glome-navigation > li[data-page="profile"].selected > a:before,
+#glomeAdmin .glome-navigation > li[data-page="profile"]:hover > a:before {
+  background-image: url(../images/icons/icon-profile-gradient.svg);
+  opacity: 1; }
+
 #glomeAdmin .glome-navigation > li[data-page="subscriptions"] > a:before {
   background-image: url(../images/icons/icon-subscriptions.svg); }
 

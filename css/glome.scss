@@ -956,7 +956,7 @@ $full_page_z_index: 10000;
   }
 }
 
-@each $type in subscriptions, statistics, rewards, settings
+@each $type in profile, subscriptions, statistics, rewards, settings
 {
   #glomeAdmin .glome-navigation > li[data-page="#{$type}"] > a:before
   {
