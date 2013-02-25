@@ -2822,7 +2822,16 @@
           if (!this.widget.size())
           {
             this.widget = plugin.Templates.get('widget').appendTo(plugin.options.widgetContainer);
-            this.widget.everyTime(60000, function()
+            this.widget.stopTime('ads');
+            this.widget.stopTime('knock');
+            
+            // Refresh the ads
+            this.widget.everyTime(60000, 'ads', function()
+            {
+              plugin.Ads.load();
+            });
+            
+            this.widget.everyTime(60000, 'knock', function()
             {
               if (jQuery(this).attr('data-state') === 'open')
               {
@@ -2989,6 +2998,17 @@
             .on('click.glome', function(e)
             {
               plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
+              return false;
+            });
+          
+          plugin.options.container.find('.force-reload')
+            .off('click.glome')
+            .on('click.glome', function(e)
+            {
+              plugin.Ads.load(function()
+              {
+                alert('Loaded total of ' + plugin.Ads.count() + ' ads');
+              });
               return false;
             });
         }
