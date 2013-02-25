@@ -2635,6 +2635,20 @@
        * Current context
        */
       currentContext: null,
+      
+      /**
+       * Close Glome layout
+       */
+      closeLayers: function()
+      {
+        if (!plugin.options.container)
+        {
+          return;
+        }
+        
+        plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
+        plugin.options.container.attr('hidden', 'true');
+      },
 
       /* !MVC Runner */
       run: function(route, args)
@@ -2967,8 +2981,7 @@
               .off('click.glome')
               .on('click.glome', function()
               {
-                plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
-                plugin.options.container.attr('hidden', 'true');
+                plugin.MVC.closeLayers();
                 plugin.MVC.run('Widget');
               });
 
