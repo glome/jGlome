@@ -306,88 +306,98 @@ $full_page_z_index: 10000;
 //}
   
 /* !Resets */
-[data-glome-container="true"],
-[data-glome-container="true"] input,
-[data-glome-container="true"] button,
-[data-glome-container="true"] textarea,
-[data-glome-container="true"] select
+[data-glome-container="true"]
 {
-  font:
+  &,
+  input,
+  button,
+  textarea,
+  select
   {
-    family: Helvetica, Arial, sans-serif !important;
-    size: $font_size !important;
+    font:
+    {
+      family: Helvetica, Arial, sans-serif !important;
+      size: $font_size !important;
+    }
   }
-}
-
-[data-glome-container="true"] input[type=text],
-[data-glome-container="true"] input[type=email],
-[data-glome-container="true"] input[type=tel],
-[data-glome-container="true"] input[type=password]
-{
-  @include reset;
-  background:
-  {
-    color: $text_color;
-  }
-  color: $text_color_light;
-  border: none;
-  display: block;
-  height: $button_height;
-  padding-left: 10px;
-}
-
-[data-glome-container="true"] .glome-content
-{
-  @include container;
-}
-
-[data-glome-container="true"].hidden,
-[data-glome-container="true"] .hidden
-{
-  display: none !important;
-}
-
-[data-glome-container="true"] .glome-clearfix:after
-{
-  display: block;
-  content: '';
-  width: 0;
-  height: 0;
-  visibility: hidden;
-  clear: both;
-}
-
-.glome-hidden
-{
-  display: none !important;
-}
-
-[data-glome-container="true"] .glome-layout-cols-2 > *
-{
-  float: left;
   
-  @include respond-to-lte(4)
+  input[type=text],
+  input[type=email],
+  input[type=tel],
+  input[type=password]
   {
-    float: none !important;
-    margin-left: 0 !important;
+    @include reset;
+    background:
+    {
+      color: $text_color;
+    }
+    color: $text_color_light;
+    border: none;
+    display: block;
+    height: $button_height;
+    padding-left: 10px;
+  }
+  
+  .glome-content
+  {
+    @include container;
+  }
+  
+  &.hidden,
+  .hidden
+  {
+    display: none !important;
+  }
+  
+  .glome-clearfix:after
+  {
+    display: block;
+    content: '';
+    width: 0;
+    height: 0;
+    visibility: hidden;
     clear: both;
   }
-}
-
-[data-glome-container="true"] .glome-layout-cols-2 > * + *
-{
-  display: block;
-  float: right;
-  margin-left: 0;
-}
-
-[data-glome-container="true"] .glome-fixed
-{
-  position: fixed;
   
-  @include respond-to-lte(4)
+  &.glome-hidden,
+  .glome-hidden
   {
-    position: static;
+    display: none !important;
+  }
+  
+  .glome-layout-cols-2 > *
+  {
+    float: left;
+    
+    @include respond-to-lte(4)
+    {
+      float: none !important;
+      margin-left: 0 !important;
+      clear: both;
+    }
+  }
+  
+  .glome-layout-cols-2 > * + *
+  {
+    display: block;
+    float: right;
+    margin-left: 0;
+  }
+  
+  .glome-fixed
+  {
+    position: fixed;
+    
+    @include respond-to-lte(4)
+    {
+      position: static;
+    }
+  }
+  
+  .glome-action-title,
+  .glome-goto-ad
+  {
+    cursor: pointer;
   }
 }
 

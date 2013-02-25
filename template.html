@@ -305,7 +305,7 @@
                         </button>
                       </div>
                       <div class="glome-text-container">
-                        <h1 class="glome-category-title">{name}</h1>
+                        <h1 class="glome-action-title glome-category-title">{name}</h1>
                         <p class="glome-short-description">{description}</p>
                       </div>
                     </div>
@@ -389,7 +389,7 @@
                 <!-- !Category view -->
                 <div id="glomePublicCategory" class="glome-content glome-layout-cols-2" data-glome-template="public-category" data-page="category" data-category-id="{id}">
                   <div class="glome-cols-2 glome-fixed">
-                    <h1>
+                    <h1 class="glome-action-title">
                       <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
                       {name}
                     </h1>
@@ -430,7 +430,7 @@
                   <div class="glome-cols-4">
                     <div class="glome-layout-cols-2 glome-clearfix">
                       <div class="glome-cols-ad-description">
-                        <h1>{title}</h1>
+                        <h1 class="glome-action-title glome-goto-ad">{title}</h1>
                         <p>
                           {description}
                         </p>
@@ -441,7 +441,7 @@
                     </div>
                     <div class="glome-layout-cols-2 glome-clearfix glome-ad-actions">
                       <div class="glome-cols-ad-description glome-ad-bonus">
-                        <h2 data-i18n="up to $1 per order" data-i18n-arguments="[&quot;{bonus}&quot;]">{bonus}</h2>
+                        <h2 class="glome-goto-ad" data-i18n="up to $1 per order" data-i18n-arguments="[&quot;{bonus}&quot;]">{bonus}</h2>
                       </div>
                       <div class="glome-cols-ad-image">
                         <button class="glome-button glome-cols-1 glome-goto-ad" data-state="on" data-state-change="false"><span data-state="on" data-i18n="get it">Get it</span></button>
