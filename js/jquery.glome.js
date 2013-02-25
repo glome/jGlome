@@ -2168,28 +2168,22 @@
        */
       notnow: function(id)
       {
-        dump('got id "' + id + '"\n');
         if (!id.toString().match(/^[1-9][0-9]*$/))
         {
           throw new Error('Ad id must be a valid integer');
         }
-        dump('is numeric\n');
-        
         id = parseInt(id);
         
         if (typeof plugin.Ads.stack[id] === 'undefined')
         {
           throw new Error('There is no ad with id ' + id);
         }
-        dump('ad was found\n');
         
         // Set status as ignored
         plugin.Ads.stack[id].view_state = plugin.Ads.states.ignore;
-        dump('was set as ignored \n');
 
         // must set this to be able to parse URL
         plugin.Ads.adId = id;
-        dump('added as active \n');
 
         return plugin.Api.create
         (
@@ -3393,7 +3387,6 @@
           this.content.find('.glome-notnow-ad')
             .on('click.glome', function(e)
             {
-              dump(typeof plugin.Ads.adId + ': ' + plugin.Ads.adId + '\n');
               plugin.Ads.notnow(plugin.Ads.adId);
               
               // Display parent category
