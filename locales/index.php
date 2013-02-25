@@ -65,9 +65,39 @@ if (   isset($regs[1])
     }
 }
 
+foreach (array_keys($langs['en']) as $k)
+{
+    if (!in_array($k, $i18n_strings))
+    {
+        $i18n_strings[] = $k;
+    }
+}
+
+sort($i18n_strings, SORT_LOCALE_STRING);
+
 if (isset($_POST['i18n']))
 {
     $langs = array_merge($langs, $_POST['i18n']);
+    
+    // Remove unwanted material
+    if (isset($_POST['delete']))
+    {
+        foreach ($_POST['delete'] as $str)
+        {
+            if ($k = array_search($str, $i18n_strings))
+            {
+                unset($langs[$lang][$k]);
+            }
+            
+            foreach (array_keys($langs) as $lang)
+            {
+                if (isset($langs[$lang][$str]))
+                {
+                    unset($langs[$lang][$str]);
+                }
+            }
+        }
+    }
     
     foreach ($langs as $lang => $values)
     {
@@ -123,6 +153,7 @@ if (count($messages))
         <table>
           <thead>
             <tr>
+              <th>rm</th>
               <th>String</th>
 <?php
 foreach (array_keys($langs) as $lang)
@@ -145,7 +176,10 @@ foreach ($i18n_strings as $i => $str)
         $class = 'even';
     }
     
+    $escaped = htmlentities(mb_convert_encoding($str, 'ISO-8859-1', 'UTF-8'));
+    
     echo "            <tr class=\"{$class}\">\n";
+    echo "              <th><input type=\"checkbox\" name=\"delete[]\" value=\"{$escaped}\" /></th>\n";
     echo "              <th>{$str}</th>\n";
     
     foreach (array_keys($langs) as $lang)
