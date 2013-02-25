@@ -2614,6 +2614,9 @@
         }
 
         var mvc = new plugin.MVC[route];
+        
+        // Bind to context
+        plugin.mvc = mvc;
 
         if (typeof mvc.run !== 'undefined')
         {
@@ -3351,12 +3354,12 @@
               return false;
             });
 
-          this.content.find('.glome-ad-image, .glome-notnow-ad')
+          this.content.find('.glome-notnow-ad')
             .on('click.glome', function(e)
             {
-              e.preventDefault();
-              plugin.Ads.notnow(parseInt(jQuery(this).parents('[data-ad-id]').attr('data-ad-id')));
+              e.preventDefault()
               plugin.options.container.find('.glome-close').trigger('click');
+              plugin.Ads.notnow(plugin.mvc.ad.id);
               return false;
             });
         }
