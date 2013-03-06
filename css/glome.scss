@@ -19,6 +19,7 @@ $button_red_dark: darken($button_red_medium, 25);
 $col_width: 120px;
 $col_margin: 15px;
 $full_width: ($col_width + $col_margin) * 7 - $col_margin;
+//$ad_image_width: ($col_width + $col_margin) * 2 - $col_margin;
 $ad_image_width: 300px;
 
 $navigation_height: 42px;
@@ -1460,7 +1461,7 @@ $full_page_z_index: 10000;
 {
   button
   {
-    font-size: 138% !important;
+    font-size: 11px !important;
   }
 
   button + button
@@ -1475,22 +1476,106 @@ $full_page_z_index: 10000;
 
   .glome-cols-ad-description
   {
-    width: ($col_width * 4 - $col_margin) - $ad_image_width;
+    width: (($col_width + $col_margin) * 4 - 2 * $col_margin) - $ad_image_width;
+    margin-left: $col_margin;
+    
+    .glome-advertiser
+    {
+      margin: 0 0 1em;
+      text-transform: uppercase;
+    }
+    
+    h1
+    {
+      font-size: 25px;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .bonus-short
+    {
+      margin: 20px 0 10px;
+      font-weight: 900;
+      font-size: 45px;
+    }
   }
 
   .glome-ad-bonus h2
   {
     margin-top: 0 !important;
   }
-
+  
+  .glome-bonus
+  {
+    text-transform: uppercase;
+  }
+  
   .glome-cols-ad-image
   {
     width: $ad_image_width;
+    
     img
     {
       min-width: $ad_image_width;
       max-width: $ad_image_width;
     }
+  }
+  
+  .glome-button
+  {
+    @include vendor-specific(box-sizing, margin-box);
+    display: table-cell;
+    width: 50%;
+    height: 80px;
+    padding-top: 10px;
+    vertical-align: middle;
+    margin-left: -3px;
+    text-transform: uppercase;
+    
+    &:before
+    {
+      content: "";
+      display: block;
+      height: 38px;
+      background:
+      {
+        repeat: no-repeat;
+        position: center top;
+        size: 38px 38px;
+      }
+      
+      opacity: 0.4;
+    }
+    
+    &.glome-goto-ad
+    {
+      &:before
+      {
+          background-image: url("../images/icons/circle-arrow.svg");
+      }
+    }
+    
+    &.glome-notnow-ad
+    {
+        color: rgba(0, 0, 0, 0.5);
+    }
+    
+    &.glome-notnow-ad:before
+    {
+        background-image: url("../images/icons/circle-x.svg");
+    }
+    
+    &:hover,
+    &:hover:before
+    {
+      color: rgba(0, 0, 0, 0.5);
+      opacity: 0.8;
+    }
+  }
+  
+  .glome-button + .glome-button
+  {
+    margin-left: 0;
   }
 
   @include respond-to(5)

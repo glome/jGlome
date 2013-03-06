@@ -927,7 +927,6 @@
   vertical-align: bottom;
   padding: 0.5em 0; }
 
-.bold,
 #glomeAdmin .glome-total-rewards [data-type="currency"],
 #glomeAdmin .glome-total-rewards [data-type="full"],
 #glomeAdmin .glome-total-rewards [data-type="decimal-separator"] {
@@ -1147,20 +1146,66 @@
 
 /* !View ad */
 #glomePublicAd button {
-  font-size: 138% !important; }
+  font-size: 11px !important; }
 #glomePublicAd button + button {
   float: right; }
 #glomePublicAd .glome-ad-actions {
   margin-top: 20px; }
 #glomePublicAd .glome-cols-ad-description {
-  width: 165px; }
+  width: 210px;
+  margin-left: 15px; }
+  #glomePublicAd .glome-cols-ad-description .glome-advertiser {
+    margin: 0 0 1em;
+    text-transform: uppercase; }
+  #glomePublicAd .glome-cols-ad-description h1 {
+    font-size: 25px;
+    font-weight: 700;
+    margin: 0; }
+  #glomePublicAd .glome-cols-ad-description .bonus-short {
+    margin: 20px 0 10px;
+    font-weight: 900;
+    font-size: 45px; }
 #glomePublicAd .glome-ad-bonus h2 {
   margin-top: 0 !important; }
+#glomePublicAd .glome-bonus {
+  text-transform: uppercase; }
 #glomePublicAd .glome-cols-ad-image {
   width: 300px; }
   #glomePublicAd .glome-cols-ad-image img {
     min-width: 300px;
     max-width: 300px; }
+#glomePublicAd .glome-button {
+  -webkit-box-sizing: margin-box;
+  -moz-box-sizing: margin-box;
+  -ms-box-sizing: margin-box;
+  -o-box-sizing: margin-box;
+  box-sizing: margin-box;
+  display: table-cell;
+  width: 50%;
+  height: 80px;
+  padding-top: 10px;
+  vertical-align: middle;
+  margin-left: -3px;
+  text-transform: uppercase; }
+  #glomePublicAd .glome-button:before {
+    content: "";
+    display: block;
+    height: 38px;
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 38px 38px;
+    opacity: 0.4; }
+  #glomePublicAd .glome-button.glome-goto-ad:before {
+    background-image: url("../images/icons/circle-arrow.svg"); }
+  #glomePublicAd .glome-button.glome-notnow-ad {
+    color: rgba(0, 0, 0, 0.5); }
+  #glomePublicAd .glome-button.glome-notnow-ad:before {
+    background-image: url("../images/icons/circle-x.svg"); }
+  #glomePublicAd .glome-button:hover, #glomePublicAd .glome-button:hover:before {
+    color: rgba(0, 0, 0, 0.5);
+    opacity: 0.8; }
+#glomePublicAd .glome-button + .glome-button {
+  margin-left: 0; }
 @media screen and (max-width: 824px) and (min-width: 690px) {
   #glomePublicAd .glome-cols-4 {
     width: 390px; }
