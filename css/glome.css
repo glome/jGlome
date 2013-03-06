@@ -429,7 +429,7 @@
   border-width: 1px; }
 
 [data-glome-container="true"] hr.glome-short {
-  width: 20px;
+  width: 0;
   margin: 0; }
 
 .glome-copyright:before {
@@ -927,6 +927,7 @@
   vertical-align: bottom;
   padding: 0.5em 0; }
 
+.bold,
 #glomeAdmin .glome-total-rewards [data-type="currency"],
 #glomeAdmin .glome-total-rewards [data-type="full"],
 #glomeAdmin .glome-total-rewards [data-type="decimal-separator"] {
