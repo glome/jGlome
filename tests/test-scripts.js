@@ -2019,6 +2019,40 @@ QUnit.asyncTest('Subscription shorthands', function()
 /* !Module: Glome user interface  */
 QUnit.module('Glome user interface');
 
+/* !Internationalization and localization */
+QUnit.test('Internationalization and localization', function()
+{
+  var locales =
+  {
+    'profile': 'Profile',
+    'there are categories': 'There {{plural:$1|is|are}} $1 {{plural:$1|category|categories}}',
+  }
+  
+  QUnit.ok(jQuery.i18n, 'There is i18n library');
+  
+  Glome.i18n = new jQuery.i18n();
+  Glome.i18n.locale = 'en';
+  QUnit.ok(Glome.i18n, 'Localization library was loaded');
+  
+  try
+  {
+    Glome.i18n.load(locales, 'en');
+    QUnit.ok(true, 'Locales loading did not throw any exceptions');
+  }
+  catch (e)
+  {
+    QUnit.ok(false, 'Locales loading did not throw any exceptions');
+  }
+  
+  QUnit.equal(Glome.i18n.parse('profile'), locales.profile, 'String "profile" was parsed correctly');
+  QUnit.equal(Glome.i18n.parse('there are categories', [1]), 'There is 1 category', 'String "there are categories" was parsed correctly with argument array [1]');
+  QUnit.equal(Glome.i18n.parse('there are categories', [2]), 'There are 2 categories', 'String "there are categories" was parsed correctly with argument array [2]');
+  
+  var template = jQuery('<div data-i18n="profile">Proffffile</div>');
+  template = Glome.Templates.parse(template);
+  QUnit.equal(template.text(), locales.profile, 'Localized "profile" as Profile');
+});
+
 /* !Glome templates */
 QUnit.test('Glome templates', function()
 {
@@ -2112,7 +2146,6 @@ QUnit.asyncTest('Populate template', function()
       .text('Hello {{world}}!');
     
     QUnit.equal('Hello {{world}}!', Glome.Templates.parse(template, {world: ''}).html(), 'Double brackets are reserved for other use and they were left alone');
-      
     QUnit.start();
   });
 });

@@ -759,32 +759,30 @@
         div.innerHTML = tmp;
         
         // Populate with i18n data
-        if (typeof jQuery.i18n === 'function')
+        if (   typeof plugin.i18n !== 'null'
+            && jQuery(div).find('[data-i18n]').size())
         {
-          jQuery(div).find('data-i18n')
+          jQuery(div).find('[data-i18n]')
             .each(function()
             {
               var str = jQuery(this).attr('data-i18n');
+              var args = null;
               
               // Check for arguments
               if (jQuery(this).attr('data-i18n-arguments'))
               {
-                var i18nArgs = [str];
                 try
                 {
                   var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
-                  i18nArgs = i18nArgs.concat(args);
-                  var l10n = jQuery.i18n.apply(null, i18nArgs)
                 }
                 catch (e)
                 {
                   console.warn(e, str);
+                  args = null;
                 }
               }
-              else
-              {
-                var l10n = jQuery.i18n(str);
-              }
+              
+              var l10n = plugin.i18n.parse(str, args)
               
               if (jQuery(this).attr('placeholder'))
               {
