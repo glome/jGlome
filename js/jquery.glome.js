@@ -38,7 +38,8 @@
       callback: null,
       onerror: null,
       xhrFields: null,
-      beforeSend: null
+      beforeSend: null,
+      i18n: null
     }
 
     var plugin = this;
@@ -759,14 +760,24 @@
         div.innerHTML = tmp;
         
         // Populate with i18n data
-        if (   typeof plugin.i18n !== 'null'
+        if (   typeof plugin.options.i18n !== 'null'
             && jQuery(div).find('[data-i18n]').size())
         {
+          dump('-- there are i18n strings here\n');
+          dump('-- i18n type is ' + typeof plugin.options.i18n + '\n');
+          
+          for (var i in plugin.options.i18n)
+          {
+            dump('   ' + i + ': ' + typeof plugin.options.i18n[i] + '\n');
+          }
+          
           jQuery(div).find('[data-i18n]')
             .each(function()
             {
               var str = jQuery(this).attr('data-i18n');
               var args = null;
+              
+              dump(' -- got: ' + str + '\n');
               
               // Check for arguments
               if (jQuery(this).attr('data-i18n-arguments'))
@@ -774,23 +785,33 @@
                 try
                 {
                   var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
+                  dump('-- with arguments: ' + args.toString() + ' (' + jQuery(this).attr('data-i18n-arguments') + ')\n');
                 }
                 catch (e)
                 {
                   console.warn(e, str);
                   args = null;
+                  dump('-- with NO parseable arguments: ' + e.message + '\n');
                 }
               }
               
-              var l10n = plugin.i18n.parse(str, args)
-              
-              if (jQuery(this).attr('placeholder'))
+              try
               {
-                jQuery(this).attr('placeholder', l10n);
+                var l10n = plugin.options.i18n.parse(str, args)
+                dump('-- which translated to ' + l10n + '\n');
+                
+                if (jQuery(this).attr('placeholder'))
+                {
+                  jQuery(this).attr('placeholder', l10n);
+                }
+                else
+                {
+                  jQuery(this).text(l10n);
+                }
               }
-              else
+              catch (e)
               {
-                jQuery(this).text(l10n);
+                dump('-- caught: ' + e.message + '\n');
               }
             });
         }

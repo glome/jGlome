@@ -2030,13 +2030,13 @@ QUnit.test('Internationalization and localization', function()
   
   QUnit.ok(jQuery.i18n, 'There is i18n library');
   
-  Glome.i18n = new jQuery.i18n();
-  Glome.i18n.locale = 'en';
-  QUnit.ok(Glome.i18n, 'Localization library was loaded');
+  Glome.options.i18n = new jQuery.i18n();
+  Glome.options.i18n.locale = 'en';
+  QUnit.ok(Glome.options.i18n, 'Localization library was loaded');
   
   try
   {
-    Glome.i18n.load(locales, 'en');
+    Glome.options.i18n.load(locales, 'en');
     QUnit.ok(true, 'Locales loading did not throw any exceptions');
   }
   catch (e)
@@ -2044,9 +2044,9 @@ QUnit.test('Internationalization and localization', function()
     QUnit.ok(false, 'Locales loading did not throw any exceptions');
   }
   
-  QUnit.equal(Glome.i18n.parse('profile'), locales.profile, 'String "profile" was parsed correctly');
-  QUnit.equal(Glome.i18n.parse('there are categories', [1]), 'There is 1 category', 'String "there are categories" was parsed correctly with argument array [1]');
-  QUnit.equal(Glome.i18n.parse('there are categories', [2]), 'There are 2 categories', 'String "there are categories" was parsed correctly with argument array [2]');
+  QUnit.equal(Glome.options.i18n.parse('profile'), locales.profile, 'String "profile" was parsed correctly');
+  QUnit.equal(Glome.options.i18n.parse('there are categories', [1]), 'There is 1 category', 'String "there are categories" was parsed correctly with argument array [1]');
+  QUnit.equal(Glome.options.i18n.parse('there are categories', [2]), 'There are 2 categories', 'String "there are categories" was parsed correctly with argument array [2]');
   
   var template = jQuery('<div data-i18n="profile">Proffffile</div>');
   template = Glome.Templates.parse(template);
