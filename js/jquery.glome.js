@@ -2687,6 +2687,45 @@
             if (   plugin.options.container
                 && typeof plugin.options.container !== 'undefined')
             {
+              // Allow to close on ESC
+              jQuery(window)
+                .off('keyup.glomeDefaults')
+                .on('keyup.glomeDefaults', function(e)
+                {
+                  dump(e.keyCode + '\n');
+                  if (e.keyCode === 27)
+                  {
+                    var focus = false;
+                    var inputs = plugin.options.container.find('input, select, textarea');
+                    
+                    for (var i = 0; i < inputs.size(); i++)
+                    {
+                      if (inputs.eq(i).is(':focus'))
+                      {
+                        // Reset the field if it is not a select
+                        if (inputs.eq(i).get(0).tagName !== 'select')
+                        {
+                          inputs.eq(i).val('');
+                          inputs.eq(i).trigger('blur');
+                        }
+                        
+                        focus = true;
+                        break;
+                      }
+                    }
+                    
+                    if (!focus)
+                    {
+                      plugin.MVC.closeLayers();
+                      plugin.MVC.run('Widget');
+                    }
+                    
+                    return true;
+                  }
+                  
+                  return true;
+                });
+              
               plugin.options.container.find('input[placeholder]')
                 .off('focus.glomeDefaults')
                 .on('focus.glomeDefaults', function()
