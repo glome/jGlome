@@ -2846,21 +2846,39 @@
             this.widget.stopTime('knock');
             
             // Refresh the ads
-            this.widget.everyTime(60000, 'ads', function()
-            {
-              plugin.Ads.load();
-            });
-            
-            this.widget.everyTime(60000, 'knock', function()
-            {
-              if (jQuery(this).attr('data-state') === 'open')
+            this.widget
+              .stopTime('ads')
+              .everyTime(60000, 'ads', function()
               {
-                return;
-              }
-              
-              m.widgetAd = null;
-              m.run();
-            });
+                plugin.Ads.load();
+              });
+            
+            this.widget
+              .stopTime('knock')
+              .everyTime(60000, 'knock', function()
+              {
+                if (jQuery(this).attr('data-state') === 'open')
+                {
+                  return;
+                }
+                
+                m.widgetAd = null;
+                m.run();
+                });
+            
+            this.widget
+              .stopTime('butler')
+              .everyTime(60 * 3600, 'butler', function()
+              {
+                if (jQuery(this).attr('data-state') === 'open')
+                {
+                  return;
+                }
+                
+                m.widgetAd = null;
+                m.run();
+                jQuery(this).attr('data-state', 'open');
+              });
           }
           else
           {
