@@ -1002,37 +1002,12 @@
         
         if (typeof beforesend === 'undefined')
         {
-          var beforesend = function(jqxhr)
-          {
-            if (   !plugin.sessionToken
-                || !plugin.cookie)
-            {
-              return;
-            }
-            
-            // revert the token and cookie from prefs if available
-/*
-            if (typeof plugin.pref('session.token') != 'undefined')
-            {
-              plugin.sessionToken = plugin.pref('session.token');
-            }
-            
-            if (typeof plugin.pref('session.cookie') != 'undefined')
-            {
-              plugin.cookie = plugin.pref('session.cookie');
-            }
-*/
-            jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
-            jqxhr.setRequestHeader('Cookie', plugin.cookie);
-          }
+          var beforesend = plugin.options.beforeSend;
         }
 
         if (typeof xhrfields === 'undefined')
         {
-          var xhrfields =
-          {
-            withCredentials: true
-          }
+          var xhrfields = plugin.options.xhrFields;
         }
         
         // Update the last action timestamp
