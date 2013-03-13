@@ -2345,10 +2345,14 @@ QUnit.asyncTest('First Run: Subscriptions', function()
 
       // First run
       QUnit.ok(Glome.MVC.FirstRunSubscriptions, 'First run: Subscriptions exists');
-
+      
       var subscriptions = new Glome.MVC.FirstRunSubscriptions();
+      QUnit.ok((!subscriptions.run()), 'Subscriptions could not be run due to missing authentication');
+      
+      subscriptions.requireAuth = false;
 
       QUnit.ok(subscriptions.run(), 'Subscriptions was successfully run');
+      QUnit.ok(subscriptions.contentArea, 'There is a content area');
 
       QUnit.equal(subscriptions.contentArea.find('.glome-category').size(), Object.keys(Glome.Categories.stack).length, 'There is a row for each category');
       QUnit.start();
@@ -2385,12 +2389,12 @@ QUnit.asyncTest('Widget', function()
       var gad = new Glome.Ads.Ad(ad);
       var gcategory = new Glome.Categories.Category({id: categoryId, subscribed: 1});
 
-      QUnit.ok(widget.run(), 'Widget was successfully run');
+      QUnit.ok(widget.run({adId: gad.id}), 'Widget was successfully run');
       QUnit.ok(widget.widgetAd, 'Widget ad was selected');
 
-      QUnit.equal(ad.title, widget.widget.find('.glome-ad-title').text(), 'Knocking ad title was changed');
-      QUnit.equal(ad.logo, widget.widget.find('.glome-ad-logo img').attr('src'), 'Knocking ad logo was changed');
-      QUnit.equal(ad.id, widget.widget.attr('data-knocking-ad'), 'Knocking ad id was passed to widget DOM');
+      QUnit.equal(widget.widget.find('.glome-ad-title').text(), ad.title, 'Knocking ad title was changed');
+      QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
+      QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
 
       QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
       QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
