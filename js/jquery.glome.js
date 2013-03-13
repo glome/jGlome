@@ -2841,11 +2841,11 @@
 
           // If there is no widgetAd, use the last
           if (   args
-              && args.adid)
+              && args.adId)
           {
             try
             {
-              this.widgetAd = new plugin.Ads.Ad(args.adid);
+              this.widgetAd = new plugin.Ads.Ad(args.adId);
             }
             catch (e)
             {
@@ -2878,6 +2878,7 @@
           // there is time"... ;)
           plugin.options.widgetContainer.find('[data-glome-template="widget"] > *').remove();
           this.widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
+          this.widget.attr('data-state', 'closed');
 
           // Reuse the old widget or create new
           if (!this.widget.size())
@@ -2926,13 +2927,6 @@
             plugin.Templates.get('widget').find('> *').appendTo(this.widget);
           }
 
-          // Start with the widget closed if no arguments were passed
-          if (!args)
-          {
-            this.widget
-              .attr('data-state', 'closed');
-          }
-          
           if (this.widgetAd)
           {
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
@@ -3421,7 +3415,7 @@
               adId: Object.keys(plugin.Ads.stack)[0]
             }
           }
-
+          
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);

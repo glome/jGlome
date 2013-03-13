@@ -2396,11 +2396,10 @@ QUnit.asyncTest('Widget', function()
       QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
       QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
 
-      QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
-      QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
+      QUnit.ok(widget.run({adId: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
       QUnit.equal(widget.widget.attr('data-knocking-ad'), '', 'Empty knocking ad id was passed to widget DOM');
       QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), '', 'Knocking ad logo was hidden');
-
+      
       QUnit.notEqual(widget.widget.attr('data-state'), 'open', 'Widget is closed on startup');
 
       QUnit.start();
