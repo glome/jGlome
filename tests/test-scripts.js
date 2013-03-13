@@ -903,6 +903,8 @@ QUnit.test('Glome API requests', function()
 {
   QUnit.equal(Glome.userData, null, 'User data should be null before it has been loaded');
   var request = Glome.API.get('login', null);
+  QUnit.ok(request, 'Got a request');
+  console.log(request);
 
   // Abort the mission immediately, these do not need to be fired
   request.abort();
@@ -1031,28 +1033,33 @@ QUnit.test('Creating a new Glome ID', function()
     'Exceeded maximum number of times to create a Glome ID',
     'Exceeded maximum number of times to create a Glome ID'
   );
+});
 
-  QUnit.stop();
-
+/* !Test Glome ID creation */
+QUnit.asyncTest('Test Glome ID creation', function()
+{
+  var date = new Date();
+  testGlomeId = 'test' + date.getTime();
+  
   Glome.Auth.createGlomeId
   (
     testGlomeId,
     function()
     {
-      QUnit.start();
       QUnit.ok(Glome.id(), 'Glome ID is initialized');
       QUnit.equal(Glome.id(), Glome.pref('glomeid'), 'Initialized and stored Glome ID is the same');
+      QUnit.start();
     },
     function()
     {
-      QUnit.start();
       QUnit.ok(false, 'Create a new Glome ID');
+      QUnit.start();
     }
   );
 });
 
 /* Set password */
-QUnit.test('Set password', function()
+QUnit.asyncTest('Set password', function()
 {
   var callback = function(){}
 
@@ -1100,6 +1107,7 @@ QUnit.test('Set password', function()
   Glome.Auth.setPassword('foo', 'bar', null, null, function()
   {
     QUnit.ok(true, 'Set password onerror was called successfully with passwords mismatch error');
+    QUnit.start();
   });
 });
 
@@ -1269,19 +1277,30 @@ QUnit.asyncTest('Login failure', function()
 /* !Get ads */
 QUnit.asyncTest('Get ads', function()
 {
-  var method = 'ads';
-  var request = Glome.API.get
+  Glome.Auth.login
   (
-    method,
+    Glome.id(),
+    '',
     function()
     {
-      QUnit.ok(true, 'Callback run after successful get');
-      QUnit.start();
+      Glome.Ads.load
+      (
+        function()
+        {
+          QUnit.ok(true, 'Callback run after successful get');
+          QUnit.start();
+        },
+        function()
+        {
+          console.warn('Failed to load the ads')
+          QUnit.ok(false, 'Callback run after successful get');
+          QUnit.start();
+        }
+      );
     },
-    function(jqXHR, status, errorThrown)
+    function()
     {
-      console.warn('URL', this.url)
-      QUnit.expect(1);
+      QUnit.ok(false, 'Login was successful');
     }
   );
 });
@@ -1291,6 +1310,8 @@ QUnit.test('Login with password', function()
 {
   QUnit.expect(1);
   QUnit.stop();
+  
+  var testGlomeId = Glome.id();
 
   Glome.Auth.login
   (
@@ -2174,10 +2195,13 @@ QUnit.test('Glome.Categories.Category object', function()
 QUnit.module('MVC');
 QUnit.test('MVC Prototype', function()
 {
+  Glome.options.container = jQuery('#qunit-fixture');
   QUnit.ok(Glome.MVC, 'There is a MVC object');
   QUnit.ok(Glome.MVC.Prototype, 'There is a prototype for MVC objects');
 
   var mvc = new Glome.MVC.Prototype();
+  mvc.requireAuth = false;
+  
   QUnit.ok(mvc, 'MVC Prototype is callable');
   QUnit.ok(mvc.run, 'Method "run" exists');
   QUnit.ok(mvc.model, 'Method "model" exists');
@@ -2302,6 +2326,7 @@ QUnit.asyncTest('First Run: Initialize', function()
     QUnit.ok(Glome.MVC.FirstRunInitialize, 'First run: initialized exists');
 
     var firstrun = new Glome.MVC.FirstRunInitialize();
+    firstrun.requireAuth = false;
 
     QUnit.ok(firstrun.run(), 'Firstrun was successfully run');
     QUnit.start();
@@ -2362,11 +2387,10 @@ QUnit.asyncTest('Widget', function()
 
       QUnit.ok(widget.run(), 'Widget was successfully run');
       QUnit.ok(widget.widgetAd, 'Widget ad was selected');
-      QUnit.equal(ad.id, widget.widgetAd.id, 'Last ad was selected');
 
-      QUnit.equal(widget.widget.find('.glome-ad-title').text(), ad.title, 'Knocking ad title was changed');
-      QUnit.equal(widget.widget.find('.glome-ad-logo img').attr('src'), ad.logo, 'Knocking ad logo was changed');
-      QUnit.equal(widget.widget.attr('data-knocking-ad'), ad.id, 'Knocking ad id was passed to widget DOM');
+      QUnit.equal(ad.title, widget.widget.find('.glome-ad-title').text(), 'Knocking ad title was changed');
+      QUnit.equal(ad.logo, widget.widget.find('.glome-ad-logo img').attr('src'), 'Knocking ad logo was changed');
+      QUnit.equal(ad.id, widget.widget.attr('data-knocking-ad'), 'Knocking ad id was passed to widget DOM');
 
       QUnit.ok(widget.run({adid: 'loremipsum'}), 'Running the widget with arguments did not cause any trouble');
       QUnit.equal(widget.widgetAd, null, 'No ad with the given id should have been found');
@@ -2399,7 +2423,7 @@ QUnit.asyncTest('All MVCs', function()
       'ShowCategory',
       'ShowAllCategories',
       'Admin',
-      'AdminSubscriptions',
+      'AdminProfile',
       'AdminStatistics',
       'AdminRewards',
       'AdminSettings',

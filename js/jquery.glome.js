@@ -38,7 +38,15 @@
       callback: null,
       onerror: null,
       xhrFields: null,
-      beforeSend: null,
+      beforeSend: function(jqxhr)
+      {
+        if (!plugin.sessionToken)
+        {
+          return;
+        }
+        
+        jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+      },
       i18n: null
     }
 
@@ -1016,10 +1024,12 @@
           plugin.updateLastActionTime();
         });
         
+        var parsedUrl = plugin.API.parseURL(plugin.API.server + this.types[type].url);
+        
         var request = jQuery.ajax
         (
           {
-            url: plugin.API.parseURL(plugin.API.server + this.types[type].url),
+            url: parsedUrl,
             data: data,
             type: method.toString(),
             dataType: 'json',
@@ -1029,6 +1039,15 @@
             error: onerror
           }
         );
+        
+        if (typeof request.settings === 'undefined')
+        {
+          request.settings = {};
+        }
+        
+        request.settings.type = method.toString();
+        request.settings.url = parsedUrl;
+        
         return request;
       },
 
@@ -1224,20 +1243,28 @@
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
-
-            var token = jqXHR.getResponseHeader('X-CSRF-Token');
-            var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
             
-            if (token)
+            try
             {
-              plugin.sessionToken = token;
-              plugin.pref('session.token', token);
+              var token = jqXHR.getResponseHeader('X-CSRF-Token');
+              
+              if (token)
+              {
+                plugin.sessionToken = token;
+                plugin.pref('session.token', token);
+              }
+  
+              var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
+              
+              if (cookie)
+              {
+                plugin.cookie = cookie;
+                plugin.pref('session.cookie', cookie);
+              }
             }
-
-            if (cookie)
+            catch (e)
             {
-              plugin.cookie = cookie;
-              plugin.pref('session.cookie', cookie);
+              console.warn(e.message);
             }
           },
           callback
