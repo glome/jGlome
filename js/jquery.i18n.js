@@ -1,1 +1,0 @@
-i18n/src/jquery.i18n.js
