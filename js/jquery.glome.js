@@ -38,7 +38,15 @@
       callback: null,
       onerror: null,
       xhrFields: null,
-      beforeSend: null,
+      beforeSend: function(jqxhr)
+      {
+        if (!plugin.sessionToken)
+        {
+          return;
+        }
+        
+        jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+      },
       i18n: null
     }
 
@@ -588,7 +596,7 @@
       {
         if (arguments.length !== 1)
         {
-          throw new Error('Glome.loadTemplate expects exactly one parameter');
+          throw new Error('Glome.Templates.get expects exactly one parameter');
         }
 
         if (   typeof this.templates == 'null'
@@ -710,6 +718,11 @@
        */
       populate: function(template, data)
       {
+        if (!data)
+        {
+          var data = {};
+        }
+        
         var tmp = this.get(template);
         return this.parse(tmp, data);
       },
@@ -1016,10 +1029,12 @@
           plugin.updateLastActionTime();
         });
         
+        var parsedUrl = plugin.API.parseURL(plugin.API.server + this.types[type].url);
+        
         var request = jQuery.ajax
         (
           {
-            url: plugin.API.parseURL(plugin.API.server + this.types[type].url),
+            url: parsedUrl,
             data: data,
             type: method.toString(),
             dataType: 'json',
@@ -1029,6 +1044,15 @@
             error: onerror
           }
         );
+        
+        if (typeof request.settings === 'undefined')
+        {
+          request.settings = {};
+        }
+        
+        request.settings.type = method.toString();
+        request.settings.url = parsedUrl;
+        
         return request;
       },
 
@@ -1224,20 +1248,28 @@
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
-
-            var token = jqXHR.getResponseHeader('X-CSRF-Token');
-            var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
             
-            if (token)
+            try
             {
-              plugin.sessionToken = token;
-              plugin.pref('session.token', token);
+              var token = jqXHR.getResponseHeader('X-CSRF-Token');
+              
+              if (token)
+              {
+                plugin.sessionToken = token;
+                plugin.pref('session.token', token);
+              }
+  
+              var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
+              
+              if (cookie)
+              {
+                plugin.cookie = cookie;
+                plugin.pref('session.cookie', cookie);
+              }
             }
-
-            if (cookie)
+            catch (e)
             {
-              plugin.cookie = cookie;
-              plugin.pref('session.cookie', cookie);
+              console.warn(e.message);
             }
           },
           callback
@@ -1754,9 +1786,9 @@
         {
           var cashback = 'cashback';
           
-          if (typeof jQuery.i18n === 'function')
+          if (plugin.options.i18n)
           {
-            cashback = jQuery.i18n(cashback);
+            cashback = plugin.options.i18n.parse(cashback);
           }
           
           if (   this.bonus_text
@@ -2692,7 +2724,6 @@
                 .off('keyup.glomeDefaults')
                 .on('keyup.glomeDefaults', function(e)
                 {
-                  dump(e.keyCode + '\n');
                   if (e.keyCode === 27)
                   {
                     var focus = false;
@@ -2814,11 +2845,11 @@
 
           // If there is no widgetAd, use the last
           if (   args
-              && args.adid)
+              && args.adId)
           {
             try
             {
-              this.widgetAd = new plugin.Ads.Ad(args.adid);
+              this.widgetAd = new plugin.Ads.Ad(args.adId);
             }
             catch (e)
             {
@@ -2851,11 +2882,12 @@
           // there is time"... ;)
           plugin.options.widgetContainer.find('[data-glome-template="widget"] > *').remove();
           this.widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
+          this.widget.attr('data-state', 'closed');
 
           // Reuse the old widget or create new
           if (!this.widget.size())
           {
-            this.widget = plugin.Templates.get('widget').appendTo(plugin.options.widgetContainer);
+            this.widget = plugin.Templates.populate('widget').appendTo(plugin.options.widgetContainer);
             this.widget.stopTime('ads');
             this.widget.stopTime('knock');
             
@@ -2896,16 +2928,9 @@
           }
           else
           {
-            plugin.Templates.get('widget').find('> *').appendTo(this.widget);
+            plugin.Templates.populate('widget').find('> *').appendTo(this.widget);
           }
 
-          // Start with the widget closed if no arguments were passed
-          if (!args)
-          {
-            this.widget
-              .attr('data-state', 'closed');
-          }
-          
           if (this.widgetAd)
           {
             this.widget.find('.glome-ad-title').text(this.widgetAd.title);
@@ -2935,7 +2960,6 @@
               return false;
             });
           
-          
           // Open and close the widget. Closing widget hides always the knocking
           // until a new knock is initialized
           this.widget.find('#glomeWidgetIcon')
@@ -2952,14 +2976,14 @@
               {
                 jQuery(this).parent().attr('data-state', 'closed');
               }
-              else if (jQuery(this).parent().attr('data-knocking-ad'))
+              else if (plugin.mvc.widgetAd)
               {
                 jQuery(this).parent()
                   .attr('data-state', 'open')
                   .off('mouseover.glome')
                   .on('mouseover.glome', function()
                   {
-                    jQuery(this).removeTime('widgetAutoclose');
+                    jQuery(this).stopTime('widgetAutoclose');
                   })
                   .off('mouseout.glome')
                   .on('mouseout.glome', function()
@@ -3008,13 +3032,13 @@
 
           if (!wrapper.size())
           {
-            var wrapper = plugin.Templates.get('public-wrapper')
+            var wrapper = plugin.Templates.populate('public-wrapper')
               .appendTo(plugin.options.container);
           }
 
           if (!wrapper.find('[data-glome-template="public-header"]').size())
           {
-            var header = plugin.Templates.get('public-header');
+            var header = plugin.Templates.populate('public-header');
             header.find('.glome-close')
               .off('click.glome')
               .on('click.glome', function()
@@ -3028,12 +3052,12 @@
 
           if (!wrapper.find('[data-glome-template="public-footer"]').size())
           {
-            plugin.Templates.get('public-footer').appendTo(wrapper);
+            plugin.Templates.populate('public-footer').appendTo(wrapper);
           }
 
           if (!wrapper.find('[data-glome-template="public-content"]').size())
           {
-            plugin.Templates.get('public-content').insertAfter(wrapper.find('[data-glome-template="public-header"]'));
+            plugin.Templates.populate('public-content').insertAfter(wrapper.find('[data-glome-template="public-header"]'));
           }
 
           this.contentArea = wrapper.find('[data-glome-template="public-content"]').find('[data-context="glome-content-area"]');
@@ -3087,7 +3111,7 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-requirepassword');
+          this.content = plugin.Templates.populate('public-requirepassword');
 
           this.content.appendTo(this.contentArea);
         }
@@ -3148,7 +3172,7 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-startup');
+          this.content = plugin.Templates.populate('public-startup');
 
           this.content.appendTo(this.contentArea);
         }
@@ -3266,7 +3290,7 @@
         mvc.prototype.view = function()
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-password');
+          this.content = plugin.Templates.populate('public-password');
 
           this.content.appendTo(this.contentArea);
         }
@@ -3346,7 +3370,7 @@
         mvc.prototype.view = function(args)
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-finish');
+          this.content = plugin.Templates.populate('public-finish');
 
           this.content.appendTo(this.contentArea);
         }
@@ -3394,7 +3418,7 @@
               adId: Object.keys(plugin.Ads.stack)[0]
             }
           }
-
+          
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);
@@ -3424,6 +3448,7 @@
             name: this.category.name,
             title: this.ad.title,
             description: this.ad.description,
+            advertiser: this.ad.advertiser,
             bonus: this.ad.bonusText,
             adId: this.ad.id,
             categoryId: this.category.id
@@ -3566,7 +3591,7 @@
         mvc.prototype.view = function(args)
         {
           this.viewInit();
-          this.content = plugin.Templates.get('public-categorylist');
+          this.content = plugin.Templates.populate('public-categorylist');
           this.content.appendTo(this.contentArea);
 
           this.content.find('.glome-category-list > .glome-category').remove();
@@ -3619,7 +3644,7 @@
           var nav = args.header.find('.glome-navigation');
           if (!nav.size())
           {
-            var nav = plugin.Templates.get('navigation-container');
+            var nav = plugin.Templates.populate('navigation-container');
             nav.insertAfter(args.header.find('.glome-icon'));
           }
 
@@ -3677,7 +3702,7 @@
 
             if (!li.size())
             {
-              var li = plugin.Templates.get('navigation-item');
+              var li = plugin.Templates.populate('navigation-item');
               li.find('a')
                 .attr('href', items[i].mvc)
                 .text(i);
@@ -3688,7 +3713,7 @@
 
             if (items[i].children)
             {
-              var subnav = plugin.Templates.get('subnavigation-container').appendTo(li);
+              var subnav = plugin.Templates.populate('subnavigation-container').appendTo(li);
 
               for (var n in items[i].children)
               {
@@ -3698,7 +3723,7 @@
 
                 if (!subli.size())
                 {
-                  var subli = plugin.Templates.get('subnavigation-item')
+                  var subli = plugin.Templates.populate('subnavigation-item')
                     .attr('data-mvc', child.mvc)
                     .appendTo(subnav);
 
@@ -3765,14 +3790,14 @@
 
           if (!wrapper.size())
           {
-            var wrapper = plugin.Templates.get('admin-wrapper')
+            var wrapper = plugin.Templates.populate('admin-wrapper')
               .appendTo(plugin.options.container);
           }
 
           var header = wrapper.find('[data-glome-template="admin-header"]');
           if (!header.size())
           {
-            var header = plugin.Templates.get('admin-header');
+            var header = plugin.Templates.populate('admin-header');
             header.find('.glome-close')
               .off('click.glome')
               .on('click.glome', function()
@@ -3789,12 +3814,12 @@
 
           if (!wrapper.find('[data-glome-template="admin-footer"]').size())
           {
-            plugin.Templates.get('admin-footer').appendTo(wrapper);
+            plugin.Templates.populate('admin-footer').appendTo(wrapper);
           }
 
           if (!wrapper.find('[data-glome-template="admin-content"]').size())
           {
-            plugin.Templates.get('admin-content').insertAfter(wrapper.find('[data-glome-template="admin-header"]'));
+            plugin.Templates.populate('admin-content').insertAfter(wrapper.find('[data-glome-template="admin-header"]'));
           }
 
           this.contentArea = wrapper.find('[data-glome-template="admin-content"]').find('[data-context="glome-content-area"]');
