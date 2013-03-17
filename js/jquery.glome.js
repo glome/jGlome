@@ -2914,7 +2914,7 @@
             
             this.widget
               .stopTime('butler')
-              .everyTime(60 * 3600, 'butler', function()
+              .everyTime('3600s', 'butler', function()
               {
                 if (jQuery(this).attr('data-state') === 'open')
                 {
@@ -2923,7 +2923,19 @@
                 
                 m.widgetAd = null;
                 m.run();
-                jQuery(this).attr('data-state', 'open');
+                jQuery(this)
+                  .off('mouseover.glome')
+                  .on('mouseover.glome', function()
+                  {
+                    // Stop self closing timer if user reacts
+                    jQuery(this).stopTime('butlerAutoClose');
+                  })
+                  .oneTime('5s', 'butlerAutoClose', function()
+                  {
+                    // Set to knock mode if the user doesn't react
+                    jQuery(this).attr('data-state', 'knock');
+                  })
+                  .attr('data-state', 'open');
               });
           }
           else
