@@ -2911,7 +2911,7 @@
 
                 m.widgetAd = null;
                 m.run();
-                });
+              });
 
             this.widget
               .stopTime('butler')
@@ -2954,6 +2954,7 @@
           else
           {
             this.widget.attr('data-knocking-ad', '');
+            this.widget.attr('data-state', 'closed');
             this.widget.find('.glome-ad-logo img').attr('src', '');
           }
         }
