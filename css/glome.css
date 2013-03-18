@@ -930,7 +930,8 @@
 
 #glomeAdmin .glome-total-rewards [data-type="currency"],
 #glomeAdmin .glome-total-rewards [data-type="full"],
-#glomeAdmin .glome-total-rewards [data-type="decimal-separator"] {
+#glomeAdmin .glome-total-rewards [data-type="decimal-separator"],
+#glomeAdmin .coming-soon {
   font-size: 300%;
   font-weight: bold; }
 

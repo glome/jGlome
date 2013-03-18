@@ -109,17 +109,14 @@
                   <div id="glomeAdminStatistics" class="glome-content glome-layout-cols-2" data-glome-template="admin-statistics">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
                       <h1 data-i18n="your digital footprint">Your Digital<br /> Footprint</h1>
+                      <span class="coming-soon" data-i18n="coming soon">Coming soon</span>
+                    </div>
+                    <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
                       <p>
                         <span data-i18n="glome will collect information about how you use the web">Glome will collect information about how you use the web</span>.
                         <span data-i18n="this information is yours - you own it and you control it">This information is yours - you own it and you control it</span>.
-                        <span data-i18n="we collect it so that we can make smart suggestions for you to update your glome profile">We collect it so that we can make smart suggestions for you to update your Glome Profile</span>
+                        <span data-i18n="we collect it so that we can make smart suggestions for you to update your glome profile">We collect it so that we can make smart suggestions for you to update your Glome Profile.</span>
                       </p>
-                      <p>
-                        <span data-i18n="this is how the web sees you">This is how the web sees you</span>
-                      </p>
-                      <hr class="glome-short" />
-                    </div>
-                    <div class="glome-cols-4 glome-cols-alt-3 glome-clearfix">
                     </div>
                   </div>
 
@@ -128,12 +125,13 @@
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
                       <h1 data-i18n="redeem your reward">Redeem your reward</h1>
                       <div class="glome-current-release">
-                        <span data-i18n="total amount to redeem">Total amount to redeem</span>:
+                        <span class="hidden" data-i18n="total amount to redeem">Total amount to redeem</span>
+                        <span class="coming-soon" data-i18n="coming soon">Coming soon</span>
                       </div>
                       <div class="glome-future-releases">
                         <span data-i18n="earned reward">Earned reward</span>:
                       </div>
-                      <p class="glome-total-rewards" id="glomeTotalRewards">
+                      <p class="hidden glome-total-rewards" id="glomeTotalRewards">
                         <span data-type="currency">€</span> <span data-type="full">20</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
                       </p>
                       <div class="glome-future-releases">
@@ -436,7 +434,8 @@
                       <div class="glome-cols-ad-description">
                         <p class="glome-advertiser">{advertiser}</p>
                         <h1 class="glome-action-title glome-goto-ad">{title}</h1>
-                        <p class="bonus-short" data-i18n="$1" data-i18n-arguments="{bonusShort}">
+                        <p class="bonus-short" data-i18n="$1" data-i18n-arguments="{bonusTextShort}">
+                        <p class="bonus-short" data-i18n="$1" data-i18n-arguments="{bonusTextShort}">
                           0.05 %
                         </p>
                         <p class="glome-bonus" data-i18n="bonus for purchase">
