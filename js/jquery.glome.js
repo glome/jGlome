@@ -3464,6 +3464,7 @@
             description: this.ad.description,
             advertiser: this.ad.advertiser,
             bonus: this.ad.bonusText,
+            bonustextshort: this.ad.bonusTextShort,
             adId: this.ad.id,
             categoryId: this.category.id
           }
