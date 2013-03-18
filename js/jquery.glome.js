@@ -4039,15 +4039,13 @@
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
-          m.passwordChange = this.content.find('#glomeAdminSettingsChangePassword');
-
           this.content.find('#glomeAdminSettingsChangePassword').find('button')
             .off('click')
             .on('click', function(e)
             {
-              var old = m.passwordChange.find('input.old').val();
-              var pw1 = m.passwordChange.find('input.pw1').val();
-              var pw2 = m.passwordChange.find('input.pw2').val();
+              var old = jQuery(e.target).parent().find('input.old').val();
+              var pw1 = jQuery(e.target).parent().find('input.pw1').val();
+              var pw2 = jQuery(e.target).parent().find('input.pw2').val();
 
               if (pw1.length < 6)
               {
