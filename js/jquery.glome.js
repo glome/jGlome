@@ -44,8 +44,9 @@
         {
           return;
         }
-        
+
         jqxhr.setRequestHeader('X-CSRF-Token', plugin.sessionToken);
+        jqxhr.setRequestHeader('Cookie', plugin.cookie);
       },
       i18n: null
     }
@@ -75,23 +76,23 @@
     this.contentPrefix = '';
     this.templateLocation = 'template.html';
     this.userData = null;
-    
+
     /**
      * Current MVC instance
      */
     this.mvc = null;
-    
+
     /**
      * Timestamp of the last successful action. This can be used in the
      * future for delayed logout or session time
-     * 
+     *
      * @var integer
      */
     this.lastActionTime = null;
-    
+
     /**
      * Update last action time
-     * 
+     *
      * @param boolean force
      * @return int timestamp
      */
@@ -104,10 +105,10 @@
       {
         return;
       }
-      
+
       var date = new Date();
       plugin.lastActionTime = Math.round(date.getTime() / 1000);
-      
+
       return plugin.lastActionTime;
     }
 
@@ -149,10 +150,10 @@
       {
         return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
       },
-      
+
       /**
        * Escape plain ampersands that are not HTML character references
-       * 
+       *
        * @param String str    Input string
        * @return String       Escaped string
        */
@@ -162,13 +163,13 @@
         {
           return null;
         }
-        
+
         return str.toString().replace(/&(?!([a-zA-Z0-9%$-_\.+!*'\(\),]+=|[#a-z0-9]+;))/g, '&amp;');
       },
-      
+
       /**
        * Escape plain ampersands that are not HTML character references, recursively
-       * 
+       *
        * @param String str    Input string
        * @return String       Escaped string
        */
@@ -178,13 +179,13 @@
         {
           level = 0;
         }
-        
+
         if (level > 10)
         {
           console.warn('Too much of recursion in escapeAmpersandsRecursive');
           return null;
         }
-        
+
         if (typeof input === 'string')
         {
           return plugin.Tools.escapeAmpersands(input);
@@ -207,7 +208,7 @@
           }
           return tmp;
         }
-        
+
         return input;
       },
 
@@ -512,7 +513,7 @@
           type: typeof value,
           val: value
         }
-        
+
         window.localStorage.setItem(key, JSON.stringify(storage));
         return true;
       }
@@ -722,7 +723,7 @@
         {
           var data = {};
         }
-        
+
         var tmp = this.get(template);
         return this.parse(tmp, data);
       },
@@ -737,7 +738,7 @@
       {
         var tmp = jQuery(dom).get(0).outerHTML;
         var matches = {}
-        
+
         // Match only with single wrapping braces (i.e. "{...}"), double
         // braces are reserved for i18n library. JavaScript unfortunately
         // doesn't support negative lookbehind assertions on the go, so
@@ -763,7 +764,7 @@
               value = '';
             }
           }
-          
+
           tmp = tmp.replace(regexp, value);
         }
 
@@ -771,7 +772,7 @@
 
         var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
         div.innerHTML = tmp;
-        
+
         // Populate with i18n data
         if (   typeof plugin.options.i18n !== 'null'
             && jQuery(div).find('[data-i18n]').size())
@@ -781,7 +782,7 @@
             {
               var str = jQuery(this).attr('data-i18n');
               var args = null;
-              
+
               // Check for arguments
               if (jQuery(this).attr('data-i18n-arguments'))
               {
@@ -795,11 +796,11 @@
                   args = null;
                 }
               }
-              
+
               try
               {
                 var l10n = plugin.options.i18n.parse(str, args)
-                
+
                 if (jQuery(this).attr('placeholder'))
                 {
                   jQuery(this).attr('placeholder', l10n);
@@ -815,7 +816,7 @@
               }
             });
         }
-        
+
         return jQuery(div).find('> *');
       }
     }
@@ -1012,7 +1013,7 @@
 
           throw new Error('No Internet connection');
         }
-        
+
         if (typeof beforesend === 'undefined')
         {
           var beforesend = plugin.options.beforeSend;
@@ -1022,15 +1023,15 @@
         {
           var xhrfields = plugin.options.xhrFields;
         }
-        
+
         // Update the last action timestamp
         callback = plugin.Tools.mergeCallbacks(callback, function()
         {
           plugin.updateLastActionTime();
         });
-        
+
         var parsedUrl = plugin.API.parseURL(plugin.API.server + this.types[type].url);
-        
+
         var request = jQuery.ajax
         (
           {
@@ -1044,15 +1045,15 @@
             error: onerror
           }
         );
-        
+
         if (typeof request.settings === 'undefined')
         {
           request.settings = {};
         }
-        
+
         request.settings.type = method.toString();
         request.settings.url = parsedUrl;
-        
+
         return request;
       },
 
@@ -1248,19 +1249,19 @@
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
-            
+
             try
             {
               var token = jqXHR.getResponseHeader('X-CSRF-Token');
-              
+
               if (token)
               {
                 plugin.sessionToken = token;
                 plugin.pref('session.token', token);
               }
-  
+
               var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
-              
+
               if (cookie)
               {
                 plugin.cookie = cookie;
@@ -1519,14 +1520,14 @@
               {
                 i = '_id';
               }
-              
+
               // Skip getters and setters
               if (   o.__lookupGetter__(i)
                   || o.__lookupSetter__(i))
               {
                 continue;
               }
-              
+
               try
               {
                 this[i] = o[i];
@@ -1638,7 +1639,7 @@
         {
           throw new Error('ID has to be an integer');
         }
-        
+
         // Typecast to integer
         v = Number(v);
 
@@ -1746,7 +1747,7 @@
        * @param boolean
        */
       disableListeners: false,
-      
+
       /**
        * View states
        */
@@ -1771,26 +1772,26 @@
           this.container = 'Ads';
           this._constructor(data);
         }
-        
+
         Ad.prototype = new plugin.Prototype();
 
         Ad.prototype.container = 'Ads';
         Ad.prototype.constructor = Ad;
         Ad.prototype.bonus = '';
         Ad.prototype.view_state = plugin.Ads.states.unread;
-        
+
         /**
          * Default getter for property id. Validates the input.
          */
         Ad.prototype.__defineGetter__('bonusText', function(v)
         {
           var cashback = 'cashback';
-          
+
           if (plugin.options.i18n)
           {
             cashback = plugin.options.i18n.parse(cashback);
           }
-          
+
           if (   this.bonus_text
               && this.bonus_text !== 'missing')
           {
@@ -1809,7 +1810,7 @@
           {
             return this.bonus_percent + ' % ' + cashback;
           }
-          
+
           return '';
         });
 
@@ -1831,7 +1832,7 @@
           {
             return this.bonus_percent + ' %';
           }
-          
+
           return '';
         });
 
@@ -2016,7 +2017,7 @@
               // Matching of the categories has already been done
               case 'subscribed':
                 break;
-              
+
               case 'view_state':
               case 'state':
                 if (ad.view_state === filters[k])
@@ -2024,7 +2025,7 @@
                   found = true;
                   break;
                 }
-                
+
                 break;
 
               default:
@@ -2082,12 +2083,12 @@
           function(data)
           {
             var i, id, ad;
-            
+
             // Reset the ad stack
 
             // Temporarily store the listeners
             plugin.Ads.disableListeners = true;
-            
+
             if (!data)
             {
               // @TODO: Display an error?
@@ -2100,7 +2101,7 @@
               id = data[i].id;
               ad = new plugin.Ads.Ad(data[i]);
             }
-            
+
             plugin.Ads.disableListeners = false;
             plugin.Ads.onchange();
           },
@@ -2196,12 +2197,12 @@
           throw new Error('Ad id must be a valid integer');
         }
         id = parseInt(id);
-        
+
         if (typeof plugin.Ads.stack[id] === 'undefined')
         {
           throw new Error('There is no ad with id ' + id);
         }
-        
+
         // Set status as ignored
         plugin.Ads.stack[id].view_state = plugin.Ads.states.ignore;
 
@@ -2648,7 +2649,7 @@
        * Current context
        */
       currentContext: null,
-      
+
       /**
        * Close Glome layout
        */
@@ -2658,7 +2659,7 @@
         {
           return;
         }
-        
+
         plugin.options.container.find('[data-glome-template="public-wrapper"]').remove();
         plugin.options.container.attr('hidden', 'true');
       },
@@ -2672,7 +2673,7 @@
         }
 
         plugin.mvc = new plugin.MVC[route];
-        
+
         if (typeof plugin.mvc.run !== 'undefined')
         {
           plugin.mvc.run(args);
@@ -2728,7 +2729,7 @@
                   {
                     var focus = false;
                     var inputs = plugin.options.container.find('input, select, textarea');
-                    
+
                     for (var i = 0; i < inputs.size(); i++)
                     {
                       if (inputs.eq(i).is(':focus'))
@@ -2739,24 +2740,24 @@
                           inputs.eq(i).val('');
                           inputs.eq(i).trigger('blur');
                         }
-                        
+
                         focus = true;
                         break;
                       }
                     }
-                    
+
                     if (!focus)
                     {
                       plugin.MVC.closeLayers();
                       plugin.MVC.run('Widget');
                     }
-                    
+
                     return true;
                   }
-                  
+
                   return true;
                 });
-              
+
               plugin.options.container.find('input[placeholder]')
                 .off('focus.glomeDefaults')
                 .on('focus.glomeDefaults', function()
@@ -2765,7 +2766,7 @@
                   {
                     jQuery(this).attr('data-placeholder', jQuery(this).attr('placeholder'));
                   }
-                  
+
                   jQuery(this).attr('placeholder', '');
                 })
                 .off('blur.glomeDefaults')
@@ -2784,7 +2785,7 @@
           {
 
           };
-          
+
           // Triggers for context changes
           this.contextChange = function(args)
           {
@@ -2797,27 +2798,27 @@
 
             plugin.MVC.currentContext = this;
           };
-          
+
           this.requireAuth = true;
 
           this.run = function(args)
           {
             this.contextChange(args);
-            
+
             if (   this.requireAuth
                 && !plugin.glomeid)
             {
               return;
             }
-            
+
             // Model the data
             this.modelDefaults(args);
             this.model(args);
-            
+
             // Create views
             this.viewDefaults(args);
             this.view(args);
-            
+
             // Set controllers
             this.controllerDefaults(args);
             this.controller(args);
@@ -2890,7 +2891,7 @@
             this.widget = plugin.Templates.populate('widget').appendTo(plugin.options.widgetContainer);
             this.widget.stopTime('ads');
             this.widget.stopTime('knock');
-            
+
             // Refresh the ads
             this.widget
               .stopTime('ads')
@@ -2898,7 +2899,7 @@
               {
                 plugin.Ads.load();
               });
-            
+
             this.widget
               .stopTime('knock')
               .everyTime(60000, 'knock', function()
@@ -2907,11 +2908,11 @@
                 {
                   return;
                 }
-                
+
                 m.widgetAd = null;
                 m.run();
                 });
-            
+
             this.widget
               .stopTime('butler')
               .everyTime('3600s', 'butler', function()
@@ -2920,7 +2921,7 @@
                 {
                   return;
                 }
-                
+
                 m.widgetAd = null;
                 m.run();
                 jQuery(this)
@@ -2963,7 +2964,7 @@
           {
             jQuery(window).trigger('resize.glome');
           });
-          
+
           this.widget.find('[data-glome-mvc]')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -2971,7 +2972,7 @@
               plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
               return false;
             });
-          
+
           // Open and close the widget. Closing widget hides always the knocking
           // until a new knock is initialized
           this.widget.find('#glomeWidgetIcon')
@@ -2983,7 +2984,7 @@
                 plugin.MVC.run('RequirePassword');
                 return false;
               }
-              
+
               if (jQuery(this).parent().attr('data-state') === 'open')
               {
                 jQuery(this).parent().attr('data-state', 'closed');
@@ -3038,7 +3039,7 @@
         {
           plugin.options.container.removeAttr('hidden');
           plugin.options.container.find('> *').remove();
-          
+
           plugin.options.container.find('[data-glome-template="admin-wrapper"]').remove();
           var wrapper = plugin.options.container.find('[data-glome-template="public-wrapper"]');
 
@@ -3075,7 +3076,7 @@
           this.contentArea = wrapper.find('[data-glome-template="public-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
-        
+
         // Initialize default controllers
         mvc.prototype.controllerInit = function(args)
         {
@@ -3087,7 +3088,7 @@
               plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
               return false;
             });
-          
+
           plugin.options.container.find('.force-reload')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -3099,7 +3100,7 @@
               return false;
             });
         }
-        
+
         // Set default controller
         mvc.prototype.controller = function(args)
         {
@@ -3132,7 +3133,7 @@
         {
           this.controllerInit(args);
           var request = null;
-          
+
           this.contentArea.find('#glomePublicRequirePasswordContainer').find('button')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -3430,7 +3431,7 @@
               adId: Object.keys(plugin.Ads.stack)[0]
             }
           }
-          
+
           if (args.adId)
           {
             this.ad = new plugin.Ads.Ad(args.adId);
@@ -3448,7 +3449,7 @@
           {
             this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
           }
-          
+
           plugin.Ads.adId = parseInt(args.adId);
           plugin.Categories.categoryId = this.category.id;
         }
@@ -3465,7 +3466,7 @@
             adId: this.ad.id,
             categoryId: this.category.id
           }
-          
+
           this.viewInit();
           this.content = plugin.Templates.populate('public-ad', vars);
           this.content.appendTo(this.contentArea);
@@ -3506,10 +3507,10 @@
             .on('click.glome', function(e)
             {
               plugin.Ads.notnow(plugin.Ads.adId);
-              
+
               // Display parent category
               plugin.options.container.find('.glome-category-title a').trigger('click');
-              
+
               return false;
             });
         }
@@ -3611,13 +3612,13 @@
           for (var i in plugin.Categories.listCategories({subscribed: 1}))
           {
             var category = plugin.Categories.stack[i];
-            
+
             // Hide categories without any ads
             if (!plugin.Ads.count({category: category.id}))
             {
               continue;
             }
-            
+
             var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
           }
         }
@@ -3797,7 +3798,7 @@
         mvc.prototype.viewInit = function(args)
         {
           plugin.options.container.find('> *').remove();
-          
+
           var wrapper = plugin.options.container.find('[data-glome-template="admin-wrapper"]');
 
           if (!wrapper.size())
@@ -3837,7 +3838,7 @@
           this.contentArea = wrapper.find('[data-glome-template="admin-content"]').find('[data-context="glome-content-area"]');
           this.contentArea.find('> *').remove();
         }
-        
+
         mvc.prototype.controllerInit = function(args)
         {
           //jQuery(window).trigger('resize.glome');
@@ -3885,7 +3886,7 @@
               var row = plugin.Templates.populate('category-row', plugin.Categories.stack[i]);
               row.appendTo(this.contentArea.find('.glome-categories'));
             }
-            
+
             // Ensure that the ID is there
             row.attr('data-glome-category', i);
 
@@ -3899,11 +3900,11 @@
             }
           }
         }
-        
+
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
-          
+
           this.contentArea.find('.glome-subscribe')
             .on('click.glome', function()
             {
@@ -3973,7 +3974,7 @@
         {
           this.controllerInit(args);
         }
-        
+
         var m = new mvc();
         return m;
       },
@@ -4006,7 +4007,7 @@
         {
           this.controllerInit(args);
         }
-        
+
         var m = new mvc();
         return m;
       },
@@ -4039,7 +4040,7 @@
         {
           this.controllerInit(args);
           m.passwordChange = this.content.find('#glomeAdminSettingsChangePassword');
-          
+
           this.content.find('#glomeAdminSettingsChangePassword').find('button')
             .off('click')
             .on('click', function(e)
@@ -4047,19 +4048,19 @@
               var old = m.passwordChange.find('input.old').val();
               var pw1 = m.passwordChange.find('input.pw1').val();
               var pw2 = m.passwordChange.find('input.pw2').val();
-              
+
               if (pw1.length < 6)
               {
                 alert('Password is too short, it should be over 6 characters');
                 return false;
               }
-              
+
               if (pw1 !== pw2)
               {
                 alert('Passwords do not match');
                 return false;
               }
-              
+
               plugin.Auth.setPassword
               (
                 pw1,
@@ -4077,7 +4078,7 @@
               )
             });
         }
-        
+
         var m = new mvc();
         return m;
       }
@@ -4129,6 +4130,7 @@
       // Create a new Glome ID if previous ID does not exist
       if (!plugin.id())
       {
+        // TODO: improve the Glome ID generation
         var date = new Date();
         var callbacks = plugin.Tools.mergeCallbacks
         (
