@@ -3147,6 +3147,11 @@
             .off('submit.glome')
             .on('submit.glome', function(e)
             {
+              // close the big view
+              plugin.options.container.find('.glome-close').trigger('click');
+              // make the loader as knock background
+              jQuery('#glomeWidget').attr('data-state', 'loading');
+
               request = plugin.Auth.login
               (
                 plugin.id(),
@@ -3155,7 +3160,9 @@
                 {
                   plugin.Ads.load(function()
                   {
-                    plugin.options.container.find('.glome-close').trigger('click');
+                    // take away loader from the knock
+                    jQuery('#glomeWidget').attr('data-state', 'knock');
+                    plugin.MVC.run('Widget');
                   });
                   plugin.Categories.load();
                   plugin.pref('loggedin', true);

@@ -1324,6 +1324,11 @@
 #glomeWidget[data-state="knock"] #glomeWidgetIcon {
   background-image: url("../images/icons/glome-symbol-light-green.svg"); }
 
+#glomeWidget[data-state="loading"] #glomeWidgetIcon {
+  background-image: url(../images/icons/loader.gif);
+  background-size: 50px 50px;
+  background-repeat: no-repeat; }
+
 div.remove-password {
   clear: both;
   display: block;

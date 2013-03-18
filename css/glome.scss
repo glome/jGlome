@@ -1751,6 +1751,16 @@ $full_page_z_index: 10000;
   background-image: url("../images/icons/glome-symbol-light-green.svg");
 }
 
+#glomeWidget[data-state="loading"] #glomeWidgetIcon
+{
+  background:
+  {
+    image: url(../images/icons/loader.gif);
+    size: 50px 50px;
+    repeat: no-repeat;
+  }
+}
+
 div.remove-password
 {
   clear: both;
