@@ -1220,6 +1220,7 @@ $full_page_z_index: 10000;
 {
   float: right;
   width: $col_width;
+  margin-bottom: 10px;
 }
 
 #glomeAdminSettings hr
@@ -1478,20 +1479,20 @@ $full_page_z_index: 10000;
   {
     width: (($col_width + $col_margin) * 4 - 2 * $col_margin) - $ad_image_width;
     margin-left: $col_margin;
-    
+
     .glome-advertiser
     {
       margin: 0 0 1em;
       text-transform: uppercase;
     }
-    
+
     h1
     {
       font-size: 25px;
       font-weight: 700;
       margin: 0;
     }
-    
+
     .bonus-short
     {
       margin: 20px 0 10px;
@@ -1504,23 +1505,23 @@ $full_page_z_index: 10000;
   {
     margin-top: 0 !important;
   }
-  
+
   .glome-bonus
   {
     text-transform: uppercase;
   }
-  
+
   .glome-cols-ad-image
   {
     width: $ad_image_width;
-    
+
     img
     {
       min-width: $ad_image_width;
       max-width: $ad_image_width;
     }
   }
-  
+
   .glome-button
   {
     @include vendor-specific(box-sizing, margin-box);
@@ -1531,7 +1532,7 @@ $full_page_z_index: 10000;
     vertical-align: middle;
     margin-left: -3px;
     text-transform: uppercase;
-    
+
     &:before
     {
       content: "";
@@ -1543,10 +1544,10 @@ $full_page_z_index: 10000;
         position: center top;
         size: 38px 38px;
       }
-      
+
       opacity: 0.4;
     }
-    
+
     &.glome-goto-ad
     {
       &:before
@@ -1554,17 +1555,17 @@ $full_page_z_index: 10000;
           background-image: url("../images/icons/circle-arrow.svg");
       }
     }
-    
+
     &.glome-notnow-ad
     {
         color: rgba(0, 0, 0, 0.5);
     }
-    
+
     &.glome-notnow-ad:before
     {
         background-image: url("../images/icons/circle-x.svg");
     }
-    
+
     &:hover,
     &:hover:before
     {
@@ -1572,7 +1573,7 @@ $full_page_z_index: 10000;
       opacity: 0.8;
     }
   }
-  
+
   .glome-button + .glome-button
   {
     margin-left: 0;
@@ -1747,4 +1748,14 @@ $full_page_z_index: 10000;
 #glomeWidget[data-state="knock"] #glomeWidgetIcon
 {
   background-image: url("../images/icons/glome-symbol-light-green.svg");
+}
+
+div.remove-password
+{
+  clear: both;
+  display: block;
+  cursor: pointer;
+  margin: 10px 0 0 0;
+  text-align: right;
+  text-decoration: underline;
 }

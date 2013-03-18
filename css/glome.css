@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* !Mixins */
 /* !Main containers */
 .glome-fullscreen-container {
@@ -961,7 +962,8 @@
 #glomeAdminSettingsChangePassword button, #glomePublicSetPassword button,
 #glomePublicRequirePassword button {
   float: right;
-  width: 120px; }
+  width: 120px;
+  margin-bottom: 10px; }
 
 #glomeAdminSettings hr {
   margin-bottom: 20px; }
@@ -1320,3 +1322,11 @@
 
 #glomeWidget[data-state="knock"] #glomeWidgetIcon {
   background-image: url("../images/icons/glome-symbol-light-green.svg"); }
+
+div.remove-password {
+  clear: both;
+  display: block;
+  cursor: pointer;
+  margin: 10px 0 0 0;
+  text-align: right;
+  text-decoration: underline; }

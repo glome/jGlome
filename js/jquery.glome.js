@@ -4075,6 +4075,30 @@
                 }
               )
             });
+
+          // password reset
+          this.content.find('#glomeAdminSettingsChangePassword').find('.remove-password')
+            .off('click')
+            .on('click', function(e)
+            {
+              var old = jQuery(e.target).parent().find('input.old').val();
+
+              plugin.Auth.setPassword
+              (
+                '',
+                '',
+                old,
+                function()
+                {
+                  alert('The password protection was removed from your profile. We advise you to set a new password as soon as possible.');
+                  plugin.MVC.run('AdminSettings');
+                },
+                function(jqXHR)
+                {
+                  alert('Failed to remove password protection.');
+                }
+              )
+            });
         }
 
         var m = new mvc();
