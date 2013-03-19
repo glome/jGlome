@@ -2309,6 +2309,9 @@
         // Description
         Category.prototype.description = '';
 
+        // Number of ads within this category
+        Category.prototype.offers = 0;
+
         // Shorthand for setting subscription status to 'on'
         Category.prototype.subscribe = function(callback)
         {
@@ -3551,6 +3554,7 @@
 
           this.category = new plugin.Categories.Category(args.categoryId);
           this.ads = plugin.Ads.listAds({category: Number(args.categoryId)});
+          this.category.offers = plugin.Ads.count({category: Number(args.categoryId)});
         }
 
         mvc.prototype.view = function(args)
