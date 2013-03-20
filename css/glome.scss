@@ -889,16 +889,6 @@ $full_page_z_index: 10000;
     vertical-align: middle;
   }
   
-  .glome-section
-  {
-    float: left;
-    
-    &.glome-pack-end
-    {
-      float: right;
-    }
-  }
-  
   .glome-off
   {
     text-transform: uppercase;
@@ -1603,8 +1593,9 @@ $full_page_z_index: 10000;
     @include vendor-specific(box-sizing, margin-box);
     display: table-cell;
     width: 50%;
-    height: 80px;
-    padding-top: 10px;
+    height: 40px;
+    //height: 80px;
+    //padding-top: 10px;
     vertical-align: middle;
     margin-left: -3px;
     text-transform: uppercase;
@@ -1612,7 +1603,8 @@ $full_page_z_index: 10000;
     &:before
     {
       content: "";
-      display: block;
+      display: none;
+      //display: block;
       height: 38px;
       background:
       {

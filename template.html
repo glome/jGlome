@@ -118,25 +118,28 @@
                   <!-- !Rewards -->
                   <div class="glome-content glome-layout-cols-2" data-glome-template="admin-rewards">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                      <h1 data-i18n="redeem your reward">Redeem your reward</h1>
-                      <div class="glome-current-release">
-                        <span class="hidden" data-i18n="total amount to redeem">Total amount to redeem</span>
-                        <span class="coming-soon" data-i18n="coming soon">Coming soon</span>
-                      </div>
-                      <div class="glome-future-releases">
-                        <span data-i18n="earned reward">Earned reward</span>:
-                      </div>
-                      <p class="hidden glome-total-rewards" id="glomeTotalRewards">
-                        <span data-type="currency">€</span> <span data-type="full">20</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
-                      </p>
-                      <div class="glome-future-releases">
+                      <div class="glome-earned-rewards">
+                        <h1 data-i18n="redeem your reward">Redeem your reward</h1>
                         <p>
-                          <span data-i18n="money transfer costs">Money transfer costs</span>:
-                          XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
+                          <span data-i18n="total amount to redeem">Total amount to redeem</span>
                         </p>
                         <p>
-                          <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                          <span data-i18n="earned reward">Earned reward</span>:
                         </p>
+                        <div class="glome-total-rewards" id="glomeTotalRewards">
+                          <div class="glome-reward-row" data-glome-template="admin-rewards-row" data-currency="{currency}">
+                            <span data-type="currency" data-i18n="{currency}">{currency}</span> <span data-type="full">{full}</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">{decimal}</span>
+                          </div>
+                        </div>
+                        <div class="glome-future-releases">
+                          <p>
+                            <span data-i18n="money transfer costs">Money transfer costs</span>:
+                            XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
+                          </p>
+                          <p>
+                            <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <div class="glome-cols-4-margin-2 glome-cols-alt-3 glome-clearfix glome-current-release">
@@ -214,7 +217,7 @@
               </div>
             </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
-            <div class="glome-full-width">
+            <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
                 <span class="glome-copyright">Glome Inc, 2013</span>
                 <span class="glome-text-separator"></span>
@@ -224,10 +227,10 @@
                 <span class="glome-text-separator"></span>
                 <a href="http://glome.me/" target="_blank">glome.me</a>
               </div>
-              <div class="glome-section glome-pack-end">
+              <div class="glome-section">
                 <a href="#public-categorylist" data-mvc="ShowAllCategories" class="glome-icon glome-cart"></a>
                 <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="CloseGlome">Turn Glome off</a>
               </div>
             </div>
           </div>
@@ -453,7 +456,7 @@
             </div>
           </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
-            <div class="glome-full-width">
+            <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
                 <span><span class="glome-copyright">Glome Inc, 2013</span></span>
                 <span class="glome-text-separator"></span>
@@ -467,16 +470,16 @@
                 <span class="glome-text-separator"></span>
                 <a class="force-reload" data-i18n="reload ads">Reload ads</a>
               </div>
-              <div class="glome-section glome-pack-end">
+              <div class="glome-section">
                 <a href="#admin-profile" data-mvc="AdminProfile" class="glome-icon glome-settings"></a>
                 <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="CloseGlome">Turn Glome off</a>
               </div>
             </div>
           </div>
         </div>
         <!-- !Widget -->
-        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="open" data-knocking-ad="">
+        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="closed" data-knocking-ad="">
           <div id="glomeWidgetContent" data-page="widget">
             <a href="#public-ad" class="glome-ad-logo">
               <img src="images/icons/glome-icon-light.svg" alt="Glome" />

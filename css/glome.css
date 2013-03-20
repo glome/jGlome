@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* !Mixins */
 /* !Main containers */
 .glome-fullscreen-container {
@@ -667,12 +668,6 @@
   display: inline-block;
   height: 26px;
   vertical-align: middle; }
-#glomeAdmin .glome-footer .glome-section,
-#glomePublic .glome-footer .glome-section {
-  float: left; }
-  #glomeAdmin .glome-footer .glome-section.glome-pack-end,
-  #glomePublic .glome-footer .glome-section.glome-pack-end {
-    float: right; }
 #glomeAdmin .glome-footer .glome-off,
 #glomePublic .glome-footer .glome-off {
   text-transform: uppercase;
@@ -1229,14 +1224,13 @@
   box-sizing: margin-box;
   display: table-cell;
   width: 50%;
-  height: 80px;
-  padding-top: 10px;
+  height: 40px;
   vertical-align: middle;
   margin-left: -3px;
   text-transform: uppercase; }
   #glomePublicAd .glome-button:before {
     content: "";
-    display: block;
+    display: none;
     height: 38px;
     background-repeat: no-repeat;
     background-position: center top;
