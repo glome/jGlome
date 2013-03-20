@@ -2106,16 +2106,7 @@ QUnit.test('Glome templates', function()
       {
         Glome.Templates.get();
       },
-      'Glome.template respects the argument count and throws an error on no arguments'
-    );
-
-    QUnit.throws
-    (
-      function()
-      {
-        Glome.Templates.get('foo', 'bar');
-      },
-      'Glome.template respects the argument count and throws an error on two arguments'
+      'Glome.Templates.get respects the argument count and throws an error on no arguments'
     );
 
     QUnit.throws
@@ -2124,7 +2115,7 @@ QUnit.test('Glome templates', function()
       {
         Glome.Templates.get('undefined-template');
       },
-      'Glome.template throws an error on undefined "undefined-template"'
+      'Glome.Templates.get throws an error on undefined "undefined-template"'
     );
 
     // Load Glome templates
@@ -2169,6 +2160,39 @@ QUnit.asyncTest('Populate template', function()
     QUnit.equal('Hello {{world}}!', Glome.Templates.parse(template, {world: ''}).html(), 'Double brackets are reserved for other use and they were left alone');
     QUnit.start();
   });
+});
+
+/* !Localize template */
+QUnit.test('Localize template', function()
+{
+  if (!jQuery.i18n)
+  {
+    QUnit.ok(false, 'jQuery.i18n was not loaded, cannot test template localizing');
+    return;
+  }
+  // Test Glome.Templates.get with second argument
+  var template = jQuery('<div />')
+    .attr('data-i18n', 'loremipsum')
+    .text('Lorem ipsum');
+  Glome.Templates.templates.helloWorld = template;
+  
+  var locales = 
+  {
+    'loremipsum': 'Dolor sit amet'
+  };
+  
+  Glome.options.i18n = new jQuery.i18n();
+  Glome.options.i18n.locale = 'en';
+
+  Glome.options.i18n.load
+  (
+    locales,
+    'en'
+  );
+  
+  
+  QUnit.equal(Glome.Templates.get('helloWorld').text(), template.text(), 'No localization was requested, nothing should change');
+  QUnit.equal(Glome.Templates.get('helloWorld', true).text(), locales.loremipsum, 'Localization was requested, text should change');
 });
 
 /* !Module: Glome Categories class */
@@ -2408,6 +2432,34 @@ QUnit.asyncTest('Widget', function()
 });
 
 
+/* !MVC: Close Glome */
+QUnit.asyncTest('Close Glome', function()
+{
+  Glome.Templates.load(function()
+  {
+    // Bind Glome to QUnit fixture
+    Glome.options.container = jQuery('#qunit-fixture');
+    Glome.options.widgetContainer = jQuery('#qunit-fixture');
+    
+    // Start by initializing the widget
+    Glome.MVC.run('Widget');
+    
+    // Close Glome for n seconds
+    QUnit.ok(Glome.MVC.CloseGlome, 'CloseGlome MVC exists');
+    var timespan = 500;
+    
+    var m = new Glome.MVC.CloseGlome();
+    QUnit.ok(m.run({reopen: timespan}), 'CloseGlome was successfully run');
+    QUnit.equal(jQuery('#qunit-fixture').find('#glomeWidget').size(), 0, 'Widget was removed');
+    
+    jQuery('#qunit-fixture').oneTime(timespan + 500, function()
+    {
+      QUnit.ok(jQuery(this).find('#glomeWidget').size(), 'Widget reappeared after ' + timespan + 'ms');
+      QUnit.start();
+    });
+  });
+});
+
 QUnit.asyncTest('All MVCs', function()
 {
   Glome.Templates.load(function()
@@ -2430,6 +2482,7 @@ QUnit.asyncTest('All MVCs', function()
       'AdminStatistics',
       'AdminRewards',
       'AdminSettings',
+      'CloseGlome',
     ];
 
     for (var i = 0; i <  items.length; i++)

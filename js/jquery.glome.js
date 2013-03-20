@@ -590,16 +590,17 @@
        * Get a template. This effectively creates a clone of the template or throws an error
        * if requested template is not available
        *
-       * @param String name     Template name
+       * @param String name        Template name
+       * @param boolean localize   Should the template be localized
        * @return jQuery DOM object
        */
-      get: function(name)
+      get: function(name, localize)
       {
-        if (arguments.length !== 1)
+        if (!name)
         {
-          throw new Error('Glome.Templates.get expects exactly one parameter');
+          throw new Error('No template name defined');
         }
-
+        
         if (   typeof this.templates == 'null'
             || typeof this.templates !== 'object')
         {
@@ -619,6 +620,11 @@
         }
 
         tmp.find('*[data-glome-template]').remove();
+        
+        if (localize)
+        {
+          return this.parse(tmp, {});
+        }
 
         return tmp;
       },
@@ -2811,20 +2817,44 @@
             if (   this.requireAuth
                 && !plugin.glomeid)
             {
-              return;
+              return false;
             }
 
             // Model the data
-            this.modelDefaults(args);
-            this.model(args);
+            try
+            {
+              this.modelDefaults(args);
+              this.model(args);
+            }
+            catch (e)
+            {
+              console.warn(e.message);
+              return false;
+            }
 
             // Create views
-            this.viewDefaults(args);
-            this.view(args);
+            try
+            {
+              this.viewDefaults(args);
+              this.view(args);
+            }
+            catch (e)
+            {
+              console.warn(e.message);
+              return false;
+            }
 
             // Set controllers
-            this.controllerDefaults(args);
-            this.controller(args);
+            try
+            {
+              this.controllerDefaults(args);
+              this.controller(args);
+            }
+            catch (e)
+            {
+              console.warn(e.message);
+              return false;
+            }
 
             return true;
           }
@@ -3022,6 +3052,56 @@
               plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
               return false;
             });
+        }
+
+        var m = new mvc();
+
+        return m;
+      },
+
+      /* !MVC: CloseGlome */
+      CloseGlome: function()
+      {
+        function mvc()
+        {
+        }
+
+        mvc.prototype = new plugin.MVC.Prototype();
+        mvc.prototype.requireAuth = false;
+
+        mvc.prototype.model = function(args)
+        {
+          if (!args)
+          {
+            throw new Error('Argument required');
+          }
+          
+          this.args =
+          {
+            reopen: false
+          }
+          
+          jQuery.extend(this.args, args);
+          console.log(this.args);
+        }
+
+        mvc.prototype.view = function(args)
+        {
+          plugin.options.container.find('> *').remove();
+          plugin.options.widgetContainer.find('> *').remove();
+        }
+
+        mvc.prototype.controller = function(args)
+        {
+          console.log(this.args);
+          if (this.args.reopen)
+          {
+            jQuery(plugin.options.container)
+              .oneTime(this.args.reopen, 'glomeReopen', function()
+              {
+                plugin.initialize();
+              });
+          }
         }
 
         var m = new mvc();
