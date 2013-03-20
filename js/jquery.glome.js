@@ -1252,18 +1252,6 @@
             plugin.pref('glomeid', id);
             plugin.userData = data;
             
-            plugin.userData.earnings =
-            {
-              fresh:
-              {
-                EUR: 212,
-                USD: 313
-              },
-              pending:{},
-              failed:{},
-              paid:{}
-            }
-            
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
