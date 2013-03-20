@@ -6,12 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
     <script type="text/javascript" src="js/jquery.timers.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.emitter.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.fallbacks.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.parser.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.messages.js"></script>
-    <script type="text/javascript" src="js/jquery.i18n.language.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.min.js"></script>
     <script type="text/javascript" src="js/template.js"></script>
     <link rel="stylesheet" type="text/css" href="css/glome.css" data-glome-include="true" />
     <link rel="localization" hreflang="en" href="locales/glome-en.json" type="application/l10n+json" data-glome-include="true" />
@@ -220,8 +215,20 @@
             </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
             <div class="glome-full-width">
-              <a href="#widget-widget" data-i18n="close admin">Close admin</a>
-              <span class="glome-copyright">Glome Inc, 2013</span>
+              <div class="glome-section">
+                <span class="glome-copyright">Glome Inc, 2013</span>
+                <span class="glome-text-separator"></span>
+                <a>FAQ</a>
+                <span class="glome-text-separator"></span>
+                <a>Contact</a>
+                <span class="glome-text-separator"></span>
+                <a href="http://glome.me/" target="_blank">glome.me</a>
+              </div>
+              <div class="glome-section glome-pack-end">
+                <a href="#public-categorylist" data-mvc="ShowAllCategories" class="glome-icon glome-cart"></a>
+                <span class="glome-line-separator"></span>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+              </div>
             </div>
           </div>
         </div>
@@ -447,17 +454,24 @@
           </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
             <div class="glome-full-width">
-              <span><span class="glome-copyright">Glome Inc, 2013</span></span>
-              <span class="glome-text-separator"></span>
-              <a>FAQ</a>
-              <span class="glome-text-separator"></span>
-              <a>Contact</a>
-              <span class="glome-text-separator"></span>
-              <a href="http://glome.me/" target="_blank">glome.me</a>
-              <span class="glome-text-separator"></span>
-              <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
-              <span class="glome-text-separator"></span>
-              <a class="force-reload" data-i18n="reload ads">Reload ads</a>
+              <div class="glome-section">
+                <span><span class="glome-copyright">Glome Inc, 2013</span></span>
+                <span class="glome-text-separator"></span>
+                <a>FAQ</a>
+                <span class="glome-text-separator"></span>
+                <a>Contact</a>
+                <span class="glome-text-separator"></span>
+                <a href="http://glome.me/" target="_blank">glome.me</a>
+                <span class="glome-text-separator"></span>
+                <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
+                <span class="glome-text-separator"></span>
+                <a class="force-reload" data-i18n="reload ads">Reload ads</a>
+              </div>
+              <div class="glome-section glome-pack-end">
+                <a href="#admin-profile" data-mvc="AdminProfile" class="glome-icon glome-settings"></a>
+                <span class="glome-line-separator"></span>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+              </div>
             </div>
           </div>
         </div>
