@@ -214,7 +214,7 @@
               </div>
             </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
-            <div class="glome-full-width">
+            <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
                 <span class="glome-copyright">Glome Inc, 2013</span>
                 <span class="glome-text-separator"></span>
@@ -224,10 +224,10 @@
                 <span class="glome-text-separator"></span>
                 <a href="http://glome.me/" target="_blank">glome.me</a>
               </div>
-              <div class="glome-section glome-pack-end">
+              <div class="glome-section">
                 <a href="#public-categorylist" data-mvc="ShowAllCategories" class="glome-icon glome-cart"></a>
                 <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="CloseGlome">Turn Glome off</a>
               </div>
             </div>
           </div>
@@ -453,7 +453,7 @@
             </div>
           </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
-            <div class="glome-full-width">
+            <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
                 <span><span class="glome-copyright">Glome Inc, 2013</span></span>
                 <span class="glome-text-separator"></span>
@@ -467,16 +467,16 @@
                 <span class="glome-text-separator"></span>
                 <a class="force-reload" data-i18n="reload ads">Reload ads</a>
               </div>
-              <div class="glome-section glome-pack-end">
+              <div class="glome-section">
                 <a href="#admin-profile" data-mvc="AdminProfile" class="glome-icon glome-settings"></a>
                 <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="TurnOff">Turn Glome off</a>
+                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-mvc="CloseGlome">Turn Glome off</a>
               </div>
             </div>
           </div>
         </div>
         <!-- !Widget -->
-        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="open" data-knocking-ad="">
+        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="closed" data-knocking-ad="">
           <div id="glomeWidgetContent" data-page="widget">
             <a href="#public-ad" class="glome-ad-logo">
               <img src="images/icons/glome-icon-light.svg" alt="Glome" />
