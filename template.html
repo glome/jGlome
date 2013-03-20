@@ -118,25 +118,28 @@
                   <!-- !Rewards -->
                   <div class="glome-content glome-layout-cols-2" data-glome-template="admin-rewards">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
-                      <h1 data-i18n="redeem your reward">Redeem your reward</h1>
-                      <div class="glome-current-release">
-                        <span class="hidden" data-i18n="total amount to redeem">Total amount to redeem</span>
-                        <span class="coming-soon" data-i18n="coming soon">Coming soon</span>
-                      </div>
-                      <div class="glome-future-releases">
-                        <span data-i18n="earned reward">Earned reward</span>:
-                      </div>
-                      <p class="hidden glome-total-rewards" id="glomeTotalRewards">
-                        <span data-type="currency">€</span> <span data-type="full">20</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">20</span>
-                      </p>
-                      <div class="glome-future-releases">
+                      <div class="glome-earned-rewards">
+                        <h1 data-i18n="redeem your reward">Redeem your reward</h1>
                         <p>
-                          <span data-i18n="money transfer costs">Money transfer costs</span>:
-                          XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
+                          <span data-i18n="total amount to redeem">Total amount to redeem</span>
                         </p>
                         <p>
-                          <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                          <span data-i18n="earned reward">Earned reward</span>:
                         </p>
+                        <div class="glome-total-rewards" id="glomeTotalRewards">
+                          <div class="glome-reward-row" data-glome-template="admin-rewards-row" data-currency="{currency}">
+                            <span data-type="currency" data-i18n="{currency}">{currency}</span> <span data-type="full">{full}</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">{decimal}</span>
+                          </div>
+                        </div>
+                        <div class="glome-future-releases">
+                          <p>
+                            <span data-i18n="money transfer costs">Money transfer costs</span>:
+                            XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
+                          </p>
+                          <p>
+                            <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <div class="glome-cols-4-margin-2 glome-cols-alt-3 glome-clearfix glome-current-release">

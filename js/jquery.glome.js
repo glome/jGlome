@@ -818,7 +818,7 @@
               }
               catch (e)
               {
-                console.warn(e.message);
+                //console.warn(e.message);
               }
             });
         }
@@ -1251,7 +1251,19 @@
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
             plugin.userData = data;
-
+            
+            plugin.userData.earnings =
+            {
+              fresh:
+              {
+                EUR: 212,
+                USD: 313
+              },
+              pending:{},
+              failed:{},
+              paid:{}
+            }
+            
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
@@ -4094,6 +4106,40 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-rewards', {});
           this.content.appendTo(this.contentArea);
+          
+          var c = this.content.find('.glome-total-rewards');
+          c.find('.admin-rewards-row').remove();
+          
+          if (   plugin.userData
+              && plugin.userData.earnings
+              && plugin.userData.earnings.fresh
+              && Object.keys(plugin.userData.earnings.fresh).length > 0)
+          {
+            this.content.find('.glome-earned-rewards').removeClass('glome-hidden');
+            
+            for (var currency in plugin.userData.earnings.fresh)
+            {
+              var data = {};
+              data.currency = currency;
+              data.full = Math.floor(plugin.userData.earnings.fresh[currency] / 100);
+              data.decimal = plugin.userData.earnings.fresh[currency] - data.full * 100;
+              
+              console.log(data);
+              
+              var row = plugin.Templates.populate('admin-rewards-row', data);
+              
+              if (!data.decimal)
+              {
+                row.find('.decimal-separator, .cents').remove();
+              }
+              
+              c.append(row);
+            }
+          }
+          else
+          {
+            this.content.find('.glome-earned-rewards').addClass('glome-hidden');
+          }
         }
 
         mvc.prototype.controller = function(args)

@@ -2384,6 +2384,55 @@ QUnit.asyncTest('First Run: Subscriptions', function()
   });
 });
 
+/* !Admin: Rewards */
+QUnit.asyncTest('Admin: rewards', function()
+{
+  Glome.Templates.load(function()
+  {
+    // Bind Glome to QUnit fixture
+    Glome.options.container = jQuery('#qunit-fixture');
+    
+    if (!Glome.userData)
+    {
+      Glome.userData = {};
+    }
+    
+    Glome.userData.earnings =
+    {
+      fresh:
+      {
+        EUR: 212,
+        USD: 313
+      },
+      pending:{},
+      failed:{},
+      paid:{}
+    }
+    
+    QUnit.ok(Glome.MVC.AdminRewards, 'There is an MVC for rewards');
+    var m = new Glome.MVC.AdminRewards();
+    
+    QUnit.ok(!m.run(), 'AdminRewards MVC requires authenticated user');
+    
+    m.requireAuth = false;
+    QUnit.ok(m.run(), 'AdminRewards MVC requires authenticated user, but is bypassable');
+    
+    QUnit.equal(Glome.options.container.find('.glome-reward-row').size(), Object.keys(Glome.userData.earnings.fresh).length, 'There is a row for each currency');
+    
+    for (var currency in Glome.userData.earnings.fresh)
+    {
+      var full = Math.floor(Glome.userData.earnings.fresh[currency] / 100);
+      var cents = Glome.userData.earnings.fresh[currency] - full * 100;
+      
+      QUnit.equal(Glome.options.container.find('.glome-reward-row[data-currency="' + currency + '"]').find('[data-type="currency"]').text(), currency, 'Currency text was found for ' + currency)
+      QUnit.equal(Glome.options.container.find('.glome-reward-row[data-currency="' + currency + '"]').find('[data-type="full"]').text(), full, 'Full digits text was found for ' + currency)
+      QUnit.equal(Glome.options.container.find('.glome-reward-row[data-currency="' + currency + '"]').find('[data-type="cents"]').text(), cents, 'Cent digits text was found for ' + currency)
+    }
+    
+    QUnit.start();
+  });
+});
+
 /* !Widget */
 QUnit.asyncTest('Widget', function()
 {
@@ -2430,7 +2479,6 @@ QUnit.asyncTest('Widget', function()
     });
   });
 });
-
 
 /* !MVC: Close Glome */
 QUnit.asyncTest('Close Glome', function()
