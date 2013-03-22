@@ -600,7 +600,7 @@
         {
           throw new Error('No template name defined');
         }
-        
+
         if (   typeof this.templates == 'null'
             || typeof this.templates !== 'object')
         {
@@ -620,7 +620,7 @@
         }
 
         tmp.find('*[data-glome-template]').remove();
-        
+
         if (localize)
         {
           return this.parse(tmp, {});
@@ -1251,7 +1251,7 @@
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
             plugin.userData = data;
-            
+
             // Enforce the last action time. This is a sign of a successful
             // login
             plugin.updateLastActionTime(true);
@@ -2928,15 +2928,17 @@
             // Refresh the ads
             this.widget
               .stopTime('ads')
-              .everyTime(60000, 'ads', function()
+              .everyTime(plugin.pref('api.refreshads') + 's', 'ads', function()
               {
+                console.log('refresh Glome ads');
                 plugin.Ads.load();
               });
 
             this.widget
               .stopTime('knock')
-              .everyTime(60000, 'knock', function()
+              .everyTime(plugin.pref('knock') + 's', 'knock', function()
               {
+                console.log('fire Glome knock');
                 if (jQuery(this).attr('data-state') === 'open')
                 {
                   return;
@@ -2948,8 +2950,9 @@
 
             this.widget
               .stopTime('butler')
-              .everyTime('3600s', 'butler', function()
+              .everyTime(plugin.pref('butler') + 's', 'butler', function()
               {
+                console.log('fire Glome butler');
                 if (jQuery(this).attr('data-state') === 'open')
                 {
                   return;
@@ -3075,12 +3078,12 @@
           {
             throw new Error('Argument required');
           }
-          
+
           this.args =
           {
             reopen: false
           }
-          
+
           jQuery.extend(this.args, args);
           console.log(this.args);
         }
@@ -4094,33 +4097,33 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-rewards', {});
           this.content.appendTo(this.contentArea);
-          
+
           var c = this.content.find('.glome-total-rewards');
           c.find('.admin-rewards-row').remove();
-          
+
           if (   plugin.userData
               && plugin.userData.earnings
               && plugin.userData.earnings.fresh
               && Object.keys(plugin.userData.earnings.fresh).length > 0)
           {
             this.content.find('.glome-earned-rewards').removeClass('glome-hidden');
-            
+
             for (var currency in plugin.userData.earnings.fresh)
             {
               var data = {};
               data.currency = currency;
               data.full = Math.floor(plugin.userData.earnings.fresh[currency] / 100);
               data.decimal = plugin.userData.earnings.fresh[currency] - data.full * 100;
-              
+
               console.log(data);
-              
+
               var row = plugin.Templates.populate('admin-rewards-row', data);
-              
+
               if (!data.decimal)
               {
                 row.find('.decimal-separator, .cents').remove();
               }
-              
+
               c.append(row);
             }
           }
