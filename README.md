@@ -7,5 +7,3 @@ More details to come.
 Copyright and License
 =====================
 Please see MIT-LICENSE.txt.
-
-
