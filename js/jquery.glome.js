@@ -2648,6 +2648,122 @@
       }
     };
 
+    /* !Login */
+    /**
+     * Login sequence
+     *
+     * Methods:
+     *
+     * Glome.Login.go
+     */
+    plugin.Login =
+    {
+      /* performs a login */
+      go: function()
+      {
+        plugin.Auth.login
+        (
+          plugin.id(),
+          '',
+          function()
+          {
+            plugin.Tools.triggerCallbacks
+            (
+              function()
+              {
+                plugin.Ads.load(function()
+                {
+                  plugin.MVC.run('Widget');
+                },
+                function()
+                {
+                  // Failed to load the ads
+                  // @TODO: display an error?
+                });
+                plugin.Categories.load();
+              },
+              plugin.options.callback
+            );
+          },
+          function()
+          {
+            var onerrors = plugin.Tools.mergeCallbacks
+            (
+              function()
+              {
+                plugin.MVC.run('RequirePassword');
+              },
+              plugin.options.onerror
+            );
+
+            plugin.Tools.triggerCallbacks(onerrors);
+          }
+        );
+      }
+    };
+
+    /* !Heartbeat */
+    /**
+     * Heartbeat interface object
+     *
+     * Methods:
+     *
+     * Glome.Heartbeat.send
+     */
+    plugin.Heartbeat =
+    {
+      /**
+       * Session state
+       */
+      alive: 'Hello!',
+
+      /**
+       * Heartbeat check
+       *
+       * @param function callback     Callback for successful load
+       * @param function onerror      Callback for unsuccessful load
+       */
+      check: function(callback, onerror)
+      {
+        plugin.Tools.validateCallback(onerror);
+
+        var callbacks = plugin.Tools.mergeCallbacks
+        (
+          function(data)
+          {
+            if (!data || data.message != plugin.Heartbeat.alive)
+            {
+              // redirect to login or start a new session
+              plugin.pref('loggedin', false);
+              plugin.Login.go();
+              return;
+            }
+          },
+          callback
+        );
+
+        var onerrors = plugin.Tools.mergeCallbacks
+        (
+          function()
+          {
+            // redirect to login or start a new session
+            plugin.pref('loggedin', false);
+            plugin.Login.go();
+          },
+          onerror
+        );
+
+        // Request heartbeat
+        plugin.Api.get
+        (
+          'login',
+          null,
+          callbacks,
+          onerrors
+        );
+      },
+    };
+
     /* !MVC */
     /**
      * Sketch of MVC. @TODO: use backbone.js or something similar in the near future
@@ -2974,6 +3090,14 @@
                   })
                   .attr('data-state', 'open');
               });
+
+            this.widget
+              .stopTime('heartbeat')
+              .everyTime(plugin.pref('api.heartbeat') + 's', 'heartbeat', function()
+              {
+                console.log('heartbeat check');
+                plugin.Heartbeat.check();
+              });
           }
           else
           {
@@ -3028,6 +3152,9 @@
               }
               else if (plugin.mvc.widgetAd)
               {
+                // check if we have a working session
+                plugin.Heartbeat.check();
+
                 jQuery(this).parent()
                   .attr('data-state', 'open')
                   .off('mouseover.glome')
@@ -3052,6 +3179,8 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
+              // check if we have a working session
+              plugin.Heartbeat.check();
               plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
               return false;
             });
@@ -4320,44 +4449,7 @@
         }
         else
         {
-          plugin.Auth.login
-          (
-            plugin.id(),
-            '',
-            function()
-            {
-              plugin.Tools.triggerCallbacks
-              (
-                function()
-                {
-                  plugin.Ads.load(function()
-                  {
-                    plugin.MVC.run('Widget');
-                  },
-                  function()
-                  {
-                    // Failed to load the ads
-                    // @TODO: display an error?
-                  });
-                  plugin.Categories.load();
-                },
-                plugin.options.callback
-              );
-            },
-            function()
-            {
-              var onerrors = plugin.Tools.mergeCallbacks
-              (
-                function()
-                {
-                  plugin.MVC.run('RequirePassword');
-                },
-                plugin.options.onerror
-              );
-
-              plugin.Tools.triggerCallbacks(onerrors);
-            }
-          );
+          plugin.Login.go();
         }
       }
 
