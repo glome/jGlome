@@ -30,12 +30,12 @@ jQuery(function()
   {
     window.location.hash = '#public-startup';
   }
-  
+
   jQuery('[data-i18n]')
     .each(function()
     {
       var str = jQuery(this).attr('data-i18n');
-      
+
       // Check for arguments
       if (jQuery(this).attr('data-i18n-arguments'))
       {
@@ -55,7 +55,7 @@ jQuery(function()
       {
         var l10n = jQuery.i18n(str);
       }
-      
+
       if (jQuery(this).attr('placeholder'))
       {
         jQuery(this).attr('placeholder', l10n);
@@ -203,7 +203,7 @@ jQuery(function()
       jQuery('[data-context="' + context + '"]').removeClass('hidden');
 
       // Toggle context page
-      jQuery('[data-context="' + context + '"]').oneTime(1, function()
+      jQuery('[data-context="' + context + '"]').oneTime('1s', function()
       {
         jQuery(this).find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').not('[data-glome-template="' + hash + '"]').addClass('hidden');
         jQuery(this).find('#glomeAdminContent, #glomePublicContent, #glomeWidgetContent').find('[data-context="glome-content-area"] > .glome-content').filter('[data-glome-template="' + hash + '"]').removeClass('hidden');
