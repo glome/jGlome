@@ -3,13 +3,25 @@
   <head>
     <title>jGlome</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <script type="text/javascript" src="js/jquery-1.9.0.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/jquery.timers.js"></script>
     <script type="text/javascript" src="js/jquery.i18n.min.js"></script>
     <script type="text/javascript" src="js/jquery.glome.js"></script>
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <script type="text/javascript" src="js/crossfilter.min.js"></script>
+    <script type="text/javascript" src="js/dc.min.js"></script>
     <script type="text/javascript">
       var glome = new jQuery.Glome();
       glome.pref('api.server', window.location.protocol + '//' + window.location.hostname + '/');
+      glome.pref('api.refreshads', '3600');
+      glome.pref('api.heartbeat', '300');
+      glome.pref('knock', '60');
+      glome.pref('butler', '3600');
+      glome.pref('loggedin', false);
+      glome.pref('turnoff', '3600');
+      // running in an extension or not
+      glome.pref('standalone', true);
+
       glome.idPrefix = 'web';
       glome.initialize
       (
@@ -18,7 +30,7 @@
           widgetContainer: '#glomeWidgetWrapper',
         }
       );
-      
+
       jQuery(function()
       {
         jQuery(window)
@@ -35,8 +47,8 @@
             }
           });
       });
-      
-      jQuery(window).oneTime(500, function()
+
+      jQuery(window).oneTime('500ms', function()
       {
         jQuery(window).trigger('hashchange');
       });
