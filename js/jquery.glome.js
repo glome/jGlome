@@ -1218,6 +1218,23 @@
        */
       login: function(id, passwd, callback, onerror)
       {
+        if (plugin.pref('loggedin'))
+        {
+          plugin.Tools.triggerCallbacks
+          (
+            function()
+            {
+              plugin.Ads.load(function()
+              {
+                plugin.MVC.run('Widget');
+              });
+              plugin.Categories.load();
+            },
+            plugin.options.callback
+          );
+          return true;
+        }
+
         if (!id)
         {
           id = plugin.id();
@@ -1251,6 +1268,7 @@
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
             plugin.userData = data;
+            plugin.pref('loggedin', true);
 
             // Enforce the last action time. This is a sign of a successful
             // login
@@ -1266,12 +1284,15 @@
                 plugin.pref('session.token', token);
               }
 
-              var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
-
-              if (cookie)
+              if (! plugin.pref('standalone'))
               {
-                plugin.cookie = cookie;
-                plugin.pref('session.cookie', cookie);
+                var cookie = jqXHR.getResponseHeader('Set-Cookie').toString().replace(/;.+$/, '');
+
+                if (cookie)
+                {
+                  plugin.cookie = cookie;
+                  plugin.pref('session.cookie', cookie);
+                }
               }
             }
             catch (e)
@@ -3121,7 +3142,7 @@
 
         mvc.prototype.controller = function(args)
         {
-          jQuery(window).oneTime(50, function()
+          jQuery(window).oneTime('50ms', function()
           {
             jQuery(window).trigger('resize.glome');
           });
@@ -3165,7 +3186,7 @@
                   .off('mouseout.glome')
                   .on('mouseout.glome', function()
                   {
-                    jQuery(this).oneTime(3000, 'widgetAutoclose', function()
+                    jQuery(this).oneTime('3s', 'widgetAutoclose', function()
                     {
                       jQuery(this)
                         .off('mouseover.glome mouseout.glome')
@@ -3203,14 +3224,9 @@
 
         mvc.prototype.model = function(args)
         {
-          if (!args)
-          {
-            throw new Error('Argument required');
-          }
-
           this.args =
           {
-            reopen: false
+            reopen: plugin.pref('turnoff') + 's'
           }
 
           jQuery.extend(this.args, args);
@@ -3219,19 +3235,23 @@
 
         mvc.prototype.view = function(args)
         {
-          plugin.options.container.find('> *').remove();
-          plugin.options.widgetContainer.find('> *').remove();
+          plugin.MVC.closeLayers();
+          plugin.options.widgetContainer.attr('hidden', 'true');
         }
 
         mvc.prototype.controller = function(args)
         {
           console.log(this.args);
+
+          plugin.pref('loggedin', false);
+
           if (this.args.reopen)
           {
             jQuery(plugin.options.container)
               .oneTime(this.args.reopen, 'glomeReopen', function()
               {
-                plugin.initialize();
+                plugin.options.widgetContainer.removeAttr('hidden');
+                plugin.MVC.run('Widget');
               });
           }
         }
@@ -3986,7 +4006,6 @@
                 console.warn('Navigation failed due to ' + e.toString());
               }
 
-
               return false;
             });
 
@@ -4382,6 +4401,8 @@
 
       if (plugin.options.container)
       {
+        jQuery(plugin.options.container).stopTime('glomeReopen');
+
         this.Templates.load(function()
         {
           // Wrap the containers with jQuery
@@ -4431,26 +4452,7 @@
       else
       {
         this.firstrun = false;
-
-        if (plugin.pref('loggedin'))
-        {
-          plugin.Tools.triggerCallbacks
-          (
-            function()
-            {
-              plugin.Ads.load(function()
-              {
-                plugin.MVC.run('Widget');
-              });
-              plugin.Categories.load();
-            },
-            plugin.options.callback
-          );
-        }
-        else
-        {
-          plugin.Login.go();
-        }
+        plugin.Login.go();
       }
 
       return true;
