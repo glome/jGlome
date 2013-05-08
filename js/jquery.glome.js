@@ -853,6 +853,11 @@
           url: 'users/login.json',
           allowed: ['create', 'read']
         },
+        logout:
+        {
+          url: 'users/logout.json',
+          allowed: ['read']
+        },
         me:
         {
           url: 'users/{glomeid}.json',
@@ -1345,13 +1350,40 @@
       loginAttempts: 0,
 
       /**
-       * Logout a user
+       * Logout current user
        *
-       * @param int Glome ID, optional; by default the current user ID is used, if available
+       * @param function callback, optional login callback
+       * @param function onerror, optional login onerror fallback
        */
-      logout: function(id)
+      logout: function()
       {
+        var callback = function()
+        {
+          plugin.pref('loggedin', false);
+          plugin.sessionToken = '';
+          plugin.pref('session.token', '');
+          plugin.cookie = '';
+          plugin.pref('session.cookie', '');
+        };
 
+        var onerror = function()
+        {
+          console.warn('Logout error');
+        };
+
+        // Default error handling
+        plugin.API.request
+        (
+          'logout',
+          {},
+          callback,
+          onerror,
+          'GET',
+          null,
+          null
+        );
+
+        return true;
       },
 
       /**
@@ -2682,36 +2714,45 @@
       /* performs a login */
       go: function()
       {
+        // ran when loggedin
+        var onloggedin = plugin.Tools.mergeCallbacks
+        (
+          function()
+          {
+            plugin.Ads.load
+            (
+              function()
+              {
+                plugin.Categories.load(
+                  function()
+                  {
+                    plugin.options.widgetContainer.removeAttr('hidden');
+                    plugin.MVC.run('Widget');
+                  }
+                );
+              },
+              function()
+              {
+                // Failed to load the ads
+                // @TODO: display an error?
+              }
+            );
+          },
+          plugin.options.callback
+        );
+
         plugin.Auth.login
         (
           plugin.id(),
           '',
-          function()
-          {
-            plugin.Tools.triggerCallbacks
-            (
-              function()
-              {
-                plugin.Ads.load(function()
-                {
-                  plugin.MVC.run('Widget');
-                },
-                function()
-                {
-                  // Failed to load the ads
-                  // @TODO: display an error?
-                });
-                plugin.Categories.load();
-              },
-              plugin.options.callback
-            );
-          },
+          onloggedin,
           function()
           {
             var onerrors = plugin.Tools.mergeCallbacks
             (
               function()
               {
+                plugin.options.widgetContainer.removeAttr('hidden');
                 plugin.MVC.run('RequirePassword');
               },
               plugin.options.onerror
@@ -2741,38 +2782,45 @@
       /**
        * Heartbeat check
        *
-       * @param function callback     Callback for successful load
-       * @param function onerror      Callback for unsuccessful load
+       * @param mixed callback      Callback for successful load
+       * @param mixed ad            ad to be displayed
+       *
        */
-      check: function(callback, onerror)
+      check: function(callback, ad)
       {
         plugin.Tools.validateCallback(onerror);
 
-        var callbacks = plugin.Tools.mergeCallbacks
-        (
-          function(data)
-          {
-            if (!data || data.message != plugin.Heartbeat.alive)
-            {
-              // redirect to login or start a new session
-              plugin.pref('loggedin', false);
-              plugin.Login.go();
-              return;
-            }
-          },
-          callback
-        );
-
-        var onerrors = plugin.Tools.mergeCallbacks
-        (
-          function()
+        var onloggedout = function(data)
+        {
+          if (!data || data.message != plugin.Heartbeat.alive)
           {
             // redirect to login or start a new session
             plugin.pref('loggedin', false);
             plugin.Login.go();
-          },
-          onerror
-        );
+          }
+          return;
+        };
+
+        if (callback && typeof callback != 'undefined')
+        {
+          var callbacks = plugin.Tools.mergeCallbacks
+          (
+            onloggedout,
+            callback(ad)
+          );
+        }
+        else
+        {
+          var callbacks = onloggedout;
+        }
+
+        var onerrors = function()
+        {
+          // redirect to login or start a new session
+          plugin.pref('loggedin', false);
+          plugin.Login.go();
+          return;
+        };
 
         // Request heartbeat
         plugin.Api.get
@@ -3157,6 +3205,8 @@
 
           // Open and close the widget. Closing widget hides always the knocking
           // until a new knock is initialized
+          // We do a heartbeat check before opening the widget
+          // TODO: log this event separately on the server for stats
           this.widget.find('#glomeWidgetIcon')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -3173,26 +3223,31 @@
               }
               else if (plugin.mvc.widgetAd)
               {
-                // check if we have a working session
-                plugin.Heartbeat.check();
-
-                jQuery(this).parent()
-                  .attr('data-state', 'open')
-                  .off('mouseover.glome')
-                  .on('mouseover.glome', function()
-                  {
-                    jQuery(this).stopTime('widgetAutoclose');
-                  })
-                  .off('mouseout.glome')
-                  .on('mouseout.glome', function()
-                  {
-                    jQuery(this).oneTime('3s', 'widgetAutoclose', function()
+                var callback = function(ad)
+                {
+                  ad.parent()
+                    .attr('data-state', 'open')
+                    .off('mouseover.glome')
+                    .on('mouseover.glome', function()
                     {
-                      jQuery(this)
-                        .off('mouseover.glome mouseout.glome')
-                        .attr('data-state', 'closed');
+                      jQuery(this).stopTime('widgetAutoclose');
+                    })
+                    .off('mouseout.glome')
+                    .on('mouseout.glome', function()
+                    {
+                       jQuery(this).oneTime('3s', 'widgetAutoclose', function()
+                      {
+                         jQuery(this)
+                          .off('mouseover.glome mouseout.glome')
+                          .attr('data-state', 'closed');
+                      });
                     });
-                  });
+                };
+
+                // check if we have a working session
+                // if we do then show open the widget
+                var ad = jQuery(this);
+                plugin.Heartbeat.check(callback, ad);
               }
             });
 
@@ -3200,10 +3255,8 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              // check if we have a working session
-              plugin.Heartbeat.check();
               plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
-              return false;
+              return true;
             });
         }
 
@@ -3241,17 +3294,19 @@
 
         mvc.prototype.controller = function(args)
         {
-          console.log(this.args);
+          plugin.Auth.logout();
+          var widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
+          widget.stopTime('heartbeat');
 
-          plugin.pref('loggedin', false);
+          var period = plugin.pref('turnoff').toString();
+          alert(plugin.options.i18n.parse('turnoff', [period]));
 
           if (this.args.reopen)
           {
             jQuery(plugin.options.container)
               .oneTime(this.args.reopen, 'glomeReopen', function()
               {
-                plugin.options.widgetContainer.removeAttr('hidden');
-                plugin.MVC.run('Widget');
+                plugin.Login.go();
               });
           }
         }
@@ -3301,7 +3356,7 @@
 
           if (!wrapper.find('[data-glome-template="public-footer"]').size())
           {
-            plugin.Templates.populate('public-footer').appendTo(wrapper);
+            var footer = plugin.Templates.populate('public-footer').appendTo(wrapper);
           }
 
           if (!wrapper.find('[data-glome-template="public-content"]').size())
@@ -3956,7 +4011,7 @@
 
           for (var i in items)
           {
-            var li = nav.find('> [data-mvc="' + items[i].mvc + '"]');
+            var li = nav.find('> [data-glome-mvc="' + items[i].mvc + '"]');
 
             if (!li.size())
             {
@@ -3965,7 +4020,7 @@
                 .attr('href', items[i].mvc)
                 .text(i);
               li
-                .attr('data-mvc', items[i].mvc)
+                .attr('data-glome-mvc', items[i].mvc)
                 .appendTo(nav);
             }
 
@@ -3977,12 +4032,12 @@
               {
                 var child = items[i].children[n];
 
-                var subli = subnav.find('> [data-mvc="' + child.mvc + '"]');
+                var subli = subnav.find('> [data-glome-mvc="' + child.mvc + '"]');
 
                 if (!subli.size())
                 {
                   var subli = plugin.Templates.populate('subnavigation-item')
-                    .attr('data-mvc', child.mvc)
+                    .attr('data-glome-mvc', child.mvc)
                     .appendTo(subnav);
 
                 }
@@ -3999,7 +4054,7 @@
             {
               try
               {
-                plugin.MVC.run(jQuery(this).parent().attr('data-mvc'));
+                plugin.MVC.run(jQuery(this).parent().attr('data-glome-mvc'));
               }
               catch (e)
               {
@@ -4011,7 +4066,7 @@
 
           if (args.selected)
           {
-            var sel = nav.find('[data-mvc="' + args.selected + '"]');
+            var sel = nav.find('[data-glome-mvc="' + args.selected + '"]');
 
             sel.each(function()
             {
@@ -4086,6 +4141,13 @@
         mvc.prototype.controllerInit = function(args)
         {
           //jQuery(window).trigger('resize.glome');
+          plugin.options.container.find('[data-glome-mvc]')
+            .off('click.glome')
+            .on('click.glome', function(e)
+            {
+              plugin.MVC.run(jQuery(this).attr('data-glome-mvc'));
+              return false;
+            });
         }
 
         var m = new mvc();
