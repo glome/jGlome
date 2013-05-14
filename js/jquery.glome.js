@@ -3965,17 +3965,19 @@
           {
             Profile:
             {
+              page: 'profile',
               mvc: 'AdminProfile',
               children:
               {
                 Profile:
                 {
-                  mvc: 'AdminProfile'
+                  mvc: 'AdminProfile',
                 }
               }
             },
             Statistics:
             {
+              page: 'statistics',
               mvc: 'AdminStatistics',
               children:
               {
@@ -3987,6 +3989,7 @@
             },
             Rewards:
             {
+              page: 'rewards',
               mvc: 'AdminRewards',
               children:
               {
@@ -3998,6 +4001,7 @@
             },
             Settings:
             {
+              page: 'settings',
               mvc: 'AdminSettings',
               children:
               {
@@ -4020,6 +4024,7 @@
                 .attr('href', items[i].mvc)
                 .text(i);
               li
+                .attr('data-page', items[i].page)
                 .attr('data-glome-mvc', items[i].mvc)
                 .appendTo(nav);
             }
