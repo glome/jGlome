@@ -3965,7 +3965,6 @@
           {
             Profile:
             {
-              page: 'profile',
               mvc: 'AdminProfile',
               children:
               {
@@ -3977,7 +3976,6 @@
             },
             Statistics:
             {
-              page: 'statistics',
               mvc: 'AdminStatistics',
               children:
               {
@@ -3989,7 +3987,6 @@
             },
             Rewards:
             {
-              page: 'rewards',
               mvc: 'AdminRewards',
               children:
               {
@@ -4001,7 +3998,6 @@
             },
             Settings:
             {
-              page: 'settings',
               mvc: 'AdminSettings',
               children:
               {
@@ -4015,7 +4011,7 @@
 
           for (var i in items)
           {
-            var li = nav.find('> [data-glome-mvc="' + items[i].mvc + '"]');
+            var li = nav.find('> [data-page="' + i.toLowerCase() + '"]');
 
             if (!li.size())
             {
@@ -4024,7 +4020,7 @@
                 .attr('href', items[i].mvc)
                 .text(i);
               li
-                .attr('data-page', items[i].page)
+                .attr('data-page', i.toLowerCase())
                 .attr('data-glome-mvc', items[i].mvc)
                 .appendTo(nav);
             }
