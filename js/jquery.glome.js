@@ -23,8 +23,6 @@
  */
 ;(jQuery)
 {
-  var version = '0.1a';
-
   /**
    * Glome master class, which is responsible for all of the non-DOM interactions
    */
@@ -66,7 +64,6 @@
 
     jQuery.extend(this.options, defaults, options);
 
-    this.version = version;
     this.glomeid = null;
     this.idPrefix = '';
     this.ads = {};
