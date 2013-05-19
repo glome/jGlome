@@ -3368,7 +3368,8 @@
         // Initialize default controllers
         mvc.prototype.controllerInit = function(args)
         {
-          //jQuery(window).trigger('resize.glome');
+          jQuery(window).trigger('resize.glome');
+
           plugin.options.container.find('[data-glome-mvc]')
             .off('click.glome')
             .on('click.glome', function(e)
@@ -4138,7 +4139,8 @@
 
         mvc.prototype.controllerInit = function(args)
         {
-          //jQuery(window).trigger('resize.glome');
+          jQuery(window).trigger('resize.glome');
+
           plugin.options.container.find('[data-glome-mvc]')
             .off('click.glome')
             .on('click.glome', function(e)
