@@ -4274,6 +4274,10 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-statistics', {});
           this.content.appendTo(this.contentArea);
+
+          var placeholder = 'div#glomeAdminStatistics div.data';
+          var event = new CustomEvent("statistics", {"detail":{"placeholder":placeholder}});
+          window.document.dispatchEvent(event);
         }
 
         mvc.prototype.controller = function(args)
