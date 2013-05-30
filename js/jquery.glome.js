@@ -2786,6 +2786,7 @@
        */
       check: function(callback, ad)
       {
+        console.log('heartbeat check');
         plugin.Tools.validateCallback(onerror);
 
         var onloggedout = function(data)
