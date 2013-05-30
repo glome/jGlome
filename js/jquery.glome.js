@@ -3162,19 +3162,19 @@
                 plugin.Ads.load();
               });
 
-            this.widget
-              .stopTime('knock')
-              .everyTime(plugin.pref('knock') + 's', 'knock', function()
-              {
-                console.log('fire Glome knock');
-                if (jQuery(this).attr('data-state') === 'open')
-                {
-                  return;
-                }
-
-                m.widgetAd = null;
-                m.run();
-              });
+            //~ this.widget
+              //~ .stopTime('knock')
+              //~ .everyTime(plugin.pref('knock') + 's', 'knock', function()
+              //~ {
+                //~ console.log('fire Glome knock');
+                //~ if (jQuery(this).attr('data-state') === 'open')
+                //~ {
+                  //~ return;
+                //~ }
+//~
+                //~ m.widgetAd = null;
+                //~ m.run();
+              //~ });
 
             this.widget
               .stopTime('butler')
