@@ -80,10 +80,12 @@
 "your glome profile":"Your Glome Profile",
 "your profile is built from these items":"Your profile is built from these items",
 "remove password protection":"Remove password protection",
+"stats since":"Since $1",
 "stats adactions info":"Your reactions on ads",
 "stats toggle data":"View numbers",
 "stats data headers date":"Date",
 "stats data headers action":"Action",
 "stats data headers value":"Value",
+"stats most visited title": "Most visited sites",
 "turnoff":"Glome will be turned off for $1 seconds."
 }

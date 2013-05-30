@@ -13,6 +13,8 @@
   font-weight: 100 !important; }
   .glome-fullscreen-container a {
     color: #4d4d4d; }
+  .glome-fullscreen-container div#statistics a {
+    color: lightgreen; }
 
 /* Reveals all boxes */
 /* !Resets */
@@ -1374,3 +1376,6 @@ div.remove-password {
   margin: 10px 0 0 0;
   text-align: right;
   text-decoration: underline; }
+
+div#rawdata {
+  display: none; }

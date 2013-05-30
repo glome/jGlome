@@ -73,6 +73,7 @@
     this.contentPrefix = '';
     this.templateLocation = 'template.html';
     this.userData = null;
+    this.stats = null;
 
     /**
      * Current MVC instance
@@ -2830,6 +2831,50 @@
       },
     };
 
+    /**
+     * Stats
+     */
+    plugin.Statistics =
+    {
+      init: function()
+      {
+        if (plugin.stats == null)
+        {
+          plugin.stats = new Statistics();
+          // selector of the raw data container
+          plugin.rawdata = 'rawdata';
+          // selector of the container to show stats
+          plugin.placeholder = '#statistics';
+          // request stats event
+          plugin.getStatsEvent = new CustomEvent("statistics_get", {"detail": {"rawdata": plugin.rawdata}});
+        }
+      },
+      /**
+       * broadcast statistics_get event
+       */
+      get: function()
+      {
+        // add event listener
+        window.document.addEventListener('statistics_ready', plugin.Statistics.ready, true);
+        window.document.dispatchEvent(plugin.getStatsEvent);
+      },
+      /**
+       * listen to statistics_ready event
+       */
+      ready: function(event)
+      {
+        // initialize stats drawing with our raw data
+        plugin.stats.init(plugin.placeholder, jQuery('#' + plugin.rawdata).text());
+        // populate the since header
+        var since = plugin.options.i18n.parse('stats since', [plugin.stats.firstRecord.humanTime]);
+        jQuery(plugin.placeholder + ' .firstrecord').text(since);
+        // display most visited stuff
+        plugin.stats.mostVisited(plugin.placeholder + ' .mostvisited');
+        // remove myself as a listener
+        window.document.removeEventListener('statistics_ready', plugin.Statistics.ready, true);
+      }
+    };
+
     /* !MVC */
     /**
      * Sketch of MVC. @TODO: use backbone.js or something similar in the near future
@@ -3161,7 +3206,6 @@
               .stopTime('heartbeat')
               .everyTime(plugin.pref('api.heartbeat') + 's', 'heartbeat', function()
               {
-                console.log('heartbeat check');
                 plugin.Heartbeat.check();
               });
           }
@@ -4274,15 +4318,12 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-statistics', {});
           this.content.appendTo(this.contentArea);
-
-          var placeholder = 'div#glomeAdminStatistics div.data';
-          var event = new CustomEvent("statistics", {"detail":{"placeholder":placeholder}});
-          window.document.dispatchEvent(event);
         }
 
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
+          plugin.Statistics.get();
         }
 
         var m = new mvc();
@@ -4510,6 +4551,7 @@
           {
             plugin.Ads.load();
             plugin.Categories.load();
+            plugin.Statistics.init();
           },
           plugin.options.callback
         );
@@ -4519,6 +4561,7 @@
       {
         this.firstrun = false;
         plugin.Login.go();
+        plugin.Statistics.init();
       }
 
       return true;

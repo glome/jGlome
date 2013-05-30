@@ -78,10 +78,12 @@
 "your glome profile":"Sinun Glome Profiili",
 "your profile is built from these items":"Profiilisi rakentuu n\u00e4ist\u00e4 elementeist\u00e4",
 "remove password protection":"Poista salasanasuojaus",
+"stats since":"Since $1",
 "stats adactions info":"Your reactions on ads",
 "stats toggle data":"View numbers",
 "stats data headers date":"Date",
 "stats data headers action":"Action",
 "stats data headers value":"Value",
+"stats most visited title": "Most visited sites",
 "turnoff":"Glome will be turned off for $1 seconds."
 }

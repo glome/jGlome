@@ -1,0 +1,58 @@
+.chart {
+/*background: #b0e0f8;*/
+border: 1px solid white;
+padding: 2px;
+margin: 5px;
+}
+
+.chart rect {
+stroke: none;
+margin: 2px 0 2px 0;
+}
+
+.chart rect.odd {
+fill: steelblue;
+}
+
+.chart rect.even {
+fill: lightgreen;
+}
+
+.chart text {
+fill: black;
+}
+
+.chart text.name {
+fill: #000;
+}
+
+.chart text.label {
+fill: #000;
+}
+
+.chart text.data {
+fill: darkgreen;
+}
+
+.chart line {
+stroke: #c1c1c1;
+}
+
+.chart .rule {
+fill: grey;
+}
+
+.chart .rule .short {
+stroke: grey;
+stroke-opacity: .3;
+}
+
+.chart .rule .long {
+stroke: black;
+stroke-opacity: .3;
+}
+
+/* a bit of hovering effect for each bar */
+.chart rect:hover {
+fill: #64707D;
+}
