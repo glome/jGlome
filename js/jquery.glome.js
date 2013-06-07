@@ -845,7 +845,7 @@
 
           if (typeof data[key] !== 'undefined')
           {
-            if (data[key])
+            if (data[key] || typeof data[key] == 'number')
             {
               value = String(data[key]);
             }
