@@ -966,6 +966,11 @@
         {
           url: 'ads/{adId}/notnow.json',
           allowed: ['create']
+        },
+        redeem:
+        {
+          url: 'users/{glomeid}/payments/redeem.json',
+          allowed: ['read']
         }
       },
 
@@ -1585,6 +1590,42 @@
               password_confirmation: pw2
             }
           },
+          callback,
+          onerror
+        );
+      },
+
+      /**
+       * Queries full profile of the authenticated user
+       * Sets the plugin.userData with the info received
+       *
+       * Fires glome.freshprofile upon completion
+       *
+       */
+      getProfile: function()
+      {
+        if (! plugin.id())
+        {
+          throw new Error('Glome ID is not available');
+        }
+
+        var callback = function(data)
+        {
+          plugin.userData = data;
+          jQuery('#glomeAdmin').trigger('profileupdate.glome');
+          plugin.Log.debug('User profile received and event fired');
+        }
+
+        var onerror = function(data)
+        {
+          plugin.Log.debug('error:');
+          plugin.Log.dump(data);
+        }
+
+        var request = plugin.API.read
+        (
+          'me',
+          {},
           callback,
           onerror
         );
@@ -2881,6 +2922,14 @@
             // redirect to login or start a new session
             plugin.pref('loggedin', false);
             plugin.Login.go();
+          }
+          else
+          {
+            if (typeof data.earnings != 'undefined')
+            {
+              plugin.userData = data;
+              plugin.Log.dump(data);
+            }
           }
           return;
         };
@@ -4438,45 +4487,146 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-rewards', {});
           this.content.appendTo(this.contentArea);
-
-          var c = this.content.find('.glome-total-rewards');
-          c.find('.admin-rewards-row').remove();
-
-          if (   plugin.userData
-              && plugin.userData.earnings
-              && plugin.userData.earnings.fresh
-              && Object.keys(plugin.userData.earnings.fresh).length > 0)
-          {
-            this.content.find('.glome-earned-rewards').removeClass('glome-hidden');
-
-            for (var currency in plugin.userData.earnings.fresh)
-            {
-              var data = {};
-              data.currency = currency;
-              data.full = Math.floor(plugin.userData.earnings.fresh[currency] / 100);
-              data.decimal = plugin.userData.earnings.fresh[currency] - data.full * 100;
-
-              console.log(data);
-
-              var row = plugin.Templates.populate('admin-rewards-row', data);
-
-              if (!data.decimal)
-              {
-                row.find('.decimal-separator, .cents').remove();
-              }
-
-              c.append(row);
-            }
-          }
-          else
-          {
-            this.content.find('.glome-earned-rewards').addClass('glome-hidden');
-          }
+          this.content.find('.admin-rewards-row').remove();
         }
 
         mvc.prototype.controller = function(args)
         {
+          var c = '';
+          var row = '';
+          var data = {};
+          var rewards = false;
+
+          var self = this;
+
           this.controllerInit(args);
+
+          var parseEarning = function(array, container, redeem)
+          {
+            container.find('h3').removeClass('glome-hidden');
+            var rows = container.find('.rows');
+
+            for (var currency in array)
+            {
+              data.currency = currency;
+              data.full = Math.floor(array[currency] / 100);
+              data.decimal = array[currency] - data.full * 100;
+
+              if (array[currency] > 0)
+              {
+                rewards = true;
+                row = plugin.Templates.populate('admin-rewards-row', data);
+
+                if (!data.decimal || data.decimal == 0)
+                {
+                  row.find('.decimal-separator, .cents').remove();
+                }
+
+                rows.append(row);
+
+                if (redeem)
+                {
+                  var button = plugin.Templates.populate('admin-redeem-button');
+                  rows.append(button);
+                }
+              }
+            }
+          }
+
+          var callback = function(self)
+          {
+            self.content.find('.glome-rewards .rows').empty();
+
+            if (   plugin.userData
+                && plugin.userData.earnings)
+            {
+              // parse all fresh earnings
+              if (   plugin.userData.earnings.fresh
+                  && Object.keys(plugin.userData.earnings.fresh).length > 0)
+              {
+                c = self.content.find('.glome-rewards.fresh');
+                parseEarning(plugin.userData.earnings.fresh, c, true);
+              }
+              // parse all pending earnings
+              if (   plugin.userData.earnings.pending
+                  && Object.keys(plugin.userData.earnings.pending).length > 0)
+              {
+                c = self.content.find('.glome-rewards.pending');
+                parseEarning(plugin.userData.earnings.pending, c, true);
+              }
+              // parse all paid earnings
+              if (   plugin.userData.earnings.paid
+                  && Object.keys(plugin.userData.earnings.paid).length > 0)
+              {
+                c = self.content.find('.glome-rewards.paid');
+                parseEarning(plugin.userData.earnings.paid, c, false);
+              }
+            }
+
+            if (rewards)
+            {
+              self.content.find('.glome-total-rewards').removeClass('glome-hidden');
+              self.content.find('.glome-earned-rewards .glome-button').removeClass('glome-hidden');
+              self.content.find('.glome-earned-rewards .none').addClass('glome-hidden');
+            }
+            else
+            {
+              self.content.find('.glome-total-rewards').addClass('glome-hidden');
+              self.content.find('.glome-earned-rewards .glome-button').addClass('glome-hidden');
+              self.content.find('.glome-earned-rewards .none').removeClass('glome-hidden');
+            }
+          }
+
+          // set event listeners
+          jQuery('#glomeAdmin')
+            .off('profileupdate.glome')
+            .on('profileupdate.glome', function(event)
+            {
+              callback(self);
+              self.content.find('.glome-button.redeem').click(function()
+              {
+                plugin.Log.debug('redeem click');
+                var redeemOk = function(data)
+                {
+                  var feedback = jQuery('.glome-earned-rewards .feedback')
+                    .hide()
+                    .text('');
+
+                  switch (data.status)
+                  {
+                    case 0:
+                      plugin.Log.debug('ok:');
+                      plugin.Log.dump(data);
+                      plugin.Auth.getProfile();
+                      plugin.options.container.find('.glome-close').trigger('click');
+                      plugin.Browser.openUrl(data.url);
+                      break;
+                    case 1:
+                      plugin.Log.debug('not ok: ' + data.message);
+                      feedback.fadeIn('1000', function() {
+                        feedback.text(data.message);
+                      })
+                      break;
+                  }
+                };
+
+                var redeemFail = function(data)
+                {
+                  plugin.Log.debug('error:');
+                  plugin.Log.dump(data);
+                };
+
+                var request = plugin.API.read
+                (
+                  'redeem',
+                  {},
+                  redeemOk,
+                  redeemFail
+                );
+              });
+            });
+
+          plugin.Auth.getProfile();
         }
 
         var m = new mvc();

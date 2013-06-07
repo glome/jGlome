@@ -1228,28 +1228,66 @@ $stats_bar_color: lightgreen;
 }
 
 /* !Admin pages: rewards */
-#glomeAdmin .glome-total-rewards
+#glomeAdmin .glome-rewards
 {
   display: table-cell;
   vertical-align: bottom;
   padding: 0.5em 0;
 }
 
-#glomeAdmin .glome-total-rewards [data-type="currency"],
-#glomeAdmin .glome-total-rewards [data-type="full"],
-#glomeAdmin .glome-total-rewards [data-type="decimal-separator"],
+#glomeAdmin .glome-rewards.fresh .glome-reward-row
+{
+color: green;
+}
+
+#glomeAdmin .glome-rewards.pending .glome-reward-row
+{
+color: orange;
+}
+
+#glomeAdmin .glome-rewards.paid .glome-reward-row
+{
+color: black;
+}
+
+#glomeAdmin .glome-rewards.paid .glome-reward-row .glome-button
+{
+display: none !important;
+}
+
+#glomeAdmin .glome-earned-rewards .none,
+#glomeAdmin .glome-reward-row [data-type="currency"],
+#glomeAdmin .glome-reward-row [data-type="full"],
+#glomeAdmin .glome-reward-row [data-type="decimal-separator"],
+#glomeAdmin .glome-reward-row [data-type="cents"],
 #glomeAdmin .coming-soon
 {
   font:
   {
-    size: 300%;
+    size: 200%;
     weight: bold;
   }
 }
 
-#glomeAdmin .glome-total-rewards [data-type="cents"]
+#glomeAdmin .glome-reward-row [data-type="currency"]
 {
-  font-size: 175%;
+margin: 0 0.5em 0 0.5em;
+}
+
+.glome-reward-row .glome-button
+{
+height: 25px;
+line-height: 25px;
+position: relative;
+top: -2px;
+}
+
+#glomeAdmin .glome-earned-rewards .feedback {
+  color: orange;
+  font: {
+    size: 15px;
+    weight: bold;
+  }
 }
 
 /* !Admin pages: settings */

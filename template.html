@@ -127,25 +127,35 @@
                   <div class="glome-content glome-layout-cols-2" data-glome-template="admin-rewards">
                     <div class="glome-cols-2 glome-cols-alt-3 glome-fixed">
                       <div class="glome-earned-rewards">
-                        <h1 data-i18n="redeem your reward">Redeem your reward</h1>
-                        <p>
-                          <span data-i18n="total amount to redeem">Total amount to redeem</span>
-                        </p>
-                        <p>
-                          <span data-i18n="earned reward">Earned reward</span>:
-                        </p>
-                        <div class="glome-total-rewards" id="glomeTotalRewards">
-                          <div class="glome-reward-row" data-glome-template="admin-rewards-row" data-currency="{currency}">
-                            <span data-type="currency" data-i18n="{currency}">{currency}</span> <span data-type="full">{full}</span><span data-type="decimal-separator" data-i18n="decimal-separator">.</span><span data-type="cents">{decimal}</span>
-                          </div>
+                        <h1 data-i18n="your rewards">Your rewards</h1>
+                        <div class="none glome-hidden" data-i18n="no rewards">None</div>
+
+                        <div class="glome-reward-row" data-glome-template="admin-rewards-row" data-currency="{currency}">
+                          <span data-type="full">{full}</span>
+                          <span data-type="decimal-separator" data-i18n="decimal-separator">.</span>
+                          <span data-type="cents">{decimal}</span>
+                          <span data-type="currency" data-i18n="{currency}">{currency}</span>
                         </div>
+                        <button class="glome-button glome-hidden redeem" data-glome-template="admin-redeem-button" data-i18n="redeem cash">Redeem cash</button>
+
+                        <div class="glome-rewards fresh" id="glomeFreshRewards">
+                          <h3 class="glome-hidden" data-i18n="fresh reward">Fresh reward</h3>
+                          <div class="rows"></div>
+                        </div>
+                        <div class="glome-rewards pending" id="glomePendingRewards">
+                          <h3 class="glome-hidden" data-i18n="pending rewards">Pending rewards</h3>
+                          <div class="rows"></div>
+                        </div>
+                        <div class="glome-rewards paid" id="glomePaidRewards">
+                          <h3 class="glome-hidden" data-i18n="paid rewards">Paid rewards</h3>
+                          <div class="rows"></div>
+                        </div>
+                        <div class="feedback"></div>
+
                         <div class="glome-future-releases">
                           <p>
                             <span data-i18n="money transfer costs">Money transfer costs</span>:
                             XXX (<a href="admin-help"><span data-i18n="what is this">What is this</span>?</a>)
-                          </p>
-                          <p>
-                            <button class="glome-button" data-i18n="redeem cash">Redeem cash</button>
                           </p>
                         </div>
                       </div>
