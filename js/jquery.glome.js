@@ -4503,7 +4503,6 @@
 
           var parseEarning = function(array, container, redeem)
           {
-            container.find('h3').removeClass('glome-hidden');
             var rows = container.find('.rows');
 
             for (var currency in array)
@@ -4530,6 +4529,11 @@
                   rows.append(button);
                 }
               }
+            }
+
+            if (rewards)
+            {
+              container.find('h3').removeClass('glome-hidden');
             }
           }
 
