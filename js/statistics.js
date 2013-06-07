@@ -1,5 +1,3 @@
-let console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
-
 /*****************************************************************************
  *
  * Statistics drawing utility based on d3.js
