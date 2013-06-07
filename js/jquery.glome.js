@@ -124,6 +124,21 @@
       plugin.online = window.navigator.onLine;
     });
 
+    // initialize logger
+    try
+    {
+      // log levels
+      this.GLOME_LOG_DEBUG = 1;
+      this.GLOME_LOG_WARNING = 2;
+      this.GLOME_LOG_ERROR = 3;
+      this.GLOME_LOG_EXCEPTION = 4;
+      this.console = (Cu.import("resource://gre/modules/devtools/Console.jsm", {})).console;
+    }
+    catch (e)
+    {
+      //
+    }
+
     /**
      * Return the current Glome ID
      *
@@ -136,6 +151,77 @@
         this.glomeid = this.pref('glomeid');
       }
       return this.glomeid;
+    }
+
+    /* !Debug */
+    /**
+     * Simple logging facility
+     */
+    plugin.Log =
+    {
+      log: function(message, level)
+      {
+        var date = new Date();
+        var ts = date.toISOString();
+        var enable = false;
+        var prefix = ts + ' jGlome';
+
+        switch (level)
+        {
+          case plugin.GLOME_LOG_DEBUG:
+            enable = plugin.pref('debug');
+            prefix += ' debug';
+            break;
+          case plugin.GLOME_LOG_DUMP:
+            enable = true;
+            prefix += ' dump';
+            break;
+          case plugin.GLOME_LOG_WARNING:
+            enable = true;
+            prefix += ' warning';
+            break;
+          case plugin.GLOME_LOG_ERROR:
+            enable = true;
+            prefix += ' error';
+            break;
+          case plugin.GLOME_LOG_EXCEPTION:
+            enable = true;
+            prefix += ' exception';
+            break;
+        }
+
+        if (enable)
+        {
+          plugin.console.log(prefix + ': ' + message);
+        }
+        //date = ts = prefix = enable = null;
+      },
+      // simple text logger
+      debug: function(message)
+      {
+        plugin.Log.log(message, plugin.GLOME_LOG_DEBUG);
+      },
+      // error logger
+      error: function(message)
+      {
+        plugin.Log.log(message, plugin.GLOME_LOG_ERROR);
+      },
+      // warning logger
+      warning: function(message)
+      {
+        plugin.Log.log(message, plugin.GLOME_LOG_WARNING);
+      },
+      // exception logger
+      exception: function(message)
+      {
+        plugin.Log.log(message, plugin.GLOME_LOG_EXCEPTION);
+      },
+      // dump objects
+      dump: function(object)
+      {
+        plugin.Log.log('', plugin.GLOME_LOG_DUMP);
+        plugin.console.dir(object);
+      }
     }
 
     /* !Tools */
@@ -180,7 +266,7 @@
 
         if (level > 10)
         {
-          console.warn('Too much of recursion in escapeAmpersandsRecursive');
+          plugin.Log.warning('Too much of recursion in escapeAmpersandsRecursive');
           return null;
         }
 
@@ -796,7 +882,7 @@
                 }
                 catch (e)
                 {
-                  console.warn(e, str);
+                  plugin.Log.warning(e, str);
                   args = null;
                 }
               }
@@ -816,7 +902,7 @@
               }
               catch (e)
               {
-                //console.warn(e.message);
+                //plugin.Log.warning(e.message);
               }
             });
         }
@@ -1006,7 +1092,7 @@
         // Check for connection
         if (!plugin.online)
         {
-          console.warn('No Internet connection, impossible to do API calls');
+          plugin.Log.warning('No Internet connection, impossible to do API calls');
 
           if (jQuery.isArray(onerror))
           {
@@ -1300,7 +1386,7 @@
             }
             catch (e)
             {
-              console.warn(e.message);
+              plugin.Log.warning(e.message);
             }
           },
           callback
@@ -1316,7 +1402,7 @@
           },
           function()
           {
-            console.warn('Login error');
+            plugin.Log.warning('Login error');
           },
           onerror
         );
@@ -1366,7 +1452,7 @@
 
         var onerror = function()
         {
-          console.warn('Logout error');
+          plugin.Log.warning('Logout error');
         };
 
         // Default error handling
@@ -1591,7 +1677,7 @@
               }
               catch (e)
               {
-                console.warn('Failed to copy ' + i);
+                plugin.Log.warning('Failed to copy ' + i);
               }
             }
 
@@ -2610,7 +2696,6 @@
         delete this.stack[id];
         plugin.Categories.onchange();
 
-
         if (typeof this.stack[id] == 'undefined')
         {
           return true;
@@ -2786,7 +2871,7 @@
        */
       check: function(callback, ad)
       {
-        console.log('heartbeat check');
+        plugin.Log.debug('heartbeat check');
         plugin.Tools.validateCallback(onerror);
 
         var onloggedout = function(data)
@@ -3056,7 +3141,7 @@
             }
             catch (e)
             {
-              console.warn(e.message);
+              plugin.Log.warning(e.message);
               return false;
             }
 
@@ -3068,7 +3153,7 @@
             }
             catch (e)
             {
-              console.warn(e.message);
+              plugin.Log.warning(e.message);
               return false;
             }
 
@@ -3080,7 +3165,7 @@
             }
             catch (e)
             {
-              console.warn(e.message);
+              plugin.Log.warning(e.message);
               return false;
             }
 
@@ -3158,7 +3243,7 @@
               .stopTime('ads')
               .everyTime(plugin.pref('api.refreshads') + 's', 'ads', function()
               {
-                console.log('refresh Glome ads');
+                plugin.Log.debug('refresh Glome ads');
                 plugin.Ads.load();
               });
 
@@ -3166,7 +3251,7 @@
               //~ .stopTime('knock')
               //~ .everyTime(plugin.pref('knock') + 's', 'knock', function()
               //~ {
-                //~ console.log('fire Glome knock');
+                //~ plugin.Log.debug('fire Glome knock');
                 //~ if (jQuery(this).attr('data-state') === 'open')
                 //~ {
                   //~ return;
@@ -3180,7 +3265,7 @@
               .stopTime('butler')
               .everyTime(plugin.pref('butler') + 's', 'butler', function()
               {
-                console.log('fire Glome butler');
+                plugin.Log.debug('fire Glome butler');
                 if (jQuery(this).attr('data-state') === 'open')
                 {
                   return;
@@ -3325,7 +3410,7 @@
           }
 
           jQuery.extend(this.args, args);
-          console.log(this.args);
+          plugin.Log.debug(this.args);
         }
 
         mvc.prototype.view = function(args)
@@ -4102,7 +4187,7 @@
               }
               catch (e)
               {
-                console.warn('Navigation failed due to ' + e.toString());
+                plugin.Log.warning('Navigation failed due to ' + e.toString());
               }
 
               return false;
