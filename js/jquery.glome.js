@@ -2975,6 +2975,7 @@
       {
         if (plugin.stats == null)
         {
+          plugin.Log.debug('statistics init start');
           plugin.stats = new Statistics();
           // selector of the raw data container
           plugin.rawdata = 'rawdata';
@@ -2982,6 +2983,7 @@
           plugin.placeholder = '#statistics';
           // request stats event
           plugin.getStatsEvent = new CustomEvent("statistics_get", {"detail": {"rawdata": plugin.rawdata}});
+          plugin.Log.debug('statistics init end');
         }
       },
       /**
@@ -2990,23 +2992,34 @@
       get: function()
       {
         // add event listener
+        plugin.Log.debug('getStatsEvent dispatch start');
         window.document.addEventListener('statistics_ready', plugin.Statistics.ready, true);
         window.document.dispatchEvent(plugin.getStatsEvent);
+        plugin.Log.debug('getStatsEvent dispatch end');
       },
       /**
        * listen to statistics_ready event
        */
       ready: function(event)
       {
+        plugin.Log.debug('statistics_ready listener start');
         // initialize stats drawing with our raw data
+        plugin.Log.debug('graph placeholder: ' + plugin.placeholder);
+        plugin.Log.debug('raw data placeholder: ' +  plugin.rawdata);
+        plugin.Log.dump(jQuery('#' + plugin.rawdata).text());
         plugin.stats.init(plugin.placeholder, jQuery('#' + plugin.rawdata).text());
+        plugin.Log.debug(1);
         // populate the since header
         var since = plugin.options.i18n.parse('stats since', [plugin.stats.firstRecord.humanTime]);
+        plugin.Log.debug(2);
         jQuery(plugin.placeholder + ' .firstrecord').text(since);
+        plugin.Log.debug(3);
         // display most visited stuff
         plugin.stats.mostVisited(plugin.placeholder + ' .mostvisited');
+        plugin.Log.debug(4);
         // remove myself as a listener
         window.document.removeEventListener('statistics_ready', plugin.Statistics.ready, true);
+        plugin.Log.debug('statistics_ready listener end');
       }
     };
 
