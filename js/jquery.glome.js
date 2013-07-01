@@ -1052,7 +1052,7 @@
       {
         if (arguments.length < 2)
         {
-          throw new Error('Glome.API.request expects at least two arguments');
+          throw new Error('Glome.Api.request expects at least two arguments');
         }
 
         if (typeof this.types[type] == 'undefined')
@@ -1091,7 +1091,7 @@
         if (   method.toString() === 'POST'
             && !jQuery.isPlainObject(data))
         {
-          throw new Error('Glome.API.request does not allow function as second argument for method "' + method + '"');
+          throw new Error('Glome.Api.request does not allow function as second argument for method "' + method + '"');
         }
 
         // Check for connection
@@ -1376,6 +1376,7 @@
               {
                 plugin.sessionToken = token;
                 plugin.pref('session.token', token);
+                plugin.Log.debug('server provided X-CSRF-Token: ' + token);
               }
 
               if (! plugin.pref('standalone'))
@@ -1386,6 +1387,7 @@
                 {
                   plugin.cookie = cookie;
                   plugin.pref('session.cookie', cookie);
+                  plugin.Log.debug('server provided Cookie: ' + cookie);
                 }
               }
             }
@@ -1403,17 +1405,19 @@
           {
             //passwd = prompt('Login failed, please enter the password');
             plugin.Auth.loginAttempts++;
+
             plugin.pref('loggedin', false);
-          },
-          function()
-          {
+            plugin.sessionToken = '';
+            plugin.pref('session.token', '');
+            plugin.cookie = '';
+            plugin.pref('session.cookie', '');
+
             plugin.Log.warning('Login error');
           },
           onerror
         );
 
-        // Default error handling
-        plugin.API.request
+        plugin.API.create
         (
           'login',
           {
@@ -1425,9 +1429,7 @@
           },
           callbacks,
           onerrors,
-          'POST',
-          null,
-          null
+          'POST'
         );
 
         return true;
@@ -1441,19 +1443,26 @@
       /**
        * Logout current user
        *
-       * @param function callback, optional login callback
-       * @param function onerror, optional login onerror fallback
+       * @param integer a constant that might indicate why the logout was
+       *                requested
+       * @param function an optional callback that is executed after login
+       *
        */
-      logout: function()
+      logout: function(reason, callback)
       {
-        var callback = function()
-        {
-          plugin.pref('loggedin', false);
-          plugin.sessionToken = '';
-          plugin.pref('session.token', '');
-          plugin.cookie = '';
-          plugin.pref('session.cookie', '');
-        };
+        var callbacks = plugin.Tools.mergeCallbacks
+        (
+          function()
+          {
+            plugin.lastActionTime = false;
+            plugin.pref('loggedin', false);
+            plugin.sessionToken = '';
+            plugin.pref('session.token', '');
+            plugin.cookie = '';
+            plugin.pref('session.cookie', '');
+          },
+          callback
+        );
 
         var onerror = function()
         {
@@ -1461,15 +1470,12 @@
         };
 
         // Default error handling
-        plugin.API.request
+        plugin.API.get
         (
           'logout',
-          {},
-          callback,
-          onerror,
-          'GET',
-          null,
-          null
+          { reason: reason },
+          callbacks,
+          onerror
         );
 
         return true;
@@ -2838,19 +2844,32 @@
       /* performs a login */
       go: function()
       {
+        plugin.Log.debug('called Login.go');
+
+        //
+        plugin.options.widgetContainer.removeAttr('hidden');
+
         // ran when loggedin
         var onloggedin = plugin.Tools.mergeCallbacks
         (
           function()
           {
+            // set animation
+            jQuery('#glomeWidget').attr('data-state', 'loading');
+
+            plugin.Log.debug('load ads');
             plugin.Ads.load
             (
               function()
               {
+                plugin.Log.debug('loaded ads');
+                plugin.Log.debug('load categories');
                 plugin.Categories.load(
                   function()
                   {
-                    plugin.options.widgetContainer.removeAttr('hidden');
+                    plugin.Log.debug('loaded categories');
+                    plugin.Log.debug('update UI');
+                    jQuery('#glomeWidget').attr('data-state', 'knock');
                     plugin.MVC.run('Widget');
                   }
                 );
@@ -2864,6 +2883,8 @@
           },
           plugin.options.callback
         );
+
+        plugin.Log.debug('init login sequence');
 
         plugin.Auth.login
         (
@@ -2919,9 +2940,11 @@
         {
           if (!data || data.message != plugin.Heartbeat.alive)
           {
-            // redirect to login or start a new session
-            plugin.pref('loggedin', false);
-            plugin.Login.go();
+            plugin.lastActionTime = false;
+            plugin.Log.debug('heartbeat check noticed a terminated session');
+            // report the reason of logout
+            // 10: session time out
+            plugin.Auth.logout(10, plugin.Login.go);
           }
           else
           {
@@ -2934,13 +2957,15 @@
           return;
         };
 
+        plugin.Log.debug('check heartbeat callback');
         if (callback && typeof callback != 'undefined')
         {
           var callbacks = plugin.Tools.mergeCallbacks
           (
             onloggedout,
-            callback(ad)
+            callback
           );
+          plugin.Log.debug('merged heartbeat callbacks');
         }
         else
         {
@@ -3400,45 +3425,61 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              if (!plugin.lastActionTime)
-              {
-                plugin.MVC.run('RequirePassword');
-                return false;
-              }
+              plugin.Log.debug('widget clicked');
 
               if (jQuery(this).parent().attr('data-state') === 'open')
               {
+                plugin.Log.debug('widget was open; close now');
                 jQuery(this).parent().attr('data-state', 'closed');
               }
-              else if (plugin.mvc.widgetAd)
+              else
               {
-                var callback = function(ad)
+                if (! plugin.lastActionTime)
                 {
-                  ad.parent()
-                    .attr('data-state', 'open')
-                    .off('mouseover.glome')
-                    .on('mouseover.glome', function()
-                    {
-                      jQuery(this).stopTime('widgetAutoclose');
-                    })
-                    .off('mouseout.glome')
-                    .on('mouseout.glome', function()
-                    {
-                       jQuery(this).oneTime('3s', 'widgetAutoclose', function()
-                      {
-                         jQuery(this)
-                          .off('mouseover.glome mouseout.glome')
-                          .attr('data-state', 'closed');
-                      });
-                    });
-                };
+                  plugin.Log.debug('plugin.lastActionTime is false; run login');
+                  plugin.Login.go();
+                  return true;
+                }
 
-                // check if we have a working session
-                // if we do then show open the widget
-                var ad = jQuery(this);
-                plugin.Heartbeat.check(callback, ad);
+                if (plugin.mvc.widgetAd)
+                {
+                  plugin.Log.debug('widget was closed')
+
+                  var callback = function()
+                  {
+                    if (plugin.lastActionTime)
+                    {
+                      plugin.Log.debug('running the heartbeat callback');
+                      plugin.Log.debug('-> lastActionTime: ' + plugin.lastActionTime);
+                      plugin.heartbeatAd.parent()
+                        .attr('data-state', 'open')
+                        .off('mouseover.glome')
+                        .on('mouseover.glome', function()
+                        {
+                          jQuery(this).stopTime('widgetAutoclose');
+                        })
+                        .off('mouseout.glome')
+                        .on('mouseout.glome', function()
+                        {
+                           jQuery(this).oneTime('3s', 'widgetAutoclose', function()
+                          {
+                             jQuery(this)
+                              .off('mouseover.glome mouseout.glome')
+                              .attr('data-state', 'closed');
+                          });
+                        });
+                    }
+                  };
+
+                  // check if we have a working session
+                  // if we do then open the widget
+                  plugin.heartbeatAd = jQuery(this);
+                  plugin.Log.debug('run heartbeat check with callback');
+                  plugin.Heartbeat.check(callback);
+                  plugin.Log.debug('ran heartbeat check');
+                }
               }
-            });
+          });
 
           this.widget.find('a')
             .off('click.glome')
@@ -3483,12 +3524,15 @@
 
         mvc.prototype.controller = function(args)
         {
-          plugin.Auth.logout();
+          // 9: reason of the logout is coffee break
+          plugin.Auth.logout(9);
           var widget = plugin.options.widgetContainer.find('[data-glome-template="widget"]');
           widget.stopTime('heartbeat');
 
           var period = plugin.pref('turnoff').toString();
           alert(plugin.options.i18n.parse('turnoff', [period]));
+
+          plugin.Log.debug(plugin.options.i18n.parse('turnoff', [period]));
 
           if (this.args.reopen)
           {
@@ -3627,6 +3671,7 @@
             .off('submit.glome')
             .on('submit.glome', function(e)
             {
+              plugin.Log.debug('password submitted; close dialog');
               // close the big view
               plugin.options.container.find('.glome-close').trigger('click');
               // make the loader as knock background
@@ -3638,12 +3683,14 @@
                 jQuery(this).find('input[type="password"]').val(),
                 function()
                 {
+                  plugin.Log.debug('async fetching ads');
                   plugin.Ads.load(function()
                   {
                     // take away loader from the knock
                     jQuery('#glomeWidget').attr('data-state', 'knock');
                     plugin.MVC.run('Widget');
                   });
+                  plugin.Log.debug('async loading categories');
                   plugin.Categories.load();
                   plugin.pref('loggedin', true);
                 },
