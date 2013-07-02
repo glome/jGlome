@@ -3322,6 +3322,7 @@
           if (!this.widget.size())
           {
             this.widget = plugin.Templates.populate('widget').appendTo(plugin.options.widgetContainer);
+
             this.widget.stopTime('ads');
             this.widget.stopTime('knock');
 
@@ -4863,6 +4864,24 @@
         plugin.Login.go();
         plugin.Statistics.init();
       }
+
+      // add event listener for shutdown
+      window.document.addEventListener(
+        'jglome_shutdown',
+        function(e)
+        {
+          // stop all timers
+          plugin.Log.debug('jglome_shutdown received');
+          jQuery('div#glomeWidget')
+            .stopTime('butler')
+            .stopTime('ads')
+            .stopTime('knock')
+            .stopTime('heartbeat');
+          plugin.Log.debug('all timers stopped');
+          plugin = null;
+        },
+        true
+      );
 
       return true;
     };
