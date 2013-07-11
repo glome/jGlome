@@ -64,12 +64,12 @@ Statistics.prototype.mostVisited = function(container)
 Statistics.prototype.barGraph = function(container, data, labels)
 {
   var x, y;
-  var gap = 2;
+  var gap = 5;
   var width = 400;
   var bar_height = 20;
   var labelpad = 150;
   var left_width = 10;
-  var height = (bar_height + 2 * gap) * data.length + 50;
+  var height = (bar_height + gap) * data.length;
 
   x = d3.scale.linear()
   .domain([0, d3.max(data)])
@@ -77,7 +77,7 @@ Statistics.prototype.barGraph = function(container, data, labels)
 
   y = d3.scale.ordinal()
   .domain(data)
-  .rangeBands([0, (bar_height + 2 * gap) * labels.length]);
+  .rangeBands([0, (bar_height + gap) * labels.length]);
 
   var chart = d3.select(container)
   .append('svg:svg')
@@ -89,25 +89,28 @@ Statistics.prototype.barGraph = function(container, data, labels)
 
   var bars = chart.selectAll('g.bar')
   .data(data)
-  .enter().append('svg:g')
+  .enter()
+  .append('svg:g')
   .attr('class', 'bar')
   .attr('transform', function(d, i) {
-    return 'translate(' + labelpad + ',' + y(i) + ')';
+    return 'translate(' + labelpad + ',' + i + ')';
   });
 
   bars.append('svg:rect')
+  .attr('y', function(d, i) { return i * bar_height; } )
+  .attr('width', x)
+  .attr('height', bar_height)
+  .attr('dy', '10')
   .attr('class', function(d, i) {
     var style = 'odd';
     (i % 2) ? style = 'even' : style = style;
     return style;
-  })
-  .attr('width', x)
-  .attr('height', y.rangeBand());
+  });
 
   bars.append('svg:text')
   .attr('class', 'label')
   .attr('x', -labelpad)
-  .attr('y', 10)
+  .attr('y', function(d, i) { return (i * bar_height) + 10; } )
   .attr('dx', 2)
   .attr('dy', '.35em')
   .attr('text-anchor', 'start')
@@ -118,7 +121,7 @@ Statistics.prototype.barGraph = function(container, data, labels)
   bars.append('svg:text')
   .attr('class', 'data')
   .attr('x', width - 60)
-  .attr('y', 10)
+  .attr('y', function(d, i) { return (i * bar_height) + 10; } )
   .attr('dx', -6)
   .attr('dy', '.35em')
   .attr('text-anchor', 'end')
