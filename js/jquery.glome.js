@@ -3432,6 +3432,9 @@
               }
               else
               {
+                // set anim
+                jQuery('#glomeWidget').attr('data-state', 'loading');
+
                 if (! plugin.lastActionTime)
                 {
                   plugin.Log.debug('plugin.lastActionTime is false; run login');
