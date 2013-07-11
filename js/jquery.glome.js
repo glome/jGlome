@@ -2846,17 +2846,14 @@
       {
         plugin.Log.debug('called Login.go');
 
-        //
-        plugin.options.widgetContainer.removeAttr('hidden');
+        plugin.MVC.run('Widget');
+        jQuery('#glomeWidget').attr('data-state', 'loading');
 
         // ran when loggedin
         var onloggedin = plugin.Tools.mergeCallbacks
         (
           function()
           {
-            // set animation
-            jQuery('#glomeWidget').attr('data-state', 'loading');
-
             plugin.Log.debug('load ads');
             plugin.Ads.load
             (
