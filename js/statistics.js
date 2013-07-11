@@ -20,8 +20,15 @@ Statistics.prototype.init = function(container, json)
 {
   var self = this;
   self.container = container;
-  self.parsed = JSON.parse(json);
-  self.firstRecord = JSON.parse(self.parsed.firstRecord);
+  try
+  {
+    self.parsed = JSON.parse(json);
+    self.firstRecord = JSON.parse(self.parsed.firstRecord);
+  }
+  catch(e)
+  {
+    //alert(e);
+  }
 }
 
 /**
