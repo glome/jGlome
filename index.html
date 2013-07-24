@@ -5,6 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/jquery.timers.js"></script>
+<!--
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.js"></script>
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.messages.js"></script>
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.fallbacks.js"></script>
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.language.js"></script>
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.parser.js"></script>
+    <script type="text/javascript" src="js/i18n/src/jquery.i18n.emitter.js"></script>
+-->
     <script type="text/javascript" src="js/jquery.i18n.min.js"></script>
     <script type="text/javascript" src="js/jquery.glome.js"></script>
     <script type="text/javascript" src="js/d3.v3.min.js"></script>
@@ -23,13 +31,50 @@
       glome.pref('standalone', true);
 
       glome.idPrefix = 'web';
-      glome.initialize
-      (
-        {
-          container: 'body',
-          widgetContainer: '#glomeWidgetWrapper',
-        }
-      );
+
+      var options =
+      {
+        container: 'body',
+        widgetContainer: '#glomeWidgetWrapper',
+      };
+
+      //~ if (typeof jQuery.i18n === 'function')
+      //~ {
+        //~ var LOCALES =
+        //~ {
+          //~ en:
+          //~ {
+            //~ 'href': 'locales/glome-en.json',
+            //~ 'raw': '',
+            //~ 'content': null,
+          //~ },
+          //~ fi:
+          //~ {
+            //~ 'href': 'locales/glome-fi.json',
+            //~ 'raw': '',
+            //~ 'content': null,
+          //~ }
+        //~ };
+        //~ options.i18n = new jQuery.i18n();
+//~
+        //~ // Set English as the default language for now. @TODO: make me configurable
+        //~ options.i18n.locale = 'en';
+//~
+        //~ try
+        //~ {
+          //~ var i18n_db = {};
+          //~ for (var lang in LOCALES)
+          //~ {
+            //~ i18n_db[lang] = LOCALES[lang].content;
+            //~ options.i18n.load(LOCALES[lang].content, lang);
+          //~ }
+        //~ }
+        //~ catch (e)
+        //~ {
+        //~ }
+      //~ }
+
+      glome.initialize(options);
 
       jQuery(function()
       {

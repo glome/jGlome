@@ -89,6 +89,11 @@
     this.lastActionTime = null;
 
     /**
+     * The last visited shopping category
+     */
+    this.lastShopCategory = null;
+
+    /**
      * Update last action time
      *
      * @param boolean force
@@ -136,7 +141,11 @@
     }
     catch (e)
     {
-      alert(e);
+      if (console)
+      {
+        this.console = console;
+      }
+      //alert(e);
     }
 
     /**
@@ -190,7 +199,7 @@
             break;
         }
 
-        if (enable)
+        if (enable && plugin.console)
         {
           plugin.console.log(prefix + ': ' + message);
         }
@@ -864,7 +873,8 @@
         div.innerHTML = tmp;
 
         // Populate with i18n data
-        if (   typeof plugin.options.i18n !== 'null'
+        if (   plugin.options.i18n
+            && typeof plugin.options.i18n !== 'undefined'
             && jQuery(div).find('[data-i18n]').size())
         {
           jQuery(div).find('[data-i18n]')
@@ -878,7 +888,7 @@
               {
                 try
                 {
-                  var args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
+                  args = JSON.parse(jQuery(this).attr('data-i18n-arguments'));
                 }
                 catch (e)
                 {
@@ -889,7 +899,7 @@
 
               try
               {
-                var l10n = plugin.options.i18n.parse(str, args)
+                var l10n = plugin.options.i18n.parse(str, args);
 
                 if (jQuery(this).attr('placeholder'))
                 {
@@ -902,7 +912,7 @@
               }
               catch (e)
               {
-                //plugin.Log.warning(e.message);
+                plugin.Log.warning(e.message);
               }
             });
         }
@@ -2131,6 +2141,12 @@
           }
         }
 
+        var title = null;
+        if (typeof filters['title'] !== 'undefined')
+        {
+          title = filters['title'];
+        }
+
         // Loop through the ads and apply filters
         for (i in plugin.Ads.stack)
         {
@@ -2141,8 +2157,8 @@
           {
             // Which object key should be used
             var filterKey = k;
-
             // Filter rules
+
             switch (k)
             {
               // Add here the cases where search is from an array
@@ -2164,7 +2180,17 @@
                   {
                     if (ad[filterKey][j].id == filter[n])
                     {
-                      found = true;
+                      if (title)
+                      {
+                        if (ad.title === title)
+                        {
+                          found = true;
+                        }
+                      }
+                      else
+                      {
+                        found = true;
+                      }
                       break;
                     }
                   }
@@ -2215,9 +2241,9 @@
                   found = true;
                   break;
                 }
-
                 break;
-
+              case 'title':
+                break;
               default:
                 throw new Error('Glome.Ads.listAds does not have a filter ' + k);
             }
@@ -3103,7 +3129,6 @@
           // Model
           this.model = function(args)
           {
-
           };
 
           // View, default operations for all routes
@@ -3115,7 +3140,6 @@
           // View
           this.view = function(args)
           {
-
           };
 
           // Controller, default operations for all routes
@@ -3220,6 +3244,10 @@
             // Model the data
             try
             {
+              if (!args)
+              {
+                args = {};
+              }
               this.modelDefaults(args);
               this.model(args);
             }
@@ -3232,6 +3260,10 @@
             // Create views
             try
             {
+              if (!args)
+              {
+                args = {};
+              }
               this.viewDefaults(args);
               this.view(args);
             }
@@ -3244,6 +3276,10 @@
             // Set controllers
             try
             {
+              if (!args)
+              {
+                args = {};
+              }
               this.controllerDefaults(args);
               this.controller(args);
             }
@@ -3391,10 +3427,12 @@
             this.widget.find('.glome-ad-reward').text(this.widgetAd.bonusTextShort);
             this.widget.find('.glome-ad-logo img').attr('src', this.widgetAd.logo);
             this.widget.attr('data-knocking-ad', this.widgetAd.id);
+            this.widget.attr('data-category', this.widgetAd.adcategories[0].id);
           }
           else
           {
             this.widget.attr('data-knocking-ad', '');
+            this.widget.attr('data-category', '');
             this.widget.attr('data-state', 'closed');
             this.widget.find('.glome-ad-logo img').attr('src', '');
           }
@@ -3486,7 +3524,7 @@
             .off('click.glome')
             .on('click.glome', function(e)
             {
-              plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad')});
+              plugin.MVC.run('ShowItem', {adId: jQuery(this).parents('[data-knocking-ad]').attr('data-knocking-ad'), forceCategory: jQuery(this).parents('[data-category]').attr('data-category')});
               return true;
             });
         }
@@ -3531,9 +3569,9 @@
           widget.stopTime('heartbeat');
 
           var period = plugin.pref('turnoff').toString();
-          alert(plugin.options.i18n.parse('turnoff', [period]));
+          alert(plugin.options.i18n.parse('start_coffee_break', [period]));
 
-          plugin.Log.debug(plugin.options.i18n.parse('turnoff', [period]));
+          plugin.Log.debug(plugin.options.i18n.parse('start_coffee_break', [period]));
 
           if (this.args.reopen)
           {
@@ -3948,8 +3986,8 @@
         return m;
       },
 
-      /* !Public: Show an ad */
-      ShowAd: function()
+      /* !Public: Show an ad with new layout */
+      ShowItem: function()
       {
         function mvc()
         {
@@ -3985,9 +4023,12 @@
           {
             this.category = new plugin.Categories.Category(this.ad.adcategories[0]);
           }
-
+          // preserve the shopping category for navigation purposes
+          plugin.lastShopCategory = this.category.id;
           plugin.Ads.adId = parseInt(args.adId);
           plugin.Categories.categoryId = this.category.id;
+
+          this.more_from_brand = plugin.Ads.listAds({subscribed: 1, title: this.ad.title});
         }
 
         mvc.prototype.view = function(args)
@@ -4000,34 +4041,51 @@
             advertiser: this.ad.advertiser,
             bonus: this.ad.bonusText,
             bonustextshort: this.ad.bonusTextShort,
-            adId: this.ad.id,
-            categoryId: this.category.id
+            id: this.ad.id,
+            category: this.category.id,
+            content: this.ad.content
           }
 
           this.viewInit();
-          this.content = plugin.Templates.populate('public-ad', vars);
+          this.content = plugin.Templates.populate('public-item', vars);
+          this.content.find('.glome-ad-image').get(0).src = this.ad.content;
           this.content.appendTo(this.contentArea);
 
-          this.content.find('.glome-ad-image').get(0).src = this.ad.content;
+          this.content.find('.more-from-brand > .ad').remove();
+
+          // hide things if there are no more ads from this brand
+          if (Object.keys(this.more_from_brand).length <= 1)
+          {
+            this.content.find('.more-from-brand').prev().hide();
+            this.content.find('.more-from-brand').hide();
+          }
+          else
+          {
+            for (var i in this.more_from_brand)
+            {
+              var ad = this.more_from_brand[i];
+              if (ad.id === this.ad.id)
+              {
+                continue;
+              }
+              jQuery.extend(ad, {category: this.category.id});
+              var row = plugin.Templates.populate('more-from-brand', ad);
+              row.find('img').attr('src', ad.content);
+              row.appendTo(this.content.find('.more-from-brand'));
+            }
+          }
         }
 
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
-          plugin.options.container.find('.glome-category-title, .glome-category-title a')
+
+          // show shop
+          this.content.find('.glome-to-shop')
             .on('click.glome', function(e)
             {
-              var categoryId = plugin.Categories.categoryId;
-
-              if (!categoryId)
-              {
-                plugin.MVC.run('ShowAllCategories');
-              }
-              else
-              {
-                plugin.MVC.run('ShowCategory', {categoryId: categoryId});
-              }
-
+              var categoryId = jQuery(this).parents('[data-category-id]').attr('data-category-id');
+              plugin.MVC.run('ShowShop', {categoryId: categoryId});
               return false;
             });
 
@@ -4035,7 +4093,6 @@
             .on('click.glome', function(e)
             {
               plugin.Ads.click(plugin.mvc.ad.id);
-              //plugin.Browser.openUrl(plugin.mvc.ad.id);
               plugin.options.container.find('.glome-close').trigger('click');
               return false;
             });
@@ -4044,10 +4101,16 @@
             .on('click.glome', function(e)
             {
               plugin.Ads.notnow(plugin.Ads.adId);
+              plugin.options.container.find('.glome-to-shop').trigger('click');
+              return false;
+            });
 
-              // Display parent category
-              plugin.options.container.find('.glome-category-title a').trigger('click');
-
+          // click handler for ads from same brand
+          this.content.find('.more-from-brand .ad')
+            .off('click.glome')
+            .on('click.glome', function(e)
+            {
+              plugin.MVC.run('ShowItem', {adId: jQuery(this).attr('data-ad-id'), forceCategory: Number(jQuery(this).attr('data-category-id'))});
               return false;
             });
         }
@@ -4057,8 +4120,8 @@
         return m;
       },
 
-      /* !Public: Show category ads */
-      ShowCategory: function()
+      /* !Public: Show categories and ads */
+      ShowShop: function()
       {
         function mvc()
         {
@@ -4068,14 +4131,18 @@
 
         mvc.prototype.model = function(args)
         {
-          if (!args)
+          if (   plugin.lastShopCategory
+              && ! args.categoryId)
           {
-            args = {}
+            args.categoryId = plugin.lastShopCategory;
           }
+
           if (!args.categoryId)
           {
             args.categoryId = Object.keys(plugin.Categories.stack)[0];
           }
+          // preserve the shopping category for navigation purposes
+          plugin.lastShopCategory = args.categoryId;
 
           this.category = new plugin.Categories.Category(args.categoryId);
           this.ads = plugin.Ads.listAds({category: Number(args.categoryId)});
@@ -4085,97 +4152,66 @@
         mvc.prototype.view = function(args)
         {
           this.viewInit();
-          this.content = plugin.Templates.populate('public-category', this.category);
+          this.content = plugin.Templates.populate('public-shop'); //, this.category);
           this.content.appendTo(this.contentArea);
 
-          // Display ads
-          this.content.find('.glome-ad-list > .glome-ad-row').remove();
-
-          for (var i in this.ads)
-          {
-            var ad = this.ads[i];
-            var row = plugin.Templates.populate('ad-row', ad);
-
-            row.find('img').attr('src', ad.content);
-
-            row.appendTo(this.content.find('.glome-ad-list'));
-          }
-        }
-
-        mvc.prototype.controller = function(args)
-        {
-          this.controllerInit(args);
-          this.content.find('.glome-link-previous')
-            .on('click.glome', function(e)
-            {
-              plugin.MVC.run('ShowAllCategories');
-              return false;
-            });
-
-          this.content.find('.glome-ad-row').find('a')
-            .off('click.glome')
-            .on('click.glome', function(e)
-            {
-              plugin.MVC.run('ShowAd', {adId: jQuery(this).parents('[data-ad-id]').attr('data-ad-id'), forceCategory: Number(jQuery(this).parents('[data-category-id]').attr('data-category-id'))});
-              return false;
-            });
-        }
-
-        var m = new mvc();
-
-        return m;
-      },
-
-      /* !Public: Show all categories */
-      ShowAllCategories: function()
-      {
-        function mvc()
-        {
-        }
-
-        mvc.prototype = new plugin.MVC.Public();
-
-        mvc.prototype.model = function(args)
-        {
-        }
-
-        mvc.prototype.view = function(args)
-        {
-          this.viewInit();
-          this.content = plugin.Templates.populate('public-categorylist');
-          this.content.appendTo(this.contentArea);
-
-          this.content.find('.glome-category-list > .glome-category').remove();
+          // Populate categories to the shop nav
+          this.content.find('#glomePublicShop .nav .glome-category').remove();
 
           for (var i in plugin.Categories.listCategories({subscribed: 1}))
           {
             var category = plugin.Categories.stack[i];
+            var row = plugin.Templates.populate('nav-category-list-row', category).appendTo(this.content.find('.nav'));
+          }
 
-            // Hide categories without any ads
-            if (!plugin.Ads.count({category: category.id}))
+          // Display ads
+          this.content.find('.ad-list > .ad').remove();
+
+          for (var i in this.ads)
+          {
+            var ad = this.ads[i];
+            var vars =
             {
-              continue;
+              id: ad.id,
+              category: args.categoryId,
+              title: ad.title,
+              bonus: ad.bonusText,
+              content: ad.content
             }
 
-            var row = plugin.Templates.populate('category-list-row', category).appendTo(this.content.find('.glome-category-list'));
+            var row = plugin.Templates.populate('shop-ad', vars);
+            row.find('img').attr('src', ad.content);
+            row.appendTo(this.content.find('.ad-list'));
           }
         }
 
         mvc.prototype.controller = function(args)
         {
           this.controllerInit(args);
-          this.content.find('.glome-category-list > .glome-category')
+
+          this.content.find('.ad .module')
+            .off('click.glome')
             .on('click.glome', function(e)
             {
-              plugin.MVC.run('ShowCategory', {categoryId: jQuery(this).attr('data-category-id')});
+              plugin.MVC.run('ShowItem', {adId: jQuery(this).parents('[data-ad-id]').attr('data-ad-id'), forceCategory: Number(jQuery(this).parents('[data-category-id]').attr('data-category-id'))});
+              return false;
+            });
+
+          this.content.find('.nav').find('li.glome-category')
+            .off('click.glome')
+            .on('click.glome', function(e)
+            {
+              plugin.MVC.run('ShowShop', {categoryId: jQuery(this).attr('data-category-id')});
               return false;
             });
         }
 
         var m = new mvc();
+
         return m;
       },
 
+      /* */
       Navigation: function()
       {
         function mvc()

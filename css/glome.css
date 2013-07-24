@@ -71,13 +71,17 @@
   float: left; }
   @media screen and (max-width: 689px) {
     [data-glome-container="true"] .glome-layout-cols-2 > * {
-      float: none !important;
-      margin-left: 0 !important;
-      clear: both; } }
+      margin-left: 0 !important; }
+      [data-glome-container="true"] .glome-layout-cols-2 > * [class^='glome'] {
+        float: none !important;
+        clear: both; } }
 [data-glome-container="true"] .glome-layout-cols-2 > * + * {
   display: block;
-  float: right;
-  margin-left: 0; }
+  margin-left: 0;
+  float: right; }
+  @media screen and (max-width: 689px) {
+    [data-glome-container="true"] .glome-layout-cols-2 > * + * {
+      float: none; } }
 [data-glome-container="true"] .glome-fixed {
   position: fixed; }
   @media screen and (max-width: 689px) {
@@ -690,6 +694,8 @@
     #glomeAdminHeader {
       padding-top: 20px;
       height: 88.5px; } }
+  #glomeAdminHeader, #glomeAdminHeader a {
+    color: #4d4d4d; }
 
 #glomeAdmin .glome-close {
   background-image: url(../images/icons/circle-x.svg);
@@ -698,7 +704,8 @@
   background-repeat: no-repeat;
   width: 40px;
   height: 40px;
-  opacity: 0.5; }
+  opacity: 0.5;
+  display: inline-block; }
   #glomeAdmin .glome-close:hover {
     opacity: 1; }
 
@@ -1052,6 +1059,8 @@
   right: 0;
   padding: 40px 0;
   height: 177px; }
+  #glomePublicHeader, #glomePublicHeader a {
+    color: #cccccc; }
   #glomePublicHeader .glome-icon {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -1072,12 +1081,23 @@
         height: 53px;
         background-size: 38px 53px; } }
 
-#glomePublicFooter {
+#glomePublicHeader,
+#glomeAdminHeader {
   letter-spacing: 0.5pt; }
-  #glomePublicFooter,
-  #glomePublicFooter a {
-    color: #cccccc; }
-  #glomePublicFooter .glome-settings {
+  #glomePublicHeader .glome-section,
+  #glomeAdminHeader .glome-section {
+    position: fixed;
+    right: 0;
+    top: 0; }
+    #glomePublicHeader .glome-section a,
+    #glomeAdminHeader .glome-section a {
+      vertical-align: top;
+      position: relative;
+      top: 20px;
+      right: 50px;
+      margin-right: 10px; }
+  #glomePublicHeader .glome-settings,
+  #glomeAdminHeader .glome-settings {
     background-image: url(../images/icons/icon-settings-white.svg);
     background-size: 30px 30px;
     display: inline-block;
@@ -1086,8 +1106,15 @@
     width: 30px;
     height: 30px;
     opacity: 0.7; }
-    #glomePublicFooter .glome-settings:hover {
+    #glomePublicHeader .glome-settings:hover,
+    #glomeAdminHeader .glome-settings:hover {
       opacity: 1; }
+
+#glomePublicFooter {
+  letter-spacing: 0.5pt; }
+  #glomePublicFooter,
+  #glomePublicFooter a {
+    color: #cccccc; }
 
 #glomePublicContent {
   -webkit-box-sizing: border-box;
@@ -1173,6 +1200,7 @@
   width: 40px;
   height: 40px;
   opacity: 0.5;
+  display: inline-block;
   background-image: url("../images/icons/icon-x-white.svg"); }
   #glomePublic .glome-close:hover {
     opacity: 1; }
@@ -1214,36 +1242,36 @@
     opacity: 1; }
 
 /* !View ad */
-#glomePublicAd button {
+.adwrapper button {
   font-size: 11px !important; }
-#glomePublicAd button + button {
+.adwrapper button + button {
   float: right; }
-#glomePublicAd .glome-ad-actions {
+.adwrapper .glome-ad-actions {
   margin-top: 20px; }
-#glomePublicAd .glome-cols-ad-description {
+.adwrapper .glome-cols-ad-description {
   width: 210px;
   margin-left: 15px; }
-  #glomePublicAd .glome-cols-ad-description .glome-advertiser {
+  .adwrapper .glome-cols-ad-description .glome-advertiser {
     margin: 0 0 1em;
     text-transform: uppercase; }
-  #glomePublicAd .glome-cols-ad-description h1 {
+  .adwrapper .glome-cols-ad-description h1 {
     font-size: 25px;
     font-weight: 700;
     margin: 0; }
-  #glomePublicAd .glome-cols-ad-description .bonus-short {
+  .adwrapper .glome-cols-ad-description .bonus-short {
     margin: 20px 0 10px;
     font-weight: 900;
     font-size: 45px; }
-#glomePublicAd .glome-ad-bonus h2 {
+.adwrapper .glome-ad-bonus h2 {
   margin-top: 0 !important; }
-#glomePublicAd .glome-bonus {
+.adwrapper .glome-bonus {
   text-transform: uppercase; }
-#glomePublicAd .glome-cols-ad-image {
+.adwrapper .glome-cols-ad-image {
   width: 300px; }
-  #glomePublicAd .glome-cols-ad-image img {
+  .adwrapper .glome-cols-ad-image img {
     min-width: 300px;
     max-width: 300px; }
-#glomePublicAd .glome-button {
+.adwrapper .glome-button {
   -webkit-box-sizing: margin-box;
   -moz-box-sizing: margin-box;
   -ms-box-sizing: margin-box;
@@ -1255,7 +1283,7 @@
   vertical-align: middle;
   margin-left: -3px;
   text-transform: uppercase; }
-  #glomePublicAd .glome-button:before {
+  .adwrapper .glome-button:before {
     content: "";
     display: none;
     height: 38px;
@@ -1263,34 +1291,34 @@
     background-position: center top;
     background-size: 38px 38px;
     opacity: 0.4; }
-  #glomePublicAd .glome-button.glome-goto-ad:before {
+  .adwrapper .glome-button.glome-goto-ad:before {
     background-image: url("../images/icons/circle-arrow.svg"); }
-  #glomePublicAd .glome-button.glome-notnow-ad {
+  .adwrapper .glome-button.glome-notnow-ad {
     color: rgba(0, 0, 0, 0.5); }
-  #glomePublicAd .glome-button.glome-notnow-ad:before {
+  .adwrapper .glome-button.glome-notnow-ad:before {
     background-image: url("../images/icons/circle-x.svg"); }
-  #glomePublicAd .glome-button:hover, #glomePublicAd .glome-button:hover:before {
+  .adwrapper .glome-button:hover, .adwrapper .glome-button:hover:before {
     color: rgba(0, 0, 0, 0.5);
     opacity: 0.8; }
-#glomePublicAd .glome-button + .glome-button {
+.adwrapper .glome-button + .glome-button {
   margin-left: 0; }
 @media screen and (max-width: 824px) and (min-width: 690px) {
-  #glomePublicAd .glome-cols-4 {
+  .adwrapper .glome-cols-4 {
     width: 390px; }
-    #glomePublicAd .glome-cols-4 .glome-layout-cols-2 > * {
+    .adwrapper .glome-cols-4 .glome-layout-cols-2 > * {
       clear: both !important;
       float: none !important; } }
 @media screen and (max-width: 689px) and (min-width: 555px) {
-  #glomePublicAd .glome-cols-4 {
+  .adwrapper .glome-cols-4 {
     width: 390px; } }
-#glomePublicAd .glome-config {
+.adwrapper .glome-config {
   background-image: url(../images/icons/icon-settings.svg);
   background-size: 30px 30px;
   display: inline-block;
   width: 30px;
   height: 30px;
   opacity: 0.7; }
-  #glomePublicAd .glome-config:hover {
+  .adwrapper .glome-config:hover {
     opacity: 1; }
 
 #glomePublicCategory .glome-ad-row .glome-text-container h1,
@@ -1404,3 +1432,120 @@ div.remove-password {
 
 div#rawdata {
   display: none; }
+
+/** new layout **/
+#glomePublicShop .shop-menu {
+  display: inline-block;
+  max-width: 33%;
+  float: left !important;
+  clear: none; }
+  @media screen and (max-width: 419px) {
+    #glomePublicShop .shop-menu {
+      max-width: 50%;
+      margin-right: 5px; } }
+  #glomePublicShop .shop-menu .search {
+    width: 90%;
+    background-color: transparent;
+    color: black;
+    border: 1px solid grey;
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px; }
+  #glomePublicShop .shop-menu .nav {
+    margin: 10px 0 5px 0;
+    padding: 0; }
+    #glomePublicShop .shop-menu .nav li {
+      display: block;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer; }
+      #glomePublicShop .shop-menu .nav li:hover {
+        text-decoration: underline; }
+      #glomePublicShop .shop-menu .nav li:selected {
+        color: green; }
+    #glomePublicShop .shop-menu .nav li.none {
+      font-weight: normal;
+      cursor: default; }
+      #glomePublicShop .shop-menu .nav li.none:hover {
+        text-decoration: none; }
+#glomePublicShop .ad-list {
+  width: 66%;
+  margin: 0 0 2px 0;
+  padding: 2px 0 2px 2px; }
+  @media screen and (max-width: 689px) {
+    #glomePublicShop .ad-list {
+      width: 100%;
+      clear: none; } }
+  #glomePublicShop .ad-list .ad {
+    margin: 8px 0;
+    height: 215px;
+    float: left;
+    width: 33.33%;
+    cursor: pointer; }
+    @media screen and (max-width: 969px) {
+      #glomePublicShop .ad-list .ad {
+        height: 185px; } }
+    @media screen and (max-width: 689px) {
+      #glomePublicShop .ad-list .ad {
+        height: 235px; } }
+    @media screen and (max-width: 554px) {
+      #glomePublicShop .ad-list .ad {
+        height: 160px;
+        min-width: 120px; } }
+    @media screen and (max-width: 419px) {
+      #glomePublicShop .ad-list .ad {
+        height: 160px;
+        min-width: 120px; } }
+    #glomePublicShop .ad-list .ad .module {
+      padding: 2px; }
+      #glomePublicShop .ad-list .ad .module .image-container img {
+        height: 150px;
+        min-height: 100px;
+        clear: none; }
+        @media screen and (max-width: 969px) {
+          #glomePublicShop .ad-list .ad .module .image-container img {
+            height: 140px; } }
+        @media screen and (max-width: 824px) {
+          #glomePublicShop .ad-list .ad .module .image-container img {
+            height: 120px; } }
+        @media screen and (max-width: 689px) {
+          #glomePublicShop .ad-list .ad .module .image-container img {
+            height: 140px; } }
+        @media screen and (max-width: 554px) {
+          #glomePublicShop .ad-list .ad .module .image-container img {
+            height: 105px; } }
+        @media screen and (max-width: 824px) and (min-width: 690px) {
+          #glomePublicShop .ad-list .ad .module .image-container img {
+            height: 115px; } }
+      #glomePublicShop .ad-list .ad .module .title {
+        font-size: 18px;
+        max-height: 32px;
+        margin: 0 0 3px 0;
+        overflow: hidden; }
+      #glomePublicShop .ad-list .ad .module .bonus {
+        font-size: 14px;
+        font-weight: bold;
+        max-height: 32px;
+        margin: 0; }
+
+#glomeShopItem .left {
+  width: 35%; }
+  #glomeShopItem .left .more-from-brand {
+    width: 100%;
+    min-height: 110px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: 5px; }
+    #glomeShopItem .left .more-from-brand .ad {
+      float: left;
+      margin-right: 5px; }
+      #glomeShopItem .left .more-from-brand .ad img {
+        height: 100px; }
+
+a.layout {
+  cursor: pointer; }
+  a.layout:hover {
+    text-decoration: underline; }

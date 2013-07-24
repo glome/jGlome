@@ -91,5 +91,12 @@
 "stats data headers action":"Action",
 "stats data headers value":"Value",
 "stats most visited title": "Most visited sites",
-"turnoff":"Thank you for the coffee break. I will be back in 1 hour. Best regards, Glome"
+"start_coffee_break":"Thank you for the coffee break. I will be back in 1 hour. Best regards, Glome",
+"turn_off":"Turn Glome off",
+"get_bonus_for_shopping":"Get bonus for shopping",
+"shop":"Shop",
+"shop_navi_home":"Home - coming soon",
+"shop_navi_popular":"Most popular - coming soon",
+"shop_navi_new":"New offers - coming soon",
+"more_from":"More from $1"
 }

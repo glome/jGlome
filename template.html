@@ -19,7 +19,12 @@
         <!-- !Admin interface -->
         <div id="glomeAdmin" data-glome-template="admin-wrapper" data-context="admin" data-glome-container="true" class="glome-fullscreen-container glome-margin-top glome-margin-bottom" style="display: none;">
           <div class="glome-header glome-margin-top glome-clearfix" data-glome-template="admin-header" id="glomeAdminHeader">
-            <div class="glome-close glome-margin-top" data-close-context="admin"></div>
+            <div class="glome-section glome-margin-top">
+              <a href="#show-shop" data-glome-mvc="ShowShop" data-i18n="shop">Shop</a>
+              <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
+              <a href="#widget-widget" class="glome-off" data-glome-mvc="CloseGlome" data-i18n="turn_off">Turn Glome off</a>
+              <div class="glome-close glome-margin-top" data-close-context="admin"></div>
+            </div>
               <div class="glome-full-width">
                 <div class="glome-icon"></div>
                 <ul class="glome-navigation" data-glome-template="navigation-container">
@@ -237,18 +242,11 @@
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="admin-footer" id="glomeAdminFooter">
             <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
-                <span class="glome-copyright">Glome Inc, 2013</span>
+                <span><a href="http://glome.me" target="_blank"><span class="glome-copyright">Glome Inc, 2013</span></a></span>
                 <span class="glome-text-separator"></span>
                 <a>FAQ</a>
                 <span class="glome-text-separator"></span>
-                <a>Contact</a>
-                <span class="glome-text-separator"></span>
-                <a href="http://glome.me/" target="_blank">glome.me</a>
-              </div>
-              <div class="glome-section">
-                <a href="#public-categorylist" data-glome-mvc="ShowAllCategories" class="glome-icon glome-cart"></a>
-                <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-glome-mvc="CloseGlome">Turn Glome off</a>
+                <a>Feedback</a>
               </div>
             </div>
           </div>
@@ -257,7 +255,12 @@
         <!-- !Public side -->
         <div id="glomePublic" data-glome-template="public-wrapper" data-context="public" data-glome-container="true" class="glome-fullscreen-container glome-margin-top glome-margin-bottom" style="display: none;">
           <div class="glome-header glome-margin-top glome-clearfix" data-glome-template="public-header" id="glomePublicHeader">
-            <div class="glome-close glome-margin-top" data-close-context="public"></div>
+            <div class="glome-section glome-margin-top">
+              <a href="#show-shop" data-glome-mvc="ShowShop" data-i18n="shop">Shop</a>
+              <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
+              <a href="#widget-widget" class="glome-off" data-glome-mvc="CloseGlome" data-i18n="turn_off">Turn Glome off</a>
+              <div class="glome-close glome-margin-top" data-close-context="public"></div>
+            </div>
             <div class="glome-full-width">
               <div class="glome-icon"></div>
             </div>
@@ -384,80 +387,59 @@
                   </p>
                 </div>
 
-                <!-- !All categories view -->
-                <div id="glomePublicCategoryList" class="glome-content glome-layout-cols-2" data-glome-template="public-categorylist" data-page="categorylist">
-                  <div class="glome-cols-2 glome-fixed">
-                    <h1 data-i18n="get bonus for shopping online">Get bonus for shopping online</h1>
-                    <p>
-                      <span data-i18n="we are on a constant journey to gather the best deals from the online world and bring them to you with a bonus">We are on a constant journey to gather the best deals from the online world and bring them to you with a bonus.</span>
-                      <span data-i18n="it is really simple">It's really simple</span>:
-                    </p>
-                    <ol>
-                      <li data-i18n="browse the categories to find offers you are interested in">Browse the categories to find offers you are interested in</li>
-                      <li data-i18n="click through our offer and buy online as normal">Click through our offer and buy online as normal</li>
-                      <li data-i18n="earn bonus from purchases made">Earn bonus from purchases made</li>
-                    </ol>
-                    <hr class="glome-short" />
+                <!-- !New shop view -->
+                <div id="glomePublicShop" class="glome-content glome-layout-cols-2" data-glome-template="public-shop" data-page="shop">
+                  <div class="shop-menu left">
+                    <h1 data-i18n="get_bonus_for_shopping">Get bonus for shopping</h1>
+                    <input type="text" class="search" placeholder="Search offers - coming soon"/>
+                    <ul class="nav">
+                      <li data-i18n="shop_navi_home">Home - coming soon</li>
+                      <li data-i18n="shop_navi_popular">Most popular - coming soon</li>
+                      <li data-i18n="shop_navi_new">New offers - coming soon</li>
+                      <li class="none">--</li>
+                      <li class="glome-category glome-row" data-i18n="{name}" data-glome-template="nav-category-list-row" data-category-id="{id}">
+                        <a href="#public-shop">{name}</a>
+                      </li>
+                    </ul>
                   </div>
-                  <div class="glome-cols-4-margin-2 glome-clearfix glome-category-list">
-                    <!-- Row -->
-                    <div class="glome-category glome-row glome-with-separator" data-glome-template="category-list-row" data-category-id="{id}">
-                      <div class="glome-text-container">
-                        <h1 class="glome-category-title"><a href="#public-category">{name}</a></h1>
-                        <p class="glome-short-description">{description}</p>
-                      </div>
-                      <div class="glome-button-container">
-                        <a class="glome-link glome-link-next" href="#public-category"></a>
+                  <div class="ad-list">
+                    <div class="ad" data-glome-template="shop-ad" data-ad-id="{id}" data-category-id="{category}">
+                      <div class="module">
+                        <div class="image-container">
+                          <img src="images/template/audi-splash.jpg" alt="" />
+                        </div>
+                        <div class="text-container">
+                          <h1 class="title">{title}</h1>
+                          <p class="bonus">{bonus}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- !Category view -->
-                <div id="glomePublicCategory" class="glome-content glome-layout-cols-2" data-glome-template="public-category" data-page="category" data-category-id="{id}">
-                  <div class="glome-cols-2 glome-fixed">
-                    <h1 class="glome-action-title">
-                      <a href="#public-categorylist" class="glome-link glome-link-previous glome-all-categories"></a>
-                      {name}
+                <!-- !New shop item view -->
+                <div id="glomeShopItem" class="adwrapper glome-content glome-layout-cols-2" data-glome-template="public-item" data-page="item" data-ad-id="{id}" data-category-id="{category}">
+                  <div class="left">
+                    <h1 class="glome-to-shop glome-action-title">
+                      <span class="glome-link glome-link-previous"></span>
+                      <span data-i18n="shop">Shop</span>
                     </h1>
-                    <p data-i18n="there {{plural:$1|is|are}} $1 {{plural:$1|offer|offers}} in this category" data-i18n-arguments="[&quot;{offers}&quot;]">
-                      There are offers in this category
-                    </p>
-                    <hr class="glome-short" />
-                  </div>
-                  <div class="glome-cols-4-margin-2 glome-clearfix glome-ad-list">
-                    <!-- Row -->
-                    <div class="glome-ad glome-ad-row glome-cols-4-margin-2 glome-row glome-with-separator" data-glome-template="ad-row" data-ad-id="{id}">
-                      <div class="glome-image-container"><a href="#public-ad"><img src="images/template/audi-splash.jpg" alt="" /></a></div>
-                      <div class="glome-text-container">
-                        <h1 class="glome-ad-title"><a href="#public-ad">{title}</a></h1>
-                        <p class="glome-short-description">
-                          <a href="#public-ad">{description}</a>
-                        </p>
-                      </div>
-                      <div class="glome-button-container">
-                        <a class="glome-link glome-link-next" href="#public-ad"></a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <span data-i18n="more_from" data-i18n-arguments="[&quot;{advertiser}&quot;]">More from</span>
 
-                <!-- !Ad view -->
-                <div id="glomePublicAd" class="glome-content glome-layout-cols-2" data-glome-template="public-ad" data-page="ad" data-ad-id="{adId}" data-category-id="{categoryId}" data-ad-action="{adAction}">
-                  <div class="glome-cols-2 glome-fixed">
-                    <h1 class="glome-category-title glome-action-title"><a href="#public-category" class="glome-link glome-link-previous"></a> {name}</h1>
-                    <p>
-                      <a class="glome-category-title" href="#public-category" data-i18n="see more in $1" data-i18n-arguments="[&quot;{name}&quot;]">See more</a>
-                    </p>
-                    <hr class="glome-short" />
-                    <div class="glome-configuration">
-                      <div class="glome-config" data-glome-mvc="AdminProfile"></div>
+                    <div class="more-from-brand">
+                      <div class="ad" data-glome-template="more-from-brand" data-ad-id="{id}" data-category-id="{category}">
+                        <div class="image-container">
+                          <img src="images/template/audi-splash.jpg" alt="" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="glome-cols-4">
                     <div class="glome-layout-cols-2 glome-clearfix">
                       <div class="glome-cols-ad-image">
-                        <a><img src="images/template/marrakech.jpg" alt="" class="glome-cols-2 glome-ad-image" /></a>
+                        <a>
+                          <img src="images/template/marrakech.jpg" alt="" class="glome-cols-2 glome-ad-image" />
+                        </a>
                       </div>
                       <div class="glome-cols-ad-description">
                         <p class="glome-advertiser">{advertiser}</p>
@@ -470,39 +452,29 @@
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
           <div class="glome-footer glome-margin-bottom glome-clearfix" data-glome-template="public-footer" id="glomePublicFooter">
             <div class="glome-full-width glome-layout-cols-2">
               <div class="glome-section">
-                <span><span class="glome-copyright">Glome Inc, 2013</span></span>
+                <span><a href="http://glome.me" target="_blank"><span class="glome-copyright">Glome Inc, 2013</span></a></span>
                 <span class="glome-text-separator"></span>
                 <a>FAQ</a>
                 <span class="glome-text-separator"></span>
-                <a>Contact</a>
-                <span class="glome-text-separator"></span>
-                <a href="http://glome.me/" target="_blank">glome.me</a>
-                <span class="glome-text-separator"></span>
-                <a href="#admin-profile" data-glome-mvc="AdminProfile" data-i18n="profile">Profile</a>
-                <span class="glome-text-separator"></span>
-                <a class="force-reload" data-i18n="reload ads">Reload ads</a>
-              </div>
-              <div class="glome-section">
-                <a href="#admin-profile" data-glome-mvc="AdminProfile" class="glome-icon glome-settings"></a>
-                <span class="glome-line-separator"></span>
-                <a href="#widget-widget" data-i18n="turn glome off" class="glome-uppercase glome-off" data-glome-mvc="CloseGlome">Turn Glome off</a>
+                <a>Feedback</a>
               </div>
             </div>
           </div>
         </div>
         <!-- !Widget -->
-        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="closed" data-knocking-ad="">
+        <div id="glomeWidget" data-glome-template="widget" data-context="widget" data-glome-container="true" data-state="closed" data-knocking-ad="" data-category="">
           <div id="glomeWidgetContent" data-page="widget">
-            <a href="#public-ad" class="glome-ad-logo">
+            <a href="#public-item" class="glome-ad-logo">
               <img src="images/icons/glome-icon-light.svg" alt="Glome" />
             </a>
-            <a href="#public-ad" class="glome-ad-title">{title}</a>
+            <a href="#public-item" class="glome-ad-title">{title}</a>
             <div class="glome-ad-reward">{bonus}</div>
           </div>
           <div id="glomeWidgetIcon"></div>
