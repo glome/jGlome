@@ -3158,6 +3158,11 @@
                   if (e.keyCode === 27)
                   {
                     var focus = false;
+
+                    if (! plugin)
+                    {
+                      return;
+                    }
                     var inputs = plugin.options.container.find('input, select, textarea');
 
                     for (var i = 0; i < inputs.size(); i++)
