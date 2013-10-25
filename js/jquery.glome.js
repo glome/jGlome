@@ -4824,13 +4824,26 @@
           this.content = plugin.Templates.populate('admin-settings', {});
           this.content.appendTo(this.contentArea);
 
-          if (plugin.syncCode)
-          {
-            jQuery('#glomeAdminSettingsPairDevices').find('button').hide();
-            jQuery('#glomeAdminSettingsPairDevices').find('input.code1').val(plugin.syncCode.substr(0, 4));
-            jQuery('#glomeAdminSettingsPairDevices').find('input.code2').val(plugin.syncCode.substr(3, 4));
-            jQuery('#glomeAdminSettingsPairDevices').find('input.code3').val(plugin.syncCode.substr(7, 4));
-          }
+          // fetch sync code
+          plugin.Auth.getSyncCode(
+            function(data)
+            {
+              plugin.Log.debug('code: ' + data[0].code);
+
+              if (data.length && data[0] && data[0].code)
+              {
+                plugin.syncCode = data[0].code
+                jQuery('#glomeAdminSettingsPairDevices').find('button').hide();
+                jQuery('#glomeAdminSettingsPairDevices').find('input.code1').val(plugin.syncCode.substr(0, 4));
+                jQuery('#glomeAdminSettingsPairDevices').find('input.code2').val(plugin.syncCode.substr(3, 4));
+                jQuery('#glomeAdminSettingsPairDevices').find('input.code3').val(plugin.syncCode.substr(7, 4));
+              }
+            },
+            function()
+            {
+              plugin.Log.debug('Error when trying to fetch open sync codes.');
+            }
+          );
         }
 
         mvc.prototype.controller = function(args)
