@@ -74,6 +74,7 @@
     this.templateLocation = 'template.html';
     this.userData = null;
     this.stats = null;
+    this.syncCode = null;
 
     /**
      * Current MVC instance
@@ -155,7 +156,7 @@
      */
     plugin.id = function()
     {
-      if (!this.glomeid)
+      if (! this.glomeid)
       {
         this.glomeid = this.pref('glomeid');
       }
@@ -981,7 +982,12 @@
         {
           url: 'users/{glomeid}/payments/redeem.json',
           allowed: ['read']
-        }
+        },
+        sync:
+        {
+          url: 'users/{glomeid}/sync.json',
+          allowed: ['read', 'create']
+        },
       },
 
       /**
@@ -1400,6 +1406,21 @@
                   plugin.Log.debug('server provided Cookie: ' + cookie);
                 }
               }
+
+              plugin.Auth.getSyncCode(
+                function(data)
+                {
+                  plugin.Log.debug('code: ' + data[0].code);
+                  if (data.length && data[0] && data[0].code)
+                  {
+                    plugin.syncCode = data[0].code
+                  }
+                },
+                function()
+                {
+                  plugin.Log.debug('Error when trying to fetch open sync codes.');
+                }
+              );
             }
             catch (e)
             {
@@ -1644,6 +1665,47 @@
           {},
           callback,
           onerror
+        );
+      },
+
+      /**
+       * Requests currently open sync code
+       */
+      getSyncCode: function(callback, onerror)
+      {
+        plugin.Log.debug('get open sync code');
+
+        if (! plugin.glomeid)
+        {
+          throw new Error('Glome ID is not available');
+        }
+
+        plugin.API.read
+        (
+          'sync',
+          {},
+          callback,
+          onerror
+        );
+      },
+
+      /**
+       * Requests a new sync code for pairing
+       */
+      createSyncCode: function(callback, onerror)
+      {
+        if (! plugin.glomeid)
+        {
+          throw new Error('Glome ID is not available');
+        }
+
+        plugin.API.request
+        (
+          'sync',
+          {},
+          callback,
+          onerror,
+          'POST'
         );
       }
     }
@@ -4761,6 +4823,14 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-settings', {});
           this.content.appendTo(this.contentArea);
+
+          if (plugin.syncCode)
+          {
+            jQuery('#glomeAdminSettingsPairDevices').find('button').hide();
+            jQuery('#glomeAdminSettingsPairDevices').find('input.code1').val(plugin.syncCode.substr(0, 4));
+            jQuery('#glomeAdminSettingsPairDevices').find('input.code2').val(plugin.syncCode.substr(3, 4));
+            jQuery('#glomeAdminSettingsPairDevices').find('input.code3').val(plugin.syncCode.substr(7, 4));
+          }
         }
 
         mvc.prototype.controller = function(args)
@@ -4823,6 +4893,30 @@
                 function(jqXHR)
                 {
                   alert('Failed to remove password protection.');
+                }
+              )
+            });
+
+          // pair Glome IDs
+          this.content.find('#glomeAdminSettingsPairDevices').find('button')
+            .off('click')
+            .on('click', function(e)
+            {
+              e.preventDefault();
+
+              plugin.Auth.createSyncCode
+              (
+                function(data)
+                {
+                  jQuery(e.target).hide();
+
+                  jQuery(e.target).parent().find('input.code1').val(data.code.substr(0, 4));
+                  jQuery(e.target).parent().find('input.code2').val(data.code.substr(3, 4));
+                  jQuery(e.target).parent().find('input.code3').val(data.code.substr(7, 4));
+                },
+                function(jqXHR)
+                {
+                  plugin.Log.error('Did not receive a pairing code.');
                 }
               )
             });
