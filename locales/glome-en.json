@@ -98,5 +98,11 @@
 "shop_navi_home":"Home - coming soon",
 "shop_navi_popular":"Most popular - coming soon",
 "shop_navi_new":"New offers - coming soon",
-"more_from":"More from $1"
+"more_from":"More from $1",
+"your_pairs": "Your pairs",
+"your_pairs_intro": "The footprint of your pairs.",
+"history_date": "Date",
+"history_kind": "Kind of subject",
+"history_action": "Action",
+"history_subject": "Subject"
 }
