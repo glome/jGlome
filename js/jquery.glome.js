@@ -4664,7 +4664,7 @@
                     {
                       var item = plugin.pairs[value.pair.glomeid]['histories'][index];
                       var historyrow = plugin.Templates.populate('admin-history-row', item);
-                      historyrow.appendTo(self.contentArea.find('.rows'));
+                      historyrow.appendTo(self.contentArea.find('.pair-row[data-glome-pair="' + value.pair.glomeid + '"] .rows'));
                     }
                   },
                   null
