@@ -1549,3 +1549,16 @@ a.layout {
   cursor: pointer; }
   a.layout:hover {
     text-decoration: underline; }
+
+.glome-history-row span {
+  display: inline-block; }
+.glome-history-row .header {
+  font-weight: bold; }
+.glome-history-row .date {
+  width: 150px; }
+.glome-history-row .kind {
+  width: 100px; }
+.glome-history-row .action {
+  width: 80px; }
+.glome-history-row .subject {
+  width: 100px; }

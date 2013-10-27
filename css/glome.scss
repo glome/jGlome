@@ -2137,3 +2137,31 @@ a.layout
     text-decoration: underline;
   }
 }
+
+.glome-history-row
+{
+  span
+  {
+    display: inline-block;
+  }
+  .header
+  {
+    font-weight: bold;
+  }
+  .date
+  {
+    width: 150px;
+  }
+  .kind
+  {
+    width: 100px;
+  }
+  .action
+  {
+    width: 80px;
+  }
+  .subject
+  {
+    width: 100px;
+  }
+}
