@@ -75,6 +75,7 @@
     this.userData = null;
     this.stats = null;
     this.syncCode = null;
+    this.pairs = {};
 
     /**
      * Current MVC instance
@@ -958,6 +959,11 @@
           url: 'users/{glomeid}.json',
           allowed: ['read', 'update', 'delete']
         },
+        pair:
+        {
+          url: 'users/{pairid}.json',
+          allowed: ['read']
+        },
         categories:
         {
           url: 'adcategories.json',
@@ -1013,6 +1019,10 @@
           {
             case 'glomeid':
               to = plugin.id();
+              break;
+
+            case 'pairid':
+              to = plugin.pairid;
               break;
 
             case 'subscriptionId':
@@ -1410,10 +1420,13 @@
               plugin.Auth.getSyncCode(
                 function(data)
                 {
-                  plugin.Log.debug('code: ' + data[0].code);
-                  if (data.length && data[0] && data[0].code)
+                  if (data[0])
                   {
-                    plugin.syncCode = data[0].code
+                    plugin.Log.debug('code: ' + data[0].code);
+                    if (data.length && data[0] && data[0].code)
+                    {
+                      plugin.syncCode = data[0].code
+                    }
                   }
                 },
                 function()
@@ -4503,7 +4516,6 @@
       {
         function mvc()
         {
-
         }
 
         var admin = new plugin.MVC.Admin();
@@ -4600,7 +4612,6 @@
       {
         function mvc()
         {
-
         }
 
         mvc.prototype = new plugin.MVC.Admin();
@@ -4617,11 +4628,85 @@
           this.viewInit(args);
           this.content = plugin.Templates.populate('admin-statistics', {});
           this.content.appendTo(this.contentArea);
+
+          var self = this;
+
+          // get data about each paired user
+          if (plugin.userData.children.length)
+          {
+            jQuery.each(plugin.userData.children, function(index, value)
+            {
+              if (value.pair)
+              {
+                plugin.pairid = value.pair.glomeid;
+                // fetch profile of pair which contains the footprint
+                // and put all to one container
+                plugin.Api.get
+                (
+                  'pair',
+                  {},
+                  function(data)
+                  {
+                    plugin.pairs[value.pair.glomeid] = data;
+                    plugin.Log.debug('added: ' + plugin.pairs[value.pair.glomeid]);
+
+                    var row = self.contentArea.find('.pair-row[data-glome-pair="' + value.pair.glomeid + '"]');
+
+                    if (! row.size())
+                    {
+                      var row = plugin.Templates.populate('admin-pair-row', data);
+                      row.appendTo(self.contentArea.find('#glomeAdminStatisticsPairs'));
+                    }
+
+                    plugin.Log.debug('Pair: ' + value.pair.glomeid + ' has ' + Object.keys(plugin.pairs[value.pair.glomeid]['histories']).length + ' history item(s)');
+
+                    for (var index in plugin.pairs[value.pair.glomeid]['histories'])
+                    {
+                      var item = plugin.pairs[value.pair.glomeid]['histories'][index];
+                      var historyrow = plugin.Templates.populate('admin-history-row', item);
+                      historyrow.appendTo(self.contentArea.find('.rows'));
+                    }
+                  },
+                  null
+                );
+
+                plugin.Log.debug('paired with ' + value.pair.glomeid);
+              }
+            });
+          }
+          else
+          {
+            plugin.Log.debug('This user has no pairs');
+          }
+
+          // now fill the templates
+          //~ for (var glomeid in plugin.pairs)
+          //~ {
+            //~ var row = this.contentArea.find('.pair-row[data-glome-pair="' + glomeid + '"]');
+//~
+            //~ if (! row.size())
+            //~ {
+              //~ var row = plugin.Templates.populate('admin-pair-row', plugin.pairs[glomeid]);
+              //~ row.appendTo(this.contentArea.find('#glomeAdminStatisticsPairs'));
+            //~ }
+//~
+            //~ plugin.Log.debug('Pair: ' + glomeid + ' has ' + Object.keys(plugin.pairs[glomeid]['histories']).length + ' history items');
+//~
+            //~ for (var index in plugin.pairs[glomeid]['histories'])
+            //~ {
+              //~ var item = plugin.pairs[glomeid]['histories'][index];
+              //~ var historyrow = plugin.Templates.populate('admin-history-row', item);
+              //~ historyrow.appendTo(this.contentArea.find('.rows'));
+            //~ }
+          //~ }
         }
 
         mvc.prototype.controller = function(args)
         {
+          var self = this;
+
           this.controllerInit(args);
+
           plugin.Statistics.get();
         }
 
@@ -4629,12 +4714,11 @@
         return m;
       },
 
-      /* !MVC: Admin statistics */
+      /* !MVC: Admin rewards */
       AdminRewards: function()
       {
         function mvc()
         {
-
         }
 
         mvc.prototype = new plugin.MVC.Admin();
@@ -4835,8 +4919,8 @@
                 plugin.syncCode = data[0].code
                 jQuery('#glomeAdminSettingsPairDevices').find('button').hide();
                 jQuery('#glomeAdminSettingsPairDevices').find('input.code1').val(plugin.syncCode.substr(0, 4));
-                jQuery('#glomeAdminSettingsPairDevices').find('input.code2').val(plugin.syncCode.substr(3, 4));
-                jQuery('#glomeAdminSettingsPairDevices').find('input.code3').val(plugin.syncCode.substr(7, 4));
+                jQuery('#glomeAdminSettingsPairDevices').find('input.code2').val(plugin.syncCode.substr(4, 4));
+                jQuery('#glomeAdminSettingsPairDevices').find('input.code3').val(plugin.syncCode.substr(8, 4));
               }
             },
             function()
