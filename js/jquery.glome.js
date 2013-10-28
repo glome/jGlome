@@ -5008,8 +5008,8 @@
                   jQuery(e.target).hide();
 
                   jQuery(e.target).parent().find('input.code1').val(data.code.substr(0, 4));
-                  jQuery(e.target).parent().find('input.code2').val(data.code.substr(3, 4));
-                  jQuery(e.target).parent().find('input.code3').val(data.code.substr(7, 4));
+                  jQuery(e.target).parent().find('input.code2').val(data.code.substr(4, 4));
+                  jQuery(e.target).parent().find('input.code3').val(data.code.substr(8, 4));
                 },
                 function(jqXHR)
                 {
