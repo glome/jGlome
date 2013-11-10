@@ -125,6 +125,33 @@
                         </div>
                       </div>
                       <div id="rawdata"></div>
+                      <div id="glomeAdminStatisticsPairs" class="glome-cols-4">
+                        <h1 data-i18n="your_pairs">Your pairs</h1>
+                        <span data-i18n="your_pairs_intro">
+                          The footprint of your pairs
+                        </span>
+                        <!-- Row -->
+                        <div class="glome-history-row" data-glome-template="admin-history-row">
+                          <span class="date" data-type="full">{created_at}</span>
+                          <span class="action" data-type="full">{action}</span>
+                          <span class="kind" data-type="full">{kind}</span>
+                          <span class="id" data-type="full">{subject_id}</span>
+                        </div>
+                        <div class="pair-row glome-row glome-with-separator" data-glome-pair="{glomeid}" data-glome-template="admin-pair-row">
+                          <div class="glome-button-container glome-cols-1">
+                            <h2>{glomeid}</h2>
+                            <div class="rows">
+                              <h4>Application: {parentapp_title}</h4>
+                              <div class="glome-history-row">
+                                <span class="header date" data-i18n="history_date" data-type="full">Date</span>
+                                <span class="header action" data-i18n="history_action" data-type="full">Action</span>
+                                <span class="header kind" data-i18n="history_kind" data-type="full">Kind of subject</span>
+                                <span class="header id" data-i18n="history_subject" data-type="full">Subject</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -137,8 +164,8 @@
 
                         <div class="glome-reward-row" data-glome-template="admin-rewards-row" data-currency="{currency}">
                           <span data-type="full">{full}</span>
-                          <span data-type="decimal-separator" data-i18n="decimal-separator">.</span>
-                          <span data-type="cents">{decimal}</span>
+                          <span data-type="decimal-separator" data-i18n="decimal-separator" class="decimal-separator">.</span>
+                          <span data-type="cents" class="decimal">{decimal}</span>
                           <span data-type="currency" data-i18n="{currency}">{currency}</span>
                         </div>
                         <button class="glome-button glome-hidden redeem" data-glome-template="admin-redeem-button" data-i18n="redeem cash">Redeem cash</button>
@@ -216,23 +243,19 @@
                     <hr class="glome-short" />
                     <div class="glome-layout-cols-2 glome-clearfix">
                       <div class="glome-cols-2">
-                        <h1 data-i18n="pair your devices">Pair your devices</h1>
+                        <h1 data-i18n="pairing_title">Pair your devices</h1>
                         <p>
-                          <span data-i18n="if you already use glome on one device you can pair all of your devices to use the same account">
-                            If you already use Glome on one device you can pair all of your devices to use the same account.
-                          </span>
+                          <span data-i18n="pairing_intro_1">pairing_intro_1</span>
                         </p>
                         <p>
-                          <span data-i18n="use the generate code button to create a unique code for pairing your devices with a glome account">
-                            Use the “generate code” button to create a unique code for pairing your devices with a Glome account.
-                          </span>
+                          <span data-i18n="pairing_intro_2">pairing_intro_2</span>
                         </p>
                       </div>
                       <div id="glomeAdminSettingsPairDevices" class="glome-cols-4">
                         <button class="glome-button"><span data-i18n="generate code">Generate code</span></button>
-                        <input type="text" placeholder="0000" readonly="readonly" />
-                        <input type="text" placeholder="0000" readonly="readonly" />
-                        <input type="text" placeholder="0000" readonly="readonly" />
+                        <input type="text" class='code1' placeholder="0000" readonly="readonly" />
+                        <input type="text" class='code2' placeholder="0000" readonly="readonly" />
+                        <input type="text" class='code3' placeholder="0000" readonly="readonly" />
                       </div>
                     </div>
                   </div>
