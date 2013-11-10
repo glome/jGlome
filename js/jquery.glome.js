@@ -4756,17 +4756,24 @@
             for (var currency in array)
             {
               data.currency = currency;
-              data.full = Math.floor(array[currency] / 100);
-              data.decimal = array[currency] - data.full * 100;
+              var amount = Number(array[currency] / 100).toFixed(2);
+              var splitted = amount.toString().split('.');
+
+              data.full = Number(splitted[0]);
+              data.decimal = splitted[1];
+
+              plugin.Log.debug('amount (number): ' + amount);
+              plugin.Log.debug('data.full (number): ' + data.full);
+              plugin.Log.debug('data.decimal (string): ' + data.decimal);
 
               if (array[currency] > 0)
               {
                 rewards = true;
                 row = plugin.Templates.populate('admin-rewards-row', data);
 
-                if (!data.decimal || data.decimal == 0)
+                if (! parseInt(data.decimal))
                 {
-                  row.find('.decimal-separator, .cents').remove();
+                  row.find('.decimal-separator, .decimal').remove();
                 }
 
                 rows.append(row);
