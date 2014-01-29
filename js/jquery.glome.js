@@ -1365,8 +1365,8 @@
           throw new Error('Glome ID not available');
         }
 
-        if (   !id
-            || !id.toString().match(/^[a-z0-9]+$/))
+        if ( !id
+            || !id.toString().match(/^[a-z0-9_]+$/))
         {
           throw new Error('Glome ID not available');
         }
