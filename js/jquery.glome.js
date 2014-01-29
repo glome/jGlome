@@ -1387,8 +1387,9 @@
           {
             plugin.glomeid = id;
             plugin.pref('glomeid', id);
-            plugin.userData = data;
             plugin.pref('loggedin', true);
+
+            plugin.Auth.getProfile();
 
             // Enforce the last action time. This is a sign of a successful
             // login
